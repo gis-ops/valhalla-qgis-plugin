@@ -1,0 +1,482 @@
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+ valhalla
+                                 A QGIS plugin
+ QGIS client to query openrouteservice
+                              -------------------
+        begin                : 2017-02-01
+        git sha              : $Format:%H$
+        copyright            : (C) 2017 by Nils Nolde
+        email                : nils.nolde@gmail.com
+ ***************************************************************************/
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
+
+import os
+import json
+import webbrowser
+
+from PyQt5.QtWidgets import (QAction,
+                             QDialog,
+                             QApplication,
+                             QMenu,
+                             QMessageBox,
+                             QDialogButtonBox)
+from PyQt5.QtGui import QIcon, QTextDocument
+from PyQt5.QtCore import QSizeF, QPointF
+
+from qgis.core import (QgsProject,
+                       QgsVectorLayer,
+                       QgsTextAnnotation,
+                       QgsMapLayerProxyModel)
+from qgis.gui import QgsMapCanvasAnnotationItem
+import processing
+
+from . import resources_rc
+
+from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
+from valhalla.utils import exceptions, maptools, logger, configmanager, convert, transform
+from valhalla.common import client, directions_core, isochrones_core, matrix_core
+from valhalla.gui import directions_gui, isochrones_gui, matrix_gui
+from valhalla.gui.common_gui import get_locations
+
+from .ValhallaDialogUI import Ui_ValhallaDialogBase
+from .ValhallaDialogConfig import ValhallaDialogConfigMain
+
+
+def on_config_click(parent):
+    """Pop up provider config window. Outside of classes because it's accessed by multiple dialogs.
+
+    :param parent: Sets parent window for modality.
+    :type parent: QDialog
+    """
+    config_dlg = ValhallaDialogConfigMain(parent=parent)
+    config_dlg.exec_()
+
+
+def on_help_click():
+    """Open help URL from button/menu entry."""
+    webbrowser.open(__help__)
+
+
+def on_about_click(parent):
+    """Slot for click event of About button/menu entry."""
+
+    info = 'Provides access to <a href="https://github.com/valhalla/valhalla" style="color: {0}">Valhalla</a> routing functionalities.<br><br>' \
+           '<center>' \
+           '<a href=\"https://gis-ops.com\"><img src=\":/plugins/Valhalla/img/logo_gisops_300.png\"/></a> <br><br>' \
+           '</center>' \
+           'Author: Nils Nolde<br>' \
+           'Email: <a href="mailto:Nils Nolde <{1}>">{1}</a><br>' \
+           'Web: <a href="{2}">{2}</a><br>' \
+           'Repo: <a href="https://github.com/gis-ops/valhalla-qgis-plugin">github.com/gis-ops/valhalla-qgis-plugin</a><br>' \
+           'Version: {3}'.format(DEFAULT_COLOR, __email__, __web__, __version__)
+
+    QMessageBox.information(
+        parent,
+        'About {}'.format(PLUGIN_NAME),
+        info
+    )
+
+
+class ValhallaDialogMain:
+    """Defines all mandatory QGIS things about dialog."""
+
+    def __init__(self, iface):
+        """
+
+        :param iface: the current QGIS interface
+        :type iface: Qgis.Interface
+        """
+        self.iface = iface
+        self.project = QgsProject.instance()
+
+        self.first_start = True
+        # Dialogs
+        self.dlg = None
+        self.menu = None
+        self.actions = None
+
+    def initGui(self):
+        """Called when plugin is activated (on QGIS startup or when activated in Plugin Manager)."""
+
+        def create_icon(f):
+            """
+            internal function to create action icons
+
+            :param f: file name of icon.
+            :type f: str
+
+            :returns: icon object to insert to QAction
+            :rtype: QIcon
+            """
+            return QIcon(RESOURCE_PREFIX + f)
+
+        icon_plugin = create_icon('icon_valhalla.png')
+
+        self.actions = [
+            QAction(
+                icon_plugin,
+                PLUGIN_NAME,  # tr text
+                self.iface.mainWindow()  # parent
+            ),
+            # Config dialog
+            QAction(
+                create_icon('icon_settings.png'),
+                'Provider Settings',
+                self.iface.mainWindow()
+            ),
+            # About dialog
+            QAction(
+                create_icon('icon_about.png'),
+                'About',
+                self.iface.mainWindow()
+            ),
+            # Help page
+            QAction(
+                create_icon('icon_help.png'),
+                'Help',
+                self.iface.mainWindow()
+            )
+
+        ]
+
+        # Create menu
+        self.menu = QMenu(PLUGIN_NAME)
+        self.menu.setIcon(icon_plugin)
+        self.menu.addActions(self.actions)
+
+        # Add menu to Web menu and make sure it exsists and add icon to toolbar
+        self.iface.addPluginToWebMenu("_tmp", self.actions[2])
+        self.iface.webMenu().addMenu(self.menu)
+        self.iface.removePluginWebMenu("_tmp", self.actions[2])
+        self.iface.addWebToolBarIcon(self.actions[0])
+
+        # Connect slots to events
+        self.actions[0].triggered.connect(self._init_gui_control)
+        self.actions[1].triggered.connect(lambda: on_config_click(parent=self.iface.mainWindow()))
+        self.actions[2].triggered.connect(lambda: on_about_click(parent=self.iface.mainWindow()))
+        self.actions[3].triggered.connect(on_help_click)
+
+    def unload(self):
+        """Called when QGIS closes or plugin is deactivated in Plugin Manager"""
+
+        self.iface.webMenu().removeAction(self.menu.menuAction())
+        self.iface.removeWebToolBarIcon(self.actions[0])
+        QApplication.restoreOverrideCursor()
+        del self.dlg
+
+    def _init_gui_control(self):
+        """Slot for main plugin button. Initializes the GUI and shows it."""
+
+        # Only populate GUI if it's the first start of the plugin within the QGIS session
+        # If not checked, GUI would be rebuilt every time!
+        if self.first_start:
+            self.first_start = False
+            self.dlg = ValhallaDialog(self.iface, self.iface.mainWindow())  # setting parent enables modal view
+            # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
+            self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
+            self.dlg.global_buttons.accepted.connect(self.run_gui_control)
+            self.dlg.avoidlocation_dropdown.setFilters(QgsMapLayerProxyModel.PointLayer)
+
+        # Populate provider box on window startup, since can be changed from multiple menus/buttons
+        providers = configmanager.read_config()['providers']
+        self.dlg.provider_combo.clear()
+        for provider in providers:
+            self.dlg.provider_combo.addItem(provider['name'], provider)
+
+        self.dlg.show()
+
+    def run_gui_control(self):
+        """Slot function for OK button of main dialog."""
+
+        # Associate annotations with map layer, so they get deleted when layer is deleted
+        for annotation in self.dlg.annotations:
+            # Has the potential to be pretty cool: instead of deleting, associate with mapLayer, you can change order after optimization
+            # Then in theory, when the layer is remove, the annotation is removed as well
+            # Doesng't work though, the annotations are still there when project is re-opened
+            # annotation.setMapLayer(layer_out)
+            self.project.annotationManager().removeAnnotation(annotation)
+        self.dlg.annotations = []
+
+        provider_id = self.dlg.provider_combo.currentIndex()
+        provider = configmanager.read_config()['providers'][provider_id]
+
+        # if there are no coordinates, throw an error message
+        if not self.dlg.routing_fromline_list.count():
+            QMessageBox.critical(
+                self.dlg,
+                "No waypoints",
+                """
+                Did you forget to set routing waypoints?<br><br>
+                
+                Use the 'Add Waypoint' button to add up to 20 waypoints.
+                """
+            )
+            return
+
+        # if no API key is present, when ORS is selected, throw an error message
+        if not provider['key'] and provider['base_url'].startswith('https://api.openrouteservice.org'):
+            QMessageBox.critical(
+                self.dlg,
+                "Missing API key",
+                """
+                Did you forget to set an <b>API key</b> for Mapbox?<br><br>
+                
+                If you don't have an API key, please visit https://account.mapbox.com/auth/signup/?route-to="/" to get one. <br><br>
+                Then enter the API key in Web ► Valhalla ► Provider Settings or the settings symbol in the main Valhalla GUI, next to the provider dropdown.
+                """
+            )
+            return
+
+        clnt = client.Client(provider)
+        clnt_msg = ''
+
+        method = self.dlg.routing_method.currentText()
+        profile = self.dlg.routing_travel_combo.currentText()
+        params = {}
+        try:
+            if method == 'route':
+                layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_Valhalla", "memory")
+                layer_out.dataProvider().addAttributes(directions_core.get_fields())
+                layer_out.updateFields()
+
+                directions = directions_gui.Directions(self.dlg)
+                params = directions.get_parameters()
+                response = clnt.request('/route', {}, post_json=params)
+                feat = directions_core.get_output_feature_directions(
+                    response,
+                    profile,
+                    directions.costing_options,
+                    "{}, {}".format(params['locations'][0]['lon'], params['locations'][0]['lat']),
+                    "{}, {}".format(params['locations'][-1]['lon'], params['locations'][-1]['lat'])
+                )
+                layer_out.dataProvider().addFeature(feat)
+                layer_out.updateExtents()
+
+            if method == 'isochrone':
+                geometry_type = self.dlg.polygons.currentText()
+                isochrones = isochrones_core.Isochrones()
+                isochrones.set_parameters(profile, geometry_type)
+
+                layer_out = QgsVectorLayer(f"{geometry_type}?crs=EPSG:4326", "Isochrone_Valhalla", "memory")
+                layer_out.dataProvider().addAttributes(isochrones.get_fields())
+                layer_out.updateFields()
+
+                isochrones_ui = isochrones_gui.Isochrones(self.dlg)
+                params = isochrones_ui.get_parameters()
+                locations = get_locations(self.dlg.routing_fromline_list)
+
+                for location in locations:
+                    params['locations'] = [location]
+                    response = clnt.request('/isochrone', {}, post_json=params)
+                    for feat in  isochrones.get_features(response, "{}, {}".format(location['lon'], location['lat']), json.dumps(isochrones_ui.costing_options)):
+                        layer_out.dataProvider().addFeature(feat)
+
+                layer_out.updateExtents()
+                isochrones.stylePoly(layer_out)
+
+            if method == 'sources_to_targets':
+                layer_out = QgsVectorLayer("None", 'Matrix_Valhalla', "memory")
+                layer_out.dataProvider().addAttributes(matrix_core.get_fields())
+                layer_out.updateFields()
+
+                matrix = matrix_gui.Matrix(self.dlg)
+                params = matrix.get_parameters()
+                response = clnt.request('/sources_to_targets', {}, post_json=params)
+                # TODO: output matrix is mixed up on IDs
+                feats = matrix_core.get_output_features_matrix(
+                    matrix.locations,
+                    response,
+                    profile,
+                    matrix.costing_options
+                )
+                for feat in feats:
+                    layer_out.dataProvider().addFeature(feat)
+
+            self.project.addMapLayer(layer_out)
+
+        except exceptions.Timeout as e:
+            msg = "The connection has timed out!"
+            logger.log(msg, 2)
+            self.dlg.debug_text.setText(msg)
+            self._display_error_popup(e)
+            return
+
+        except (exceptions.ApiError,
+                exceptions.InvalidKey,
+                exceptions.GenericServerError) as e:
+            msg = (e.__class__.__name__,
+                   str(e))
+
+            logger.log("{}: {}".format(*msg), 2)
+            clnt_msg += "<b>{}</b>: ({})<br>".format(*msg)
+            self._display_error_popup(e)
+            return
+
+        except Exception as e:
+            msg = [e.__class__.__name__ ,
+                   str(e)]
+            logger.log("{}: {}".format(*msg), 2)
+            clnt_msg += "<b>{}</b>: {}<br>".format(*msg)
+            self._display_error_popup(e)
+            return
+
+        finally:
+            # Set URL in debug window
+
+            clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}<br><b>timing</b>: {2:.3f} secs'.format(clnt.url, json.dumps(params, indent=2), clnt.response_time)
+            self.dlg.debug_text.setHtml(clnt_msg)
+
+    def _display_error_popup(self, e):
+        QMessageBox.critical(
+            self.dlg,
+            e.__class__.__name__,
+            str(e)
+        )
+
+
+class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
+    """Define the custom behaviour of Dialog"""
+
+    def __init__(self, iface, parent=None):
+        """
+        :param iface: QGIS interface
+        :type iface: QgisInterface
+
+        :param parent: parent window for modality.
+        :type parent: QDialog/QApplication
+        """
+        QDialog.__init__(self, parent)
+        self.setupUi(self)
+
+        self._iface = iface
+        self.project = QgsProject.instance()  # invoke a QgsProject instance
+        self.map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+
+        # Set things around the custom map tool
+        self.line_tool = None
+        self.last_maptool = self._iface.mapCanvas().mapTool()
+        self.annotations = []
+
+        # Change OK and Cancel button names
+        self.global_buttons.button(QDialogButtonBox.Ok).setText('Apply')
+        self.global_buttons.button(QDialogButtonBox.Cancel).setText('Close')
+
+        #### Set up signals/slots ####
+
+        # Config/Help dialogs
+        self.provider_config.clicked.connect(lambda: on_config_click(self))
+        self.help_button.clicked.connect(on_help_click)
+        self.about_button.clicked.connect(lambda: on_about_click(parent=self._iface.mainWindow()))
+        self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
+
+        # Routing tab
+        self.routing_fromline_map.clicked.connect(self._on_linetool_init)
+        self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+
+        # Batch
+        self.batch_routing_points.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_2_layers'.format(PLUGIN_NAME)))
+        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_1_layer'.format(PLUGIN_NAME)))
+        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_polylines_layer'.format(PLUGIN_NAME)))
+        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_point'.format(PLUGIN_NAME)))
+        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_layer'.format(PLUGIN_NAME)))
+        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix_from_layers'.format(PLUGIN_NAME)))
+
+    def _on_prov_refresh_click(self):
+        """Populates provider dropdown with fresh list from config.yml"""
+
+        providers = configmanager.read_config()['providers']
+        self.provider_combo.clear()
+        for provider in providers:
+            self.provider_combo.addItem(provider['name'], provider)
+
+    def _on_clear_listwidget_click(self):
+        """Clears the contents of the QgsListWidget and the annotations."""
+        items = self.routing_fromline_list.selectedItems()
+        if items:
+            # if items are selected, only clear those
+            for item in items:
+                row = self.routing_fromline_list.row(item)
+                self.routing_fromline_list.takeItem(row)
+                if self.annotations:
+                    self.project.annotationManager().removeAnnotation(self.annotations.pop(row))
+        else:
+            # else clear all items and annotations
+            self.routing_fromline_list.clear()
+            self._clear_annotations()
+
+    def _linetool_annotate_point(self, point, idx):
+        annotation = QgsTextAnnotation()
+
+        c = QTextDocument()
+        html = "<strong>" + str(idx) + "</strong>"
+        c.setHtml(html)
+
+        annotation.setDocument(c)
+
+        annotation.setFrameSize(QSizeF(27, 20))
+        annotation.setFrameOffsetFromReferencePoint(QPointF(5, 5))
+        annotation.setMapPosition(point)
+        annotation.setMapPositionCrs(self.map_crs)
+
+        return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
+
+    def _clear_annotations(self):
+        """Clears annotations"""
+        for annotation in self.annotations:
+            if annotation in self.project.annotationManager().annotations():
+                self.project.annotationManager().removeAnnotation(annotation)
+        self.annotations = []
+
+    def _on_linetool_init(self):
+        """Hides GUI dialog, inits line maptool and add items to line list box."""
+        self.hide()
+        self.routing_fromline_list.clear()
+        # Remove all annotations which were added (if any)
+        self._clear_annotations()
+
+        self.line_tool = maptools.LineTool(self._iface.mapCanvas())
+        self._iface.mapCanvas().setMapTool(self.line_tool)
+        self.line_tool.pointDrawn.connect(lambda point, idx: self._on_linetool_map_click(point, idx))
+        self.line_tool.doubleClicked.connect(self._on_linetool_map_doubleclick)
+
+    def _on_linetool_map_click(self, point, idx):
+        """Adds an item to QgsListWidget and annotates the point in the map canvas"""
+
+        transformer = transform.transformToWGS(self.map_crs)
+        point_wgs = transformer.transform(point)
+        self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, point_wgs.x(), point_wgs.y()))
+
+        annotation = self._linetool_annotate_point(point, idx)
+        self.annotations.append(annotation)
+        self.project.annotationManager().addAnnotation(annotation)
+
+    def _on_linetool_map_doubleclick(self):
+        """
+        Populate line list widget with coordinates, end line drawing and show dialog again.
+
+        :param points_num: number of points drawn so far.
+        :type points_num: int
+        """
+
+        self.line_tool.pointDrawn.disconnect()
+        self.line_tool.doubleClicked.disconnect()
+        QApplication.restoreOverrideCursor()
+        self._iface.mapCanvas().setMapTool(self.last_maptool)
+        self.show()

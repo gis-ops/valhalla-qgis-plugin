@@ -1,0 +1,25 @@
+[general]
+name=Valhalla
+qgisMinimumVersion=3.0
+description=valhalla routing, isochrones and matrix calculations for QGIS
+
+version=1.0.0
+author=GIS • OPS UG
+email=nils@gis-ops.com
+
+about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
+
+changelog=2019/10/05 v0.1 first version
+
+tracker=https://github.com/gis-ops/valhalla-qgis-plugin/issues
+repository=https://github.com/gis-ops/valhalla-qgis-plugin.git
+help=https://github.com/valhalla/valhalla-docs/blob/master/turn-by-turn/api-reference.md
+
+homepage=https://github.com/valhalla/valhalla
+category=Plugins
+icon=gui/img/icon_valhalla.png
+experimental=False
+
+deprecated=False
+
+tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS, processing
