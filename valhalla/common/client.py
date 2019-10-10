@@ -208,23 +208,23 @@ class Client(QObject):
                 message
             )
 
-        if status_code == 429:
+        elif status_code == 429:
             raise exceptions.OverQueryLimit(
                 str(status_code),
                 # error,
                 message
             )
         # Internal error message for Bad Request
-        if 400 <= status_code < 500:
+        elif status_code and 400 <= status_code < 500:
             raise exceptions.ApiError(
                 str(status_code),
                 # error,
                 message
             )
         # Other HTTP errors have different formatting
-        if status_code != 200:
+        else:
             raise exceptions.GenericServerError(
-                str(status_code),
+                "Connection error",
                 # error,
                 message
             )

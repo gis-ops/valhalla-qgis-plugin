@@ -181,6 +181,13 @@ class ValhallaDialogMain:
         QApplication.restoreOverrideCursor()
         del self.dlg
 
+    def _cleanup_annotations(self):
+        """When window is closed without calculating, clean up annotations"""
+
+        if hasattr(self, 'dlg'):
+            for a in self.dlg.annotations:
+                self.project.annotationManager().removeAnnotation(a)
+
     def _init_gui_control(self):
         """Slot for main plugin button. Initializes the GUI and shows it."""
 
@@ -192,13 +199,15 @@ class ValhallaDialogMain:
             # Make sure plugin window stays open when OK is clicked by reconnecting the accepted() signal
             self.dlg.global_buttons.accepted.disconnect(self.dlg.accept)
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
+            self.dlg.global_buttons.rejected.connect(self._cleanup_annotations)
             self.dlg.avoidlocation_dropdown.setFilters(QgsMapLayerProxyModel.PointLayer)
 
+            providers = configmanager.read_config()['providers']
+            self.dlg.provider_combo.clear()
+            for provider in providers:
+                self.dlg.provider_combo.addItem(provider['name'], provider)
+
         # Populate provider box on window startup, since can be changed from multiple menus/buttons
-        providers = configmanager.read_config()['providers']
-        self.dlg.provider_combo.clear()
-        for provider in providers:
-            self.dlg.provider_combo.addItem(provider['name'], provider)
 
         self.dlg.show()
 
@@ -335,7 +344,7 @@ class ValhallaDialogMain:
             logger.log("{}: {}".format(*msg), 2)
             clnt_msg += "<b>{}</b>: {}<br>".format(*msg)
             self._display_error_popup(e)
-            return
+            raise
 
         finally:
             # Set URL in debug window

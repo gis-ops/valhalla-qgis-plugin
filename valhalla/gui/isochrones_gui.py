@@ -53,7 +53,7 @@ class Isochrones:
         # if self.dlg.optimization_group.isChecked():
         #     return self._get_optimize_parameters()
 
-        # API parameters
+        # API parameters<
         profile = self.dlg.routing_travel_combo.currentText()
         contours = self.dlg.contours.value()
         polygons = self.dlg.polygons.currentText()
