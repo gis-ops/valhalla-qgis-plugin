@@ -26,35 +26,15 @@
  *                                                                         *
  ***************************************************************************/
 """
+from .directions_points_layer_auto import ValhallaRoutePointsLayerCarAlgo
+from ..costing_params import CostingPedestrian
 
-from qgis.core import QgsApplication
+class ValhallaRoutePointsLayerTruckAlgo(ValhallaRoutePointsLayerCarAlgo):
 
-from .gui import ValhallaDialog
-from .proc import provider
+    ALGO_NAME = 'directions_from_point_layer_truck'
 
+    COSTING = CostingPedestrian
+    PROFILE = 'truck'
 
-class Valhalla():
-    """QGIS Plugin Implementation."""
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
-
-    def __init__(self, iface):
-        """Constructor.
-
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
-        """
-        self.dialog = ValhallaDialog.ValhallaDialogMain(iface)
-        self.provider = provider.ValhallaProvider()
-
-    def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
-        QgsApplication.processingRegistry().addProvider(self.provider)
-        self.dialog.initGui()
-        
-    def unload(self):
-        """remove menu entry and toolbar icons"""
-        QgsApplication.processingRegistry().removeProvider(self.provider)
-        self.dialog.unload()
+    def createInstance(self):
+        return ValhallaRoutePointsLayerTruckAlgo()

@@ -26,35 +26,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-
-from qgis.core import QgsApplication
-
-from .gui import ValhallaDialog
-from .proc import provider
+from ..costing_params import CostingBicycle
+from .isochrones_layer_auto import ValhallaIsochronesCarAlgo
 
 
-class Valhalla():
-    """QGIS Plugin Implementation."""
-        # noinspection PyTypeChecker,PyArgumentList,PyCallByClass
+class ValhallaIsochronesBicycleAlgo(ValhallaIsochronesCarAlgo):
 
-    def __init__(self, iface):
-        """Constructor.
+    ALGO_NAME = 'isochrones_bicycle'
 
-        :param iface: An interface instance that will be passed to this class
-            which provides the hook by which you can manipulate the QGIS
-            application at run time.
-        :type iface: QgsInterface
-        """
-        self.dialog = ValhallaDialog.ValhallaDialogMain(iface)
-        self.provider = provider.ValhallaProvider()
+    COSTING = CostingBicycle
+    PROFILE = 'bicycle'
 
-    def initGui(self):
-        """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
-        QgsApplication.processingRegistry().addProvider(self.provider)
-        self.dialog.initGui()
-        
-    def unload(self):
-        """remove menu entry and toolbar icons"""
-        QgsApplication.processingRegistry().removeProvider(self.provider)
-        self.dialog.unload()
+    def createInstance(self):
+        return ValhallaIsochronesBicycleAlgo()

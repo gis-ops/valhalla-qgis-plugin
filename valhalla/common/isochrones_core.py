@@ -56,15 +56,15 @@ class Isochrones():
         self.id_field_type = None
         self.id_field_name = None
 
-    def set_parameters(self, profile, geometry, id_field_type=QVariant.String, id_field_name='ID'):
+    def set_parameters(self, profile, geometry_param='LineString', id_field_type=QVariant.String, id_field_name='ID'):
         """
         Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know its parameters yet.
 
         :param profile: Transportation mode being used
         :type profile: str
 
-        :param factor: Unit factor being used, depending on dimension.
-        :type factor: int
+        :param geometry_param: geometry parameter for Valhalla isochrone service.
+        :type geometry_param: str
 
         :param id_field_type: field type of ID field
         :type id_field_type: QVariant enum
@@ -73,7 +73,7 @@ class Isochrones():
         :type id_field_name: str
         """
         self.profile = profile
-        self.geometry = geometry
+        self.geometry = geometry_param
         self.id_field_type = id_field_type
         self.id_field_name = id_field_name
 
@@ -92,7 +92,7 @@ class Isochrones():
 
         return fields
 
-    def get_features(self, response, id_field_value, options):
+    def get_features(self, response, id_field_value, options=''):
         """
         Generator to return output isochrone features from response.
 
@@ -101,6 +101,9 @@ class Isochrones():
 
         :param id_field_value: Value of ID field.
         :type id_field_value: any
+
+        :param options: costing options
+        :type options: str
 
         :returns: output feature
         :rtype: QgsFeature

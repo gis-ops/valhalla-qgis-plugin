@@ -39,31 +39,41 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
+                       QgsProcessingParameterDefinition,
+                       QgsProcessingParameterMapLayer,
                        )
-from . import HELP_DIR
+from .. import HELP_DIR
 from valhalla import RESOURCE_PREFIX, __help__
-from valhalla.common import client, directions_core, PROFILES, PREFERENCES
+from valhalla.common import client, directions_core
 from valhalla.utils import configmanager, transform, exceptions,logger
+from ..costing_params import CostingAuto
+from ..request_builder import get_directions_params, get_avoid_locations
 
 
-class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
-    # TODO: create base algorithm class common to all modules
+class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
 
-    ALGO_NAME = 'directions_from_points_2_layers'
+    ALGO_NAME = 'directions_from_points_2_layers_auto'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
     MODE_SELECTION = ['Row-by-Row', 'All-by-All']
+
+    HELP = 'algorithm_directions_points.help'
+
+    COSTING = CostingAuto
+    PROFILE = 'auto'
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
     IN_START_FIELD = "INPUT_START_FIELD"
     IN_END = "INPUT_END_LAYER"
     IN_END_FIELD = "INPUT_END_FIELD"
-    IN_PROFILE = "INPUT_PROFILE"
-    IN_PREFERENCE = "INPUT_PREFERENCE"
     IN_MODE = "INPUT_MODE"
+    IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
 
-    providers = configmanager.read_config()['providers']
+    def __init__(self):
+        super(ValhallaRoutePointsLayersCarAlgo, self).__init__()
+        self.providers = configmanager.read_config()['providers']
+        self.costing_options = self.COSTING()
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
@@ -111,24 +121,6 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PREFERENCE,
-                "Travel preference",
-                PREFERENCES,
-                defaultValue=PREFERENCES[0]
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterEnum(
                 self.IN_MODE,
                 "Layer mode",
                 self.MODE_SELECTION,
@@ -137,17 +129,32 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
         )
 
         self.addParameter(
+            QgsProcessingParameterMapLayer(
+                name=self.IN_AVOID,
+                description="Point layer with locations to avoid",
+                optional=True
+            )
+        )
+
+        advanced = self.costing_options.get_costing_params()
+
+        for p in advanced:
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(p)
+
+        self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
-                description="Directions",
+                description="Valhalla_Routing_Points_" + self.PROFILE,
+                createByDefault=False
             )
         )
 
     def group(self):
-        return "Directions"
+        return self.PROFILE.capitalize()
 
     def groupId(self):
-        return 'directions'
+        return self.PROFILE
 
     def name(self):
         return self.ALGO_NAME
@@ -157,7 +164,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
 
         file = os.path.join(
             HELP_DIR,
-            'algorithm_directions_points.help'
+            self.HELP
         )
         with open(file) as helpf:
             msg = helpf.read()
@@ -175,10 +182,7 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
         return QIcon(RESOURCE_PREFIX + 'icon_directions.png')
 
     def createInstance(self):
-        return ORSdirectionsPointsLayersAlgo()
-
-    # TODO: preprocess parameters to options the range clenaup below:
-    # https://www.qgis.org/pyqgis/master/core/Processing/QgsProcessingAlgorithm.html#qgis.core.QgsProcessingAlgorithm.preprocessParameters
+        return ValhallaRoutePointsLayersCarAlgo()
 
     def processAlgorithm(self, parameters, context, feedback):
 
@@ -188,24 +192,6 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
         clnt = client.Client(provider)
         clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
-
-        profile = PROFILES[self.parameterAsEnum(
-            parameters,
-            self.IN_PROFILE,
-            context
-        )]
-
-        preference = PREFERENCES[self.parameterAsEnum(
-            parameters,
-            self.IN_PREFERENCE,
-            context
-        )]
-
-        mode = self.MODE_SELECTION[self.parameterAsEnum(
-            parameters,
-            self.IN_MODE,
-            context
-        )]
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -229,19 +215,23 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
             context
         )
 
+        mode = self.MODE_SELECTION[self.parameterAsEnum(
+            parameters,
+            self.IN_MODE,
+            context
+        )]
+
+        avoid_layer = self.parameterAsLayer(
+            parameters,
+            self.IN_AVOID,
+            context
+        )
+
         # Get fields from field name
         source_field_id = source.fields().lookupField(source_field_name)
         source_field = source.fields().field(source_field_id)
         destination_field_id = destination.fields().lookupField(destination_field_name)
         destination_field = destination.fields().field(destination_field_id)
-
-        params = {
-            'preference': preference,
-            'geometry': 'true',
-            'instructions': 'false',
-            'elevation': True,
-            'id': None
-        }
 
         route_dict = self._get_route_dict(
             source,
@@ -261,15 +251,21 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
                                                QgsCoordinateReferenceSystem(4326))
 
         counter = 0
-        for coordinates, values in directions_core.get_request_point_features(route_dict, mode):
+
+        params = dict()
+        if avoid_layer:
+            params['avoid_locations'] = get_avoid_locations(avoid_layer)
+
+        for points, values in directions_core.get_request_point_features(route_dict, mode):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
 
-            params['coordinates'] = coordinates
+            params.update(get_directions_params(points, self.PROFILE, self.costing_options))
+            params['id'] = f"{values[0]} & {values[1]}"
 
             try:
-                response = clnt.request('/v2/directions/' + profile + '/geojson', {}, post_json=params)
+                response = clnt.request('/route', post_json=params)
             except (exceptions.ApiError,
                     exceptions.InvalidKey,
                     exceptions.GenericServerError) as e:
@@ -282,10 +278,14 @@ class ORSdirectionsPointsLayersAlgo(QgsProcessingAlgorithm):
                 logger.log(msg)
                 continue
 
+            options = {}
+            if params.get('costing_options'):
+                options = params['costing_options']
+
             sink.addFeature(directions_core.get_output_feature_directions(
                 response,
-                profile,
-                preference,
+                self.PROFILE,
+                options.get(self.PROFILE),
                 from_value=values[0],
                 to_value=values[1]
             ))

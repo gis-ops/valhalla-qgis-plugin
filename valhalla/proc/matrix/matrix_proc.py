@@ -44,7 +44,7 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
                        )
-from . import HELP_DIR
+from valhalla.proc import HELP_DIR
 from valhalla import RESOURCE_PREFIX, __help__
 from valhalla.common import client, PROFILES
 from valhalla.utils import transform, exceptions, logger, configmanager

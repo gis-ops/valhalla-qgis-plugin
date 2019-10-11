@@ -1,5 +1,11 @@
 ---
 providers:
+- name: Staging - TomTom
+  base_url: http://82.165.29.155:9000
+  key:
+- name: Staging - OSM
+  base_url: http://82.165.29.155:9000
+  key:
 - name: localhost
   base_url: http://localhost:8002
   key:

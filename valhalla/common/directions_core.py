@@ -52,7 +52,7 @@ def get_request_point_features(route_dict, row_by_row):
     :type row_by_row: str
 
     :returns: tuple of coordinates and ID field value for each routing feature in route_dict
-    :rtype: tuple
+    :rtype: tuple of QgsPointXY and others
     """
 
     locations_list = list(product(route_dict['start']['geometries'],
@@ -73,7 +73,7 @@ def get_request_point_features(route_dict, row_by_row):
         if properties[0][0] == properties[0][-1]:
             continue
 
-        coordinates = [[round(x, 6), round(y, 6)] for x, y in properties[0]]
+        coordinates = [QgsPointXY(x, y) for x, y in properties[0]]
         values = properties[1]
 
         yield (coordinates, values)
@@ -124,10 +124,7 @@ def get_output_feature_directions(response, profile, options=None, from_value=No
     :param profile: Transportation mode being used
     :type profile: str
 
-    :param preference: Cost being used, shortest or fastest.
-    :type preference: str
-
-    :param options: Avoidables being used.
+    :param options: Costing option being used.
     :type options: str
 
     :param from_value: value of 'FROM_ID' field

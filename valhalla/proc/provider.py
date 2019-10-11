@@ -31,27 +31,47 @@ from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, __version__
-from .isochrones_layer_proc import ORSisochronesLayerAlgo
-from .isochrones_point_proc import ORSisochronesPointAlgo
-from .matrix_proc import ORSmatrixAlgo
-from .directions_points_layers_proc import ORSdirectionsPointsLayersAlgo
-from .directions_points_layer_proc import ORSdirectionsPointsLayerAlgo
-from .directions_lines_proc import ORSdirectionsLinesAlgo
+from .directions_lines.directions_lines_auto import ValhallaRouteLinesCarAlgo
+from .directions_lines.directions_lines_truck import ValhallaRouteLinesTruckAlgo
+from .directions_lines.directions_lines_bicycle import ValhallaRouteLinesBicycleAlgo
+from .directions_lines.directions_lines_pedestrian import ValhallaRouteLinesPedestrianAlgo
+from .directions_point_layer.directions_points_layer_auto import ValhallaRoutePointsLayerCarAlgo
+from .directions_point_layer.directions_points_layer_truck import ValhallaRoutePointsLayerTruckAlgo
+from .directions_point_layer.directions_points_layer_bicycle import ValhallaRoutePointsLayerBicycleAlgo
+from .directions_point_layer.directions_points_layer_pedestrian import ValhallaRoutePointsLayerPedestrianAlgo
+from .directions_points_layers.directions_points_layers_auto import ValhallaRoutePointsLayersCarAlgo
+from .directions_points_layers.directions_points_layers_truck import ValhallaRoutePointsLayersTruckAlgo
+from .directions_points_layers.directions_points_layers_bicycle import ValhallaRoutePointsLayersBicycleAlgo
+from .directions_points_layers.directions_points_layers_pedestrian import ValhallaRoutePointsLayersPedestrianAlgo
+from .isochrones.isochrones_layer_auto import ValhallaIsochronesCarAlgo
+from .isochrones.isochrones_layer_truck import ValhallaIsochronesTruckAlgo
+from .isochrones.isochrones_layer_bicycle import ValhallaIsochronesBicycleAlgo
+from .isochrones.isochrones_layer_pedestrian import ValhallaIsochronesPedestrianAlgo
 
 
-class ORStoolsProvider(QgsProcessingProvider):
+class ValhallaProvider(QgsProcessingProvider):
 
     def __init__(self):
         QgsProcessingProvider.__init__(self)
 
         # Load algorithms
         self.alglist = [
-            ORSdirectionsPointsLayersAlgo(),
-            ORSdirectionsPointsLayerAlgo(),
-            ORSdirectionsLinesAlgo(),
-            ORSisochronesLayerAlgo(),
-            ORSisochronesPointAlgo(),
-            ORSmatrixAlgo()
+            ValhallaRouteLinesCarAlgo(),
+            ValhallaRouteLinesTruckAlgo(),
+            ValhallaRouteLinesBicycleAlgo(),
+            ValhallaRouteLinesPedestrianAlgo(),
+            ValhallaRoutePointsLayerCarAlgo(),
+            ValhallaRoutePointsLayerBicycleAlgo(),
+            ValhallaRoutePointsLayerPedestrianAlgo(),
+            ValhallaRoutePointsLayerTruckAlgo(),
+            ValhallaRoutePointsLayersCarAlgo(),
+            ValhallaRoutePointsLayersTruckAlgo(),
+            ValhallaRoutePointsLayersBicycleAlgo(),
+            ValhallaRoutePointsLayersPedestrianAlgo(),
+            ValhallaIsochronesCarAlgo(),
+            ValhallaIsochronesTruckAlgo(),
+            ValhallaIsochronesBicycleAlgo(),
+            ValhallaIsochronesPedestrianAlgo()
         ]
 
     def unload(self):
@@ -69,7 +89,7 @@ class ORStoolsProvider(QgsProcessingProvider):
             self.addAlgorithm(alg)
 
     def icon(self):
-        return QIcon(RESOURCE_PREFIX + 'icon_orstools.png')
+        return QIcon(RESOURCE_PREFIX + 'icon_valhalla.png')
 
     def id(self):
         """

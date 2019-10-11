@@ -36,34 +36,40 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessing,
                        QgsProcessingAlgorithm,
                        QgsProcessingParameterField,
+                       QgsProcessingParameterDefinition,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
-                       QgsProcessingParameterBoolean,
                        QgsPointXY,
                        )
-from . import HELP_DIR
+from .. import HELP_DIR
 from valhalla import RESOURCE_PREFIX, __help__
-from valhalla.common import client, directions_core, PROFILES, PREFERENCES
+from valhalla.common import client, directions_core, PROFILES
 from valhalla.utils import configmanager, transform, exceptions,logger, convert
+from ..costing_params import CostingAuto
+from ..request_builder import get_directions_params
 
 
-class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
+class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
     """Algorithm class for Directions Lines."""
 
-    ALGO_NAME = 'directions_from_polylines_layer'
+    ALGO_NAME = 'directions_from_polylines_auto'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
+
+    HELP = 'algorithm_directions_line.help'
+
+    COSTING = CostingAuto
+    PROFILE = 'auto'
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_LINES = "INPUT_LINE_LAYER"
     IN_FIELD = "INPUT_LAYER_FIELD"
-    IN_PROFILE = "INPUT_PROFILE"
-    IN_PREFERENCE = "INPUT_PREFERENCE"
-    IN_OPTIMIZE = "INPUT_OPTIMIZE"
-    IN_MODE = "INPUT_MODE"
     OUT = 'OUTPUT'
 
-    providers = configmanager.read_config()['providers']
+    def __init__(self):
+        super(ValhallaRouteLinesCarAlgo, self).__init__()
+        self.providers = configmanager.read_config()['providers']
+        self.costing_options = self.COSTING()
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
@@ -93,44 +99,25 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
             )
         )
 
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
-            )
-        )
+        advanced = self.costing_options.get_costing_params()
 
-        self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PREFERENCE,
-                "Travel preference",
-                PREFERENCES,
-                defaultValue=PREFERENCES[0]
-            )
-        )
-
-        self.addParameter(
-            QgsProcessingParameterBoolean(
-                name=self.IN_OPTIMIZE,
-                description="Optimize waypoint order (except first and last)",
-                defaultValue=False
-            )
-        )
+        for p in advanced:
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(p)
 
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
-                description="Output Layer",
+                description="Valhalla_Routing_Lines_" + self.PROFILE,
+                createByDefault=False
             )
         )
 
     def group(self):
-        return "Directions"
+        return self.PROFILE.capitalize()
 
     def groupId(self):
-        return 'directions'
+        return self.PROFILE
 
     def name(self):
         return self.ALGO_NAME
@@ -140,7 +127,7 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
 
         file = os.path.join(
             HELP_DIR,
-            'algorithm_directions_line.help'
+            self.HELP
         )
         with open(file) as helpf:
             msg = helpf.read()
@@ -158,44 +145,17 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
         return QIcon(RESOURCE_PREFIX + 'icon_directions.png')
 
     def createInstance(self):
-        return ORSdirectionsLinesAlgo()
+        return ValhallaRouteLinesCarAlgo()
 
     def processAlgorithm(self, parameters, context, feedback):
-        # Init ORS client
 
         providers = configmanager.read_config()['providers']
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
-        clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
-
-        profile = PROFILES[self.parameterAsEnum(
-            parameters,
-            self.IN_PROFILE,
-            context
-        )]
-
-        preference = PREFERENCES[self.parameterAsEnum(
-            parameters,
-            self.IN_PREFERENCE,
-            context
-        )]
-
-        optimize = self.parameterAsBool(
-            parameters,
-            self.IN_OPTIMIZE,
-            context
-        )
 
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
             self.IN_LINES,
-            context
-        )
-
-        source_field_idx = self.parameterAsEnum(
-            parameters,
-            self.IN_FIELD,
             context
         )
 
@@ -205,51 +165,17 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
             context
         )
 
+        # Sets all advanced parameters as attributes of self.costing_options
+        self.costing_options.set_costing_options(self, parameters, context)
+
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                directions_core.get_fields(from_type=source.fields().field(source_field_name).type(),
                                                                           from_name=source_field_name,
                                                                           line=True),
                                                source.wkbType(),
                                                QgsCoordinateReferenceSystem(4326))
-        count = source.featureCount()
 
-        for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):
-            # Stop the algorithm if cancel button has been clicked
-            if feedback.isCanceled():
-                break
-
-            try:
-                if optimize:
-                    params = self._get_params_optimize(line, profile)
-                    response = clnt.request('/optimization', {}, post_json=params)
-
-                    sink.addFeature(directions_core.get_output_features_optimization(
-                        response,
-                        profile,
-                        from_value=field_value
-                    ))
-                else:
-                    params = self._get_params_directions(line, profile, preference)
-                    response = clnt.request('/v2/directions/' + profile + '/geojson', params)
-
-                    sink.addFeature(directions_core.get_output_feature_directions(
-                        response,
-                        profile,
-                        preference,
-                        from_value=field_value
-                    ))
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
-                msg = "Feature ID {} caused a {}:\n{}".format(
-                    line[source_field_name],
-                    e.__class__.__name__,
-                    str(e))
-                feedback.reportError(msg)
-                logger.log(msg)
-                continue
-
-            feedback.setProgress(int(100.0 / count * num))
+        self._make_request(source, sink, provider, source_field_name, feedback)
 
         return {self.OUT: dest_id}
 
@@ -282,70 +208,43 @@ class ORSdirectionsLinesAlgo(QgsProcessingAlgorithm):
 
             yield line, field_value
 
-    @staticmethod
-    def _get_params_directions(line, profile, preference):
-        """
-        Build parameters for optimization endpoint
+    def _make_request(self, source, sink, provider, source_field_name, feedback, extra_params={}):
 
-        :param line: individual polyline points
-        :type line: list of QgsPointXY
+        # Init ORS client
+        clnt = client.Client(provider)
+        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
-        :param profile: transport profile to be used
-        :type profile: str
+        count = source.featureCount()
 
-        :param preference: routing preference, shortest/fastest
-        :type preference: str
+        for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):
+            # Stop the algorithm if cancel button has been clicked
+            if feedback.isCanceled():
+                break
 
-        :returns: parameters for optimization endpoint
-        :rtype: dict
-        """
+            try:
+                params = get_directions_params(line, self.PROFILE, self.costing_options)
+                params['id'] = field_value
+                params.update(extra_params)
+                response = clnt.request('/route', post_json=params)
+                options = {}
+                if params.get('costing_options'):
+                    options = params['costing_options']
 
-        params = {
-            'coordinates': convert.build_coords([[point.x(), point.y()] for point in line]),
-            'profile': profile,
-            'preference': preference,
-            'geometry': 'true',
-            'format': 'geojson',
-            'geometry_format': 'geojson',
-            'instructions': 'false',
-            'elevation': True,
-            'id': None
-        }
+                sink.addFeature(directions_core.get_output_feature_directions(
+                    response,
+                    self.PROFILE,
+                    options.get(self.PROFILE),
+                    from_value=field_value
+                ))
+            except (exceptions.ApiError,
+                    exceptions.InvalidKey,
+                    exceptions.GenericServerError) as e:
+                msg = "Feature ID {} caused a {}:\n{}".format(
+                    field_value,
+                    e.__class__.__name__,
+                    str(e))
+                feedback.reportError(msg)
+                logger.log(msg)
+                continue
 
-        return params
-
-    @staticmethod
-    def _get_params_optimize(line, profile):
-        """
-        Build parameters for optimization endpoint
-
-        :param line: individual polyline points
-        :type line: list of QgsPointXY
-
-        :param profile: transport profile to be used
-        :type profile: str
-
-        :returns: parameters for optimization endpoint
-        :rtype: dict
-        """
-
-        start = line.pop(0)
-        end = line.pop(-1)
-
-        params = {
-            'jobs': list(),
-            'vehicles': [{
-                "id": 0,
-                "profile": profile,
-                "start": [start.x(), start.y()],
-                "end": [end.x(), end.y()]
-            }],
-            'options': {'g': True}
-        }
-        for point in line:
-            params['jobs'].append({
-                "location": [point.x(), point.y()],
-                "id": line.index(point)
-            })
-
-        return params
+            feedback.setProgress(int(100.0 / count * num))

@@ -187,6 +187,7 @@ class ValhallaDialogMain:
         if hasattr(self, 'dlg'):
             for a in self.dlg.annotations:
                 self.project.annotationManager().removeAnnotation(a)
+            self.dlg.annotations = []
 
     def _init_gui_control(self):
         """Slot for main plugin button. Initializes the GUI and shows it."""
