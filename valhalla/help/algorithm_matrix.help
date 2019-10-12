@@ -1,13 +1,14 @@
 The Matrix algorithm returns a duration and distance matrix for multiple source and destination points.
 
-You need to have a valid API key ('Web' menu > 'Configuration') or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+You need to have a server running Valhalla or a <b>valid API key</b> for at least one provider (Web ► Valhalla ► Configuration), e.g. <a href="https://mapbox.com">Mapbox</a>.
 
-The Travel Mode determines the profile used.
-
-For Start and End layers, only Point layers are allowed, NOT MultiPoint.
+For Start and End layers, only Point layers are allowed, <b>not MultiPoint</b>.
 
 The Start and End ID fields can be used to join the input layers afterwards.
 
-The output layer is a geometryless table with ID, duration and distance attributes.
+Specify points to be avoided during routing with <b>Avoid layer</b> parameter. Only Point layers are allowed, <b>not MultiPoint</b>.
 
-For current restrictions, please see https://openrouteservice.org/restrictions/.
+Valhalla has a dynamic cost model. You can set an extensive amount of costing options in the <b>Advanced Parameters</b> section. Refer to
+<a href="https://github.com/valhalla/valhalla/blob/master/docs/api/turn-by-turn/api-reference.md">the documentation</a> for an in-depth explanation.
+
+The output layer is a geometryless table with ID, duration and distance attributes.

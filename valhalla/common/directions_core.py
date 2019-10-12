@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -31,8 +30,7 @@ from itertools import product
 import json
 from PyQt5.QtCore import QVariant
 
-from qgis.core import (QgsPoint,
-                       QgsPointXY,
+from qgis.core import (QgsPointXY,
                        QgsGeometry,
                        QgsFeature,
                        QgsFields,
@@ -125,7 +123,7 @@ def get_output_feature_directions(response, profile, options=None, from_value=No
     :type profile: str
 
     :param options: Costing option being used.
-    :type options: str
+    :type options: dict
 
     :param from_value: value of 'FROM_ID' field
     :type from_value: any
@@ -155,41 +153,6 @@ def get_output_feature_directions(response, profile, options=None, from_value=No
                         json.dumps(options),
                         from_value,
                         to_value
-                        ])
-
-    return feat
-
-
-def get_output_features_optimization(response, profile, from_value=None):
-    """
-    Build output feature based on response attributes for optimization endpoint.
-
-    :param response: API response object
-    :type response: dict
-
-    :param profile: transportation profile to be used
-    :type profile: str
-
-    :param from_value: value of 'FROM_ID' field
-    :type from_value: any
-
-    :returns: built feature
-    :rtype: QgsFeature
-    """
-
-    response_mini = response['routes'][0]
-    feat = QgsFeature()
-    polyline = response_mini['geometry']
-    distance = response_mini['distance']
-    duration = response_mini['cost']
-    qgis_coords = [QgsPointXY(x, y) for x, y in convert.decode_polyline(polyline)]
-    feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-    feat.setAttributes(["{0:.3f}".format(distance / 1000),
-                        "{0:.3f}".format(duration / 3600),
-                        profile,
-                        'fastest',
-                        'optimized',
-                        from_value
                         ])
 
     return feat

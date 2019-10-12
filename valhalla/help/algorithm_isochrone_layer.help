@@ -1,11 +1,20 @@
 The Isochrone algorithm returns service/reachability areas for multiple locations and time/distance ranges.
 
-You need to have a valid API key ('Web' menu ► 'ORS Tools' ► 'Configuration') or sign up at <a href="https://openrouteservice.org/sign-up/">https://openrouteservice.org/sign-up/</a>.
+You need to have a server running Valhalla or a <b>valid API key</b> for at least one provider (Web ► Valhalla ► Configuration), e.g. <a href="https://mapbox.com">Mapbox</a>.
 
-As Geometry Input, choose a Point Layer. Only Point layers are allowed, NOT MultiPoint.
+Choose an input Point Layer. Only Point layers are allowed, <b>not MultiPoint</b>.
 
-The ID field can be used to join the input layer afterwards. If not specified, it'll take the first field of the input layer.
+The ID field can be used to join the input layer afterwards.
 
-The ranges parameter needs to be a comma-separated list of integer values, no decimal points. Current restriction limits apply, see https://openrouteservice.org/restrictions/.
+The <b>intervals</b> for which to calculate isochrones are in minutes. By default, up to 4 intervals are allowed.
 
-The output layer is a Polygon layer with ID, range value, travel mode and total population (from GHSL). The CRS is EPSG:4326.
+<b>Denoise</b> refers to retention of small parts of the resulting isochrone.
+
+<b>Generalize</b> refers to the Epsilon value of the Douglas-Peucker generalization algorithm.
+
+Specify points to be avoided during routing with <b>Avoid layer</b> parameter. Only Point layers are allowed, <b>not MultiPoint</b>.
+
+The output can be in Polygon or LineString format, controlled by the <b>Ouput geometry type</b> parameter.
+
+Valhalla has a dynamic cost model. You can set an extensive amount of costing options in the <b>Advanced Parameters</b> section. Refer to
+<a href="https://github.com/valhalla/valhalla/blob/master/docs/api/isochrone/api-reference.md">the documentation</a> for an in-depth explanation.

@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -27,12 +26,12 @@
  ***************************************************************************/
 """
 
+import json
 
 from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
 
 from qgis.core import (QgsPointXY,
-                       QgsPolygon,
                        QgsFeature,
                        QgsField,
                        QgsFields,
@@ -40,9 +39,7 @@ from qgis.core import (QgsPointXY,
                        QgsSymbol,
                        QgsSimpleFillSymbolLayer,
                        QgsRendererCategory,
-                       QgsCategorizedSymbolRenderer,
-                       QgsProcessingUtils)
-import processing
+                       QgsCategorizedSymbolRenderer)
 
 class Isochrones():
     """convenience class to build isochrones"""
@@ -92,7 +89,7 @@ class Isochrones():
 
         return fields
 
-    def get_features(self, response, id_field_value, options=''):
+    def get_features(self, response, id_field_value, options={}):
         """
         Generator to return output isochrone features from response.
 
@@ -103,7 +100,7 @@ class Isochrones():
         :type id_field_value: any
 
         :param options: costing options
-        :type options: str
+        :type options: dict
 
         :returns: output feature
         :rtype: QgsFeature
@@ -126,7 +123,7 @@ class Isochrones():
                 id_field_value,
                 int(iso_value),
                 self.profile,
-                options
+                json.dumps(options)
             ])
 
             yield feat

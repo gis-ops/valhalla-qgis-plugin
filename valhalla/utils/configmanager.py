@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -56,16 +55,3 @@ def write_config(new_config):
     """
     with open(CONFIG_PATH, 'w') as f:
         yaml.safe_dump(new_config, f)
-
-
-def write_env_var(key, value):
-    """
-    Update quota env variables
-
-    :param key: environment variable to update.
-    :type key: str
-
-    :param value: value for env variable.
-    :type value: str
-    """
-    os.environ[key] = value

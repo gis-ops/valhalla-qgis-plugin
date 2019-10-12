@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -27,8 +26,7 @@
  ***************************************************************************/
 """
 
-from valhalla.gui.common_gui import get_locations, get_costing_options
-from valhalla.utils import transform
+from valhalla.gui.common_gui import get_costing_options
 
 
 class Isochrones:
@@ -49,9 +47,6 @@ class Isochrones:
         :returns: All parameter mappings except for coordinates.
         :rtype: dict
         """
-
-        # if self.dlg.optimization_group.isChecked():
-        #     return self._get_optimize_parameters()
 
         # API parameters<
         profile = self.dlg.routing_travel_combo.currentText()

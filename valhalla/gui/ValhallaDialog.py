@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -26,8 +25,6 @@
  *                                                                         *
  ***************************************************************************/
 """
-
-import os
 import json
 import webbrowser
 
@@ -50,7 +47,7 @@ import processing
 from . import resources_rc
 
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
-from valhalla.utils import exceptions, maptools, logger, configmanager, convert, transform
+from valhalla.utils import exceptions, maptools, logger, configmanager, transform
 from valhalla.common import client, directions_core, isochrones_core, matrix_core
 from valhalla.gui import directions_gui, isochrones_gui, matrix_gui
 from valhalla.gui.common_gui import get_locations
@@ -295,7 +292,7 @@ class ValhallaDialogMain:
                 for location in locations:
                     params['locations'] = [location]
                     response = clnt.request('/isochrone', {}, post_json=params)
-                    for feat in  isochrones.get_features(response, "{}, {}".format(location['lon'], location['lat']), json.dumps(isochrones_ui.costing_options)):
+                    for feat in  isochrones.get_features(response, "{}, {}".format(location['lon'], location['lat']), isochrones_ui.costing_options):
                         layer_out.dataProvider().addFeature(feat)
 
                 layer_out.updateExtents()
@@ -398,14 +395,6 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
-
-        # Batch
-        self.batch_routing_points.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_2_layers'.format(PLUGIN_NAME)))
-        self.batch_routing_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_points_1_layer'.format(PLUGIN_NAME)))
-        self.batch_routing_line.clicked.connect(lambda: processing.execAlgorithmDialog('{}:directions_from_polylines_layer'.format(PLUGIN_NAME)))
-        self.batch_iso_point.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_point'.format(PLUGIN_NAME)))
-        self.batch_iso_layer.clicked.connect(lambda: processing.execAlgorithmDialog('{}:isochrones_from_layer'.format(PLUGIN_NAME)))
-        self.batch_matrix.clicked.connect(lambda: processing.execAlgorithmDialog('{}:matrix_from_layers'.format(PLUGIN_NAME)))
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""

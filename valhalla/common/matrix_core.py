@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -66,11 +65,9 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     return fields
 
 
-def get_output_features_matrix(response, profile, options=None, source_attrs=[], destination_attrs=[]):
+def get_output_features_matrix(response, profile, options={}, source_attrs=[], destination_attrs=[]):
     """
     Build output feature based on response attributes for directions endpoint.
-
-    :param locations: locations list from matrix params, i.e. [{"lon": x, "lat": y}, ...]
 
     :param response: API response object
     :type response: dict
@@ -81,8 +78,14 @@ def get_output_features_matrix(response, profile, options=None, source_attrs=[],
     :param options: Costing options being used.
     :type options: dict
 
-    :returns: Ouput feature with attributes and geometry set.
-    :rtype: QgsFeature
+    :param source_attrs: Attribute values of the source features.
+    :type source_attrs: list of any
+
+    :param destination_attrs: Attribute values of the destination features.
+    :type destination_attrs: list of any
+
+    :returns: Ouput features with attributes and geometry set.
+    :rtype: list of QgsFeature
     """
 
     feats = []

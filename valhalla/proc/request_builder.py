@@ -1,3 +1,30 @@
+# -*- coding: utf-8 -*-
+"""
+/***************************************************************************
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
+                              -------------------
+        begin                : 2019-10-12
+        git sha              : $Format:%H$
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
+ ***************************************************************************/
+
+ This plugin provides access to the various APIs from OpenRouteService
+ (https://openrouteservice.org), developed and
+ maintained by GIScience team at University of Heidelberg, Germany. By using
+ this plugin you agree to the ORS terms of service
+ (https://openrouteservice.org/terms-of-service/).
+
+/***************************************************************************
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *                                                                         *
+ ***************************************************************************/
+"""
 import inspect
 
 from qgis.core import QgsPointXY, QgsWkbTypes
@@ -7,6 +34,7 @@ from .costing_params import CostingAuto
 
 def get_directions_params(points, profile, costing_options):
     """
+    Get the full list of parameters except for avoiding points.
 
     :param points: Point list
     :type points: list of QgsPointXY
@@ -35,6 +63,7 @@ def get_directions_params(points, profile, costing_options):
 
 def get_locations(points):
     """
+    Get the locations parameter value.
 
     :param points: List of QgsPointXY
     :type points: list of QgsPointXY
@@ -48,6 +77,7 @@ def get_locations(points):
 
 def get_costing_options(costing_options, profile):
     """
+    Get the costing_options parameter value per profile.
 
     :param costing_options: costing options class with costing options as attributes
     :type costing_options: CostingAuto
@@ -70,6 +100,7 @@ def get_costing_options(costing_options, profile):
 
 def get_avoid_locations(avoid_layer):
     """
+    Get the avoid locations parameter value.
 
     :param avoid_layer: The point layer to be avoided
     :type avoid_layer: QgsProcessingFeatureSource

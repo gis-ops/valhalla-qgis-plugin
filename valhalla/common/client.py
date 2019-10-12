@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
 """
 /***************************************************************************
- valhalla
-                                 A QGIS plugin
- QGIS client to query openrouteservice
+                                 Valhalla - QGIS plugin
+ QGIS client to query Valhalla APIs
                               -------------------
-        begin                : 2017-02-01
+        begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2017 by Nils Nolde
-        email                : nils.nolde@gmail.com
+        copyright            : (C) 2019 by Nils Nolde
+        email                : nils@gis-ops.com
  ***************************************************************************/
 
  This plugin provides access to the various APIs from OpenRouteService
@@ -38,7 +37,7 @@ from PyQt5.QtCore import QObject, pyqtSignal
 
 from valhalla import __version__
 from valhalla.common import networkaccessmanager
-from valhalla.utils import exceptions, configmanager, logger
+from valhalla.utils import exceptions, logger
 
 _USER_AGENT = "ValhallaQGISClient@v{}".format(__version__)
 
