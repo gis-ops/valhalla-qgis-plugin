@@ -30,41 +30,49 @@
 import os.path
 
 from PyQt5.QtGui import QIcon
-from PyQt5.QtCore import QVariant
 
 from qgis.core import (QgsWkbTypes,
-                       QgsFeature,
-                       QgsProcessing,
-                       QgsFields,
-                       QgsField,
+                       QgsCoordinateReferenceSystem,
                        QgsProcessingException,
+                       QgsProcessing,
                        QgsProcessingAlgorithm,
                        QgsProcessingParameterField,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
+                       QgsProcessingParameterDefinition,
+                       QgsProcessingParameterMapLayer,
                        )
-from valhalla.proc import HELP_DIR
+from .. import HELP_DIR
 from valhalla import RESOURCE_PREFIX, __help__
-from valhalla.common import client, PROFILES
-from valhalla.utils import transform, exceptions, logger, configmanager
+from valhalla.common import client, matrix_core
+from valhalla.utils import configmanager, transform, exceptions,logger
+from ..costing_params import CostingAuto
+from ..request_builder import get_locations, get_costing_options, get_avoid_locations
 
 
-class ORSmatrixAlgo(QgsProcessingAlgorithm):
-    # TODO: create base algorithm class common to all modules
+class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
 
-    ALGO_NAME = 'matrix_from_layers'
+    ALGO_NAME = 'matrix_auto'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
+
+    HELP = 'algorithm_directions_points.help'
+
+    COSTING = CostingAuto
+    PROFILE = 'auto'
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
     IN_START_FIELD = "INPUT_START_FIELD"
     IN_END = "INPUT_END_LAYER"
     IN_END_FIELD = "INPUT_END_FIELD"
-    IN_PROFILE = "INPUT_PROFILE"
+    IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
 
-    providers = configmanager.read_config()['providers']
+    def __init__(self):
+        super(ValhallaMatrixCarAlgo, self).__init__()
+        self.providers = configmanager.read_config()['providers']
+        self.costing_options = self.COSTING()
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
 
@@ -111,26 +119,33 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         )
 
         self.addParameter(
-            QgsProcessingParameterEnum(
-                self.IN_PROFILE,
-                "Travel mode",
-                PROFILES,
-                defaultValue=PROFILES[0]
+            QgsProcessingParameterFeatureSource(
+                name=self.IN_AVOID,
+                description="Point layer with locations to avoid",
+                types=[QgsProcessing.TypeVectorPoint],
+                optional=True
             )
         )
+
+        advanced = self.costing_options.get_costing_params()
+
+        for p in advanced:
+            p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
+            self.addParameter(p)
 
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
-                description="Matrix",
+                description="Valhalla_Matrix_" + self.PROFILE,
+                createByDefault=False
             )
         )
 
     def group(self):
-        return "Matrix"
+        return self.PROFILE.capitalize()
 
     def groupId(self):
-        return 'matrix'
+        return self.PROFILE
 
     def name(self):
         return self.ALGO_NAME
@@ -140,7 +155,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
 
         file = os.path.join(
             HELP_DIR,
-            'algorithm_matrix.help'
+            self.HELP
         )
         with open(file) as helpf:
             msg = helpf.read()
@@ -158,7 +173,7 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         return QIcon(RESOURCE_PREFIX + 'icon_matrix.png')
 
     def createInstance(self):
-        return ORSmatrixAlgo()
+        return ValhallaMatrixCarAlgo()
 
     def processAlgorithm(self, parameters, context, feedback):
 
@@ -167,15 +182,6 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
         clnt = client.Client(provider)
         clnt.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying"))
-
-        params = dict()
-
-        # Get profile value
-        profile = PROFILES[self.parameterAsEnum(
-            parameters,
-            self.IN_PROFILE,
-            context
-        )]
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -198,6 +204,11 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
             self.IN_END_FIELD,
             context
         )
+        avoid_layer = self.parameterAsSource(
+            parameters,
+            self.IN_AVOID,
+            context
+        )
 
         # Get fields from field name
         source_field_id = source.fields().lookupField(source_field_name)
@@ -206,101 +217,103 @@ class ORSmatrixAlgo(QgsProcessingAlgorithm):
         destination_field_id = destination.fields().lookupField(destination_field_name)
         destination_field = destination.fields().field(destination_field_id)
 
-        # Abort when MultiPoint type
-        if (source.wkbType() or destination.wkbType()) == 4:
-            raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
-
-        # Get source and destination features
-        sources_features = list(source.getFeatures())
-        destination_features = list(destination.getFeatures())
-        # Get feature amounts/counts
-        sources_amount = source.featureCount()
-        destinations_amount = destination.featureCount()
-
-        # Allow for 50 features in source if source == destination
-        source_equals_destination = parameters['INPUT_START_LAYER'] == parameters['INPUT_END_LAYER']
-        if source_equals_destination:
-            features = sources_features
-            xformer = transform.transformToWGS(source.sourceCrs())
-            features_points = [xformer.transform(feat.geometry().asPoint()) for feat in features]
-        else:
-            xformer = transform.transformToWGS(source.sourceCrs())
-            sources_features_xformed = [xformer.transform(feat.geometry().asPoint()) for feat in sources_features]
-
-            xformer = transform.transformToWGS(destination.sourceCrs())
-            destination_features_xformed = [xformer.transform(feat.geometry().asPoint()) for feat in destination_features]
-
-            features_points = sources_features_xformed + destination_features_xformed
-
-        # Get IDs
-        sources_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount))
-        destination_ids = list(range(sources_amount)) if source_equals_destination else list(range(sources_amount, sources_amount + destinations_amount))
-
-        # Populate parameters further
-        params.update({
-            'locations': [[point.x(), point.y()] for point in features_points],
-            'sources': sources_ids,
-            'destinations': destination_ids,
-            'metrics': ["duration", "distance"],
-            'id': 'Matrix'
-        })
-
-        # Make request and catch ApiError
-        try:
-            response = clnt.request('/v2/matrix/' + profile, {}, post_json=params)
-
-        except (exceptions.ApiError,
-                exceptions.InvalidKey,
-                exceptions.GenericServerError) as e:
-            msg = "{}: {}".format(
-                e.__class__.__name__,
-                str(e))
-            feedback.reportError(msg)
-            logger.log(msg)
-
         (sink, dest_id) = self.parameterAsSink(
             parameters,
             self.OUT,
             context,
-            self.get_fields(
+            matrix_core.get_fields(
                 source_field.type(),
                 destination_field.type()
             ),
             QgsWkbTypes.NoGeometry
         )
 
+        # Abort when MultiPoint type
+        if (source.wkbType() or destination.wkbType()) == 4:
+            raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
+
+        # Get feature amounts/counts
+        sources_amount = source.featureCount()
+        destinations_amount = destination.featureCount()
+        if (sources_amount or destinations_amount) > 10000:
+            raise QgsProcessingException(
+                "ProcessingError: Too large input, please decimate."
+            )
+
+        sources_features = list(source.getFeatures())
+        destinations_features = list(destination.getFeatures())
+
+        # Get source and destination features
+        xformer_source = transform.transformToWGS(source.sourceCrs())
+        sources_points = [xformer_source.transform(feat.geometry().asPoint()) for feat in sources_features]
+        xformer_destination = transform.transformToWGS(destination.sourceCrs())
+        destination_points = [xformer_destination.transform(feat.geometry().asPoint()) for feat in destinations_features]
+
+        # Build params
+        params = dict(
+            costing=self.PROFILE
+        )
+
+        # Sets all advanced parameters as attributes of self.costing_options
+        self.costing_options.set_costing_options(self, parameters, context)
+
+        costing_params = get_costing_options(self.costing_options, self.PROFILE)
+        if costing_params:
+            params['costing_options'] = costing_params
+
+        if avoid_layer:
+            params['avoid_locations'] = get_avoid_locations(avoid_layer)
+
         sources_attributes = [feat.attribute(source_field_name) for feat in sources_features]
-        destinations_attributes = [feat.attribute(destination_field_name) for feat in destination_features]
+        destinations_attributes = [feat.attribute(destination_field_name) for feat in destinations_features]
 
-        for s, source in enumerate(sources_attributes):
-            for d, destination in enumerate(destinations_attributes):
-                duration = response['durations'][s][d]
-                distance = response['distances'][s][d]
-                feat = QgsFeature()
-                feat.setAttributes([
-                    source,
-                    destination,
-                    duration / 3600 if duration is not None else None,
-                    distance / 1000 if distance is not None else None
-                ])
+        source_attr_iter = self._chunks(sources_attributes, 50)
+        for sources in self._chunks(sources_points, 50):
+            params["sources"] = get_locations(sources)
+            source_attributes = next(source_attr_iter)
 
-                sink.addFeature(feat)
+            destination_attr_iter = self._chunks(destinations_attributes, 50)
+            for destinations in self._chunks(destination_points, 50):
+                params["targets"] = get_locations(destinations)
+                params["id"] = "matrix"
+                destination_attributes = next(destination_attr_iter)
+
+                # Make request and catch ApiError
+                try:
+                    response = clnt.request('/sources_to_targets', post_json=params)
+
+                    feats = matrix_core.get_output_features_matrix(
+                        response,
+                        self.PROFILE,
+                        costing_params,
+                        source_attributes,
+                        destination_attributes
+                    )
+
+                    for feat in feats:
+                        sink.addFeature(feat)
+
+                except (exceptions.ApiError,
+                        exceptions.InvalidKey,
+                        exceptions.GenericServerError) as e:
+                    msg = "{}: {}".format(
+                        e.__class__.__name__,
+                        str(e))
+                    feedback.reportError(msg)
+                    logger.log(msg)
+
+                except Exception as e:
+                    msg = "{}: {}".format(
+                        e.__class__.__name__,
+                        str(e))
+                    feedback.reportError(msg)
+                    logger.log(msg)
+                    raise
 
         return {self.OUT: dest_id}
 
     @staticmethod
-    def get_fields(source_type, destination_type):
-
-        fields = QgsFields()
-        fields.append(QgsField("FROM_ID", source_type))
-        fields.append(QgsField("TO_ID", destination_type))
-        fields.append(QgsField("DURATION_H", QVariant.Double))
-        fields.append(QgsField("DIST_KM", QVariant.Double))
-
-        return fields
-
-    @staticmethod
-    def chunks(l, n):
+    def _chunks(l, n):
         """Yield successive n-sized chunks from l."""
         for i in range(0, len(l), n):
             yield l[i:i + n]

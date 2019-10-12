@@ -30,15 +30,12 @@
 import json
 from PyQt5.QtCore import QVariant
 
-from qgis.core import (NULL,
-                       QgsFeature,
+from qgis.core import (QgsFeature,
                        QgsFields,
                        QgsField)
 
-from valhalla.utils import convert
 
-
-def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FROM_ID", to_name="TO_ID", line=False):
+def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FROM_ID", to_name="TO_ID"):
     """
     Builds output fields for directions response layer.
 
@@ -53,9 +50,6 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
 
     :param to_name: field name for 'TO_ID' field
     :type to_name: field name for 'TO_ID' field
-
-    :param line: Specifies whether the output feature is a line or a point
-    :type line: boolean
 
     :returns: fields object to set attributes of output layer
     :rtype: QgsFields
@@ -72,7 +66,7 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     return fields
 
 
-def get_output_features_matrix(locations, response, profile, options=None):
+def get_output_features_matrix(response, profile, options=None, source_attrs=[], destination_attrs=[]):
     """
     Build output feature based on response attributes for directions endpoint.
 
@@ -85,7 +79,7 @@ def get_output_features_matrix(locations, response, profile, options=None):
     :type profile: str
 
     :param options: Costing options being used.
-    :type options: str
+    :type options: dict
 
     :returns: Ouput feature with attributes and geometry set.
     :rtype: QgsFeature
@@ -95,14 +89,22 @@ def get_output_features_matrix(locations, response, profile, options=None):
     sources = response['sources'][0]
     targets = response['targets'][0]
     for o, origin in enumerate(response['sources_to_targets']):
-        from_id = "{}, {}".format(sources[o]['lon'], sources[o]["lat"])
+        try:
+            from_id = source_attrs[o]
+        except IndexError:
+            from_id ="{}, {}".format(sources[o]['lon'], sources[o]["lat"])
         for d, destination in enumerate(origin):
-            to_id = "{}, {}".format(targets[d]['lon'], targets[d]["lat"])
+            try:
+                to_id = destination_attrs[d]
+            except IndexError:
+                to_id ="{}, {}".format(targets[d]['lon'], targets[d]["lat"])
             time = destination['time']
             distance = destination['distance']
 
             if time:
-                round(time / 3600, 3)
+                time = round(time / 3600, 3)
+            if distance:
+                distance = round(distance, 3)
 
             feat = QgsFeature()
             feat.setAttributes([

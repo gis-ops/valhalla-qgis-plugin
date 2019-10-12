@@ -308,10 +308,9 @@ class ValhallaDialogMain:
 
                 matrix = matrix_gui.Matrix(self.dlg)
                 params = matrix.get_parameters()
-                response = clnt.request('/sources_to_targets', {}, post_json=params)
+                response = clnt.request('/sources_to_targets', post_json=params)
                 # TODO: output matrix is mixed up on IDs
                 feats = matrix_core.get_output_features_matrix(
-                    matrix.locations,
                     response,
                     profile,
                     matrix.costing_options

@@ -100,9 +100,10 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
         )
 
         self.addParameter(
-            QgsProcessingParameterMapLayer(
+            QgsProcessingParameterFeatureSource(
                 name=self.IN_AVOID,
                 description="Point layer with locations to avoid",
+                types=[QgsProcessing.TypeVectorPoint],
                 optional=True
             )
         )
@@ -216,6 +217,9 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
         params = dict()
         if avoid_layer:
             params['avoid_locations'] = get_avoid_locations(avoid_layer)
+
+        # Sets all advanced parameters as attributes of self.costing_options
+        self.costing_options.set_costing_options(self, parameters, context)
 
         for num, (points, from_value) in enumerate(zip(input_points, from_values)):
             # Stop the algorithm if cancel button has been clicked

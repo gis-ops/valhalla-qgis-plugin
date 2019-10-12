@@ -47,6 +47,10 @@ from .isochrones.isochrones_layer_auto import ValhallaIsochronesCarAlgo
 from .isochrones.isochrones_layer_truck import ValhallaIsochronesTruckAlgo
 from .isochrones.isochrones_layer_bicycle import ValhallaIsochronesBicycleAlgo
 from .isochrones.isochrones_layer_pedestrian import ValhallaIsochronesPedestrianAlgo
+from .matrix.matrix_auto import ValhallaMatrixCarAlgo
+from .matrix.matrix_truck import ValhallaMatrixTruckAlgo
+from .matrix.matrix_bicycle import ValhallaMatrixBicycleAlgo
+from .matrix.matrix_pedestrian import ValhallaMatrixPedestrianAlgo
 
 
 class ValhallaProvider(QgsProcessingProvider):
@@ -71,7 +75,11 @@ class ValhallaProvider(QgsProcessingProvider):
             ValhallaIsochronesCarAlgo(),
             ValhallaIsochronesTruckAlgo(),
             ValhallaIsochronesBicycleAlgo(),
-            ValhallaIsochronesPedestrianAlgo()
+            ValhallaIsochronesPedestrianAlgo(),
+            ValhallaMatrixCarAlgo(),
+            ValhallaMatrixTruckAlgo(),
+            ValhallaMatrixBicycleAlgo(),
+            ValhallaMatrixPedestrianAlgo(),
         ]
 
     def unload(self):

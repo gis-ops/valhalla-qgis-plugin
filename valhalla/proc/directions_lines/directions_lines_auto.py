@@ -44,10 +44,10 @@ from qgis.core import (QgsWkbTypes,
                        )
 from .. import HELP_DIR
 from valhalla import RESOURCE_PREFIX, __help__
-from valhalla.common import client, directions_core, PROFILES
-from valhalla.utils import configmanager, transform, exceptions,logger, convert
+from valhalla.common import client, directions_core
+from valhalla.utils import configmanager, transform, exceptions,logger
 from ..costing_params import CostingAuto
-from ..request_builder import get_directions_params
+from ..request_builder import get_directions_params, get_avoid_locations
 
 
 class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
@@ -64,6 +64,7 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_LINES = "INPUT_LINE_LAYER"
     IN_FIELD = "INPUT_LAYER_FIELD"
+    IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
 
     def __init__(self):
@@ -96,6 +97,15 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
                 name=self.IN_FIELD,
                 description="Layer ID Field",
                 parentLayerParameterName=self.IN_LINES,
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterFeatureSource(
+                name=self.IN_AVOID,
+                description="Point layer with locations to avoid",
+                types=[QgsProcessing.TypeVectorPoint],
+                optional=True
             )
         )
 
@@ -149,8 +159,11 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
 
     def processAlgorithm(self, parameters, context, feedback):
 
+        # Init ORS client
         providers = configmanager.read_config()['providers']
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
+        clnt = client.Client(provider)
+        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -165,8 +178,18 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
             context
         )
 
+        avoid_layer = self.parameterAsLayer(
+            parameters,
+            self.IN_AVOID,
+            context
+        )
+
+        params = dict()
         # Sets all advanced parameters as attributes of self.costing_options
         self.costing_options.set_costing_options(self, parameters, context)
+        avoid_param = get_avoid_locations(avoid_layer)
+        if avoid_param:
+            params['avoid_locations'] = avoid_param
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                directions_core.get_fields(from_type=source.fields().field(source_field_name).type(),
@@ -175,7 +198,38 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
                                                source.wkbType(),
                                                QgsCoordinateReferenceSystem(4326))
 
-        self._make_request(source, sink, provider, source_field_name, feedback)
+        count = source.featureCount()
+        for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):
+            # Stop the algorithm if cancel button has been clicked
+            if feedback.isCanceled():
+                break
+
+            try:
+                params.update(get_directions_params(line, self.PROFILE, self.costing_options))
+                params['id'] = field_value
+                response = clnt.request('/route', post_json=params)
+                options = {}
+                if params.get('costing_options'):
+                    options = params['costing_options']
+
+                sink.addFeature(directions_core.get_output_feature_directions(
+                    response,
+                    self.PROFILE,
+                    options.get(self.PROFILE),
+                    from_value=field_value
+                ))
+            except (exceptions.ApiError,
+                    exceptions.InvalidKey,
+                    exceptions.GenericServerError) as e:
+                msg = "Feature ID {} caused a {}:\n{}".format(
+                    field_value,
+                    e.__class__.__name__,
+                    str(e))
+                feedback.reportError(msg)
+                logger.log(msg)
+                continue
+
+            feedback.setProgress(int(100.0 / count * num))
 
         return {self.OUT: dest_id}
 
@@ -207,44 +261,3 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
                 line = [xformer.transform(QgsPointXY(point)) for point in feat.geometry().asPolyline()]
 
             yield line, field_value
-
-    def _make_request(self, source, sink, provider, source_field_name, feedback, extra_params={}):
-
-        # Init ORS client
-        clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
-
-        count = source.featureCount()
-
-        for num, (line, field_value) in enumerate(self._get_sorted_lines(source, source_field_name)):
-            # Stop the algorithm if cancel button has been clicked
-            if feedback.isCanceled():
-                break
-
-            try:
-                params = get_directions_params(line, self.PROFILE, self.costing_options)
-                params['id'] = field_value
-                params.update(extra_params)
-                response = clnt.request('/route', post_json=params)
-                options = {}
-                if params.get('costing_options'):
-                    options = params['costing_options']
-
-                sink.addFeature(directions_core.get_output_feature_directions(
-                    response,
-                    self.PROFILE,
-                    options.get(self.PROFILE),
-                    from_value=field_value
-                ))
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
-                msg = "Feature ID {} caused a {}:\n{}".format(
-                    field_value,
-                    e.__class__.__name__,
-                    str(e))
-                feedback.reportError(msg)
-                logger.log(msg)
-                continue
-
-            feedback.setProgress(int(100.0 / count * num))

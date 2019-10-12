@@ -146,9 +146,10 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         )
 
         self.addParameter(
-            QgsProcessingParameterMapLayer(
+            QgsProcessingParameterFeatureSource(
                 name=self.IN_AVOID,
                 description="Point layer with locations to avoid",
+                types=[QgsProcessing.TypeVectorPoint],
                 optional=True
             )
         )
@@ -230,8 +231,9 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             self.IN_AVOID,
             context
         )
-        if avoid_layer:
-            params['avoid_locations'] = get_avoid_locations(avoid_layer)
+        avoid_param = get_avoid_locations(avoid_layer)
+        if avoid_param:
+            params['avoid_locations'] = avoid_param
 
         # Get ID field properties
         id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
@@ -247,6 +249,9 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         # Populate iso_layer instance with parameters
         self.isochrones.set_parameters(self.PROFILE, geometry_param, id_field.type(), id_field_name)
+
+        # Sets all advanced parameters as attributes of self.costing_options
+        self.costing_options.set_costing_options(self, parameters, context)
 
         # Make the actual requests
         requests = []

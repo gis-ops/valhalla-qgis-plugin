@@ -144,13 +144,13 @@ def get_output_feature_directions(response, profile, options=None, from_value=No
                 list(reversed(coord))
                 for coord in convert.decode_polyline6(leg['shape'])
             ])
-            duration += leg['summary']['time']
-            distance += int(leg['summary']['length'])
+            duration += round(leg['summary']['time'] / 3600, 3)
+            distance += round(leg['summary']['length'], 3)
 
     qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
     feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-    feat.setAttributes(["{0:.3f}".format(distance),
-                        "{0:.3f}".format(duration / 3600),
+    feat.setAttributes([distance,
+                        duration,
                         profile,
                         json.dumps(options),
                         from_value,

@@ -2,39 +2,27 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="3c3a534b-3a27-4b9d-ad9c-72a2f917ce5b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/costing_params.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_lines/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_bicycle.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_pedestrian.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_truck.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_bicycle.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_pedestrian.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_truck.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_bicycle.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_pedestrian.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_truck.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/isochrones/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_bicycle.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_pedestrian.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_truck.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/valhalla/proc/request_builder.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/valhalla/proc/matrix/matrix_bicycle.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/valhalla/proc/matrix/matrix_pedestrian.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/valhalla/proc/matrix/matrix_truck.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/ValhallaPlugin.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/ValhallaPlugin.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/common/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/common/__init__.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/valhalla/common/directions_core.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/common/directions_core.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/common/isochrones_core.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/common/isochrones_core.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/common/matrix_core.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/common/matrix_core.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/valhalla/config.yml" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/config.yml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/valhalla/gui/ValhallaDialog.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/gui/ValhallaDialog.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/gui/ValhallaDialogUI.ui" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/gui/ValhallaDialogUI.ui" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/help/algorithm_isochrone_point.help" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/proc/directions_lines_proc.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/proc/directions_points_layer_proc.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/proc/directions_points_layers_proc.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/proc/isochrones_layer_proc.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/valhalla/proc/isochrones_point_proc.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/metadata.txt" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/metadata.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/proc/matrix/matrix_proc.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/matrix/matrix_auto.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/valhalla/proc/provider.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/provider.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/proc/request_builder.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/proc/request_builder.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/static/html/github_star.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/static/js/github_buttons.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/utils/convert.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/valhalla/utils/maptools.py" beforeDir="false" afterPath="$PROJECT_DIR$/valhalla/utils/maptools.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -46,46 +34,48 @@
     <session id="-78820545">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="5" />
+          <entry key="project.closed" value="6" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.1" value="2" />
-          <entry key="project.open.time.2" value="1" />
+          <entry key="project.open.time.2" value="2" />
           <entry key="project.open.time.7" value="2" />
-          <entry key="project.opened" value="6" />
+          <entry key="project.opened" value="7" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="Python Console" value="186" />
-          <entry key="dummy" value="375" />
-          <entry key="py" value="14650" />
-          <entry key="txt" value="70" />
-          <entry key="yml" value="82" />
+          <entry key="Python Console" value="274" />
+          <entry key="dummy" value="385" />
+          <entry key="gitignore" value="7" />
+          <entry key="py" value="17216" />
+          <entry key="txt" value="145" />
+          <entry key="yml" value="84" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="445" />
-          <entry key="Python" value="14836" />
-          <entry key="YAML" value="82" />
+          <entry key="PLAIN_TEXT" value="537" />
+          <entry key="Python" value="17490" />
+          <entry key="YAML" value="84" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
+          <entry key="gitignore" value="1" />
           <entry key="png" value="1" />
-          <entry key="py" value="112" />
+          <entry key="py" value="141" />
           <entry key="svg" value="1" />
-          <entry key="txt" value="2" />
-          <entry key="yml" value="2" />
+          <entry key="txt" value="3" />
+          <entry key="yml" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="Image" value="1" />
-          <entry key="PLAIN_TEXT" value="2" />
-          <entry key="Python" value="112" />
+          <entry key="PLAIN_TEXT" value="4" />
+          <entry key="Python" value="141" />
           <entry key="SVG" value="1" />
-          <entry key="YAML" value="2" />
+          <entry key="YAML" value="3" />
         </counts>
       </usages-collector>
     </session>
@@ -93,72 +83,58 @@
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_auto.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="56" column="41" lean-forward="true" selection-start-line="56" selection-start-column="41" selection-end-line="56" selection-end-column="41" />
+            <state relative-caret-position="263">
+              <caret line="124" column="54" selection-start-line="124" selection-start-column="54" selection-end-line="124" selection-end-column="54" />
               <folding>
                 <element signature="e#1441#1455#0" expanded="true" />
-                <marker date="1570819757947" expanded="true" signature="2412:2418" ph="..." />
-                <marker date="1570819757947" expanded="true" signature="6345:6351" ph="..." />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_bicycle.py">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_truck.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
-              <caret line="35" column="51" selection-start-line="35" selection-start-column="51" selection-end-line="35" selection-end-column="51" />
+            <state relative-caret-position="520">
+              <caret line="37" column="21" lean-forward="true" selection-start-line="37" selection-start-column="21" selection-end-line="37" selection-end-column="21" />
               <folding>
-                <element signature="e#1440#1483#0" expanded="true" />
+                <element signature="e#1440#1486#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_pedestrian.py">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_bicycle.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
-              <caret line="55" column="54" selection-start-line="55" selection-start-column="54" selection-end-line="55" selection-end-column="54" />
+            <state relative-caret-position="555">
+              <caret line="37" column="22" selection-start-line="37" selection-start-column="22" selection-end-line="37" selection-end-column="22" />
               <folding>
-                <element signature="e#1441#1455#0" expanded="true" />
+                <element signature="e#1440#1486#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_pedestrian.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="480">
+              <caret line="32" column="58" lean-forward="true" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
+              <folding>
+                <element signature="e#1440#1486#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_truck.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="460">
-              <caret line="56" column="49" selection-start-line="56" selection-start-column="49" selection-end-line="56" selection-end-column="49" />
-              <folding>
-                <element signature="e#1441#1455#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="486">
-              <caret line="55" column="41" lean-forward="true" selection-start-line="55" selection-start-column="41" selection-end-line="55" selection-end-column="41" />
-              <folding>
-                <element signature="e#1441#1455#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/valhalla/proc/provider.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="415">
-              <caret line="69" column="39" lean-forward="true" selection-start-line="69" selection-start-column="39" selection-end-line="69" selection-end-column="39" />
+            <state relative-caret-position="385">
+              <caret line="73" column="54" lean-forward="true" selection-start-line="73" selection-start-column="54" selection-end-line="73" selection-end-column="54" />
               <folding>
                 <element signature="e#1441#1470#0" expanded="true" />
               </folding>
@@ -167,34 +143,36 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_pedestrian.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="510">
-              <caret line="34" column="59" selection-start-line="34" selection-start-column="59" selection-end-line="34" selection-end-column="59" />
-              <folding>
-                <element signature="e#1440#1515#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_bicycle.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="555">
-              <caret line="37" column="22" selection-start-line="37" selection-start-column="22" selection-end-line="37" selection-end-column="22" />
-              <folding>
-                <element signature="e#1440#1515#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="188">
-              <caret line="55" column="41" lean-forward="true" selection-start-line="55" selection-start-column="41" selection-end-line="55" selection-end-column="41" />
+            <state relative-caret-position="488">
+              <caret line="134" column="54" selection-start-line="134" selection-start-column="54" selection-end-line="134" selection-end-column="54" />
+              <folding>
+                <element signature="e#1441#1455#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="135">
+              <caret line="105" column="66" lean-forward="true" selection-start-line="105" selection-start-column="66" selection-end-line="106" selection-end-column="54" />
+              <folding>
+                <element signature="e#1441#1455#0" expanded="true" />
+                <marker date="1570888530253" expanded="true" signature="2414:2420" ph="..." />
+                <marker date="1570888530253" expanded="true" signature="8379:8385" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="201">
+              <caret line="105" column="54" selection-start-line="105" selection-start-column="54" selection-end-line="105" selection-end-column="54" />
               <folding>
                 <element signature="e#1441#1455#0" expanded="true" />
               </folding>
@@ -205,10 +183,24 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2153">
-              <caret line="195" column="75" selection-start-line="195" selection-start-column="75" selection-end-line="195" selection-end-column="75" />
+            <state relative-caret-position="420">
+              <caret line="151" column="54" selection-start-line="151" selection-start-column="54" selection-end-line="151" selection-end-column="54" />
               <folding>
                 <element signature="e#1440#1454#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/valhalla/proc/request_builder.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="4" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="4" />
+              <folding>
+                <element signature="e#0#14#0" expanded="true" />
+                <marker date="1570887925741" expanded="true" signature="1167:1819" ph="..." />
+                <marker date="1570887925741" expanded="true" signature="1856:1861" ph="..." />
               </folding>
             </state>
           </provider>
@@ -248,19 +240,14 @@
       <list>
         <option value="$USER_HOME$/anaconda3/lib/python3.7/site-packages/PyQt5/uic/properties.py" />
         <option value="$PROJECT_DIR$/valhalla/gui/ValhallaDialogConfig.py" />
-        <option value="$PROJECT_DIR$/valhalla/metadata.txt" />
         <option value="$PROJECT_DIR$/valhalla/utils/convert.py" />
         <option value="$PROJECT_DIR$/valhalla/__init__.py" />
         <option value="$PROJECT_DIR$/valhalla/gui/common_gui.py" />
-        <option value="$PROJECT_DIR$/valhalla/utils/maptools.py" />
         <option value="$PROJECT_DIR$/valhalla/gui/directions_gui.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/matrix_proc.py" />
         <option value="$PROJECT_DIR$/valhalla/gui/matrix_gui.py" />
-        <option value="$PROJECT_DIR$/valhalla/common/matrix_core.py" />
         <option value="$PROJECT_DIR$/valhalla/gui/isochrones_gui.py" />
         <option value="$PROJECT_DIR$/valhalla/common/client.py" />
-        <option value="$PROJECT_DIR$/valhalla/config.yml" />
-        <option value="$PROJECT_DIR$/valhalla/gui/ValhallaDialog.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_lines_proc.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_proc.py" />
         <option value="$PROJECT_DIR$/valhalla/ValhallaPlugin.py" />
@@ -269,8 +256,6 @@
         <option value="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_truck.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_bicycle.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_pedestrian.py" />
-        <option value="$PROJECT_DIR$/valhalla/proc/request_builder.py" />
-        <option value="$PROJECT_DIR$/valhalla/common/directions_core.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_truck.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/costing_params.py" />
         <option value="$PROJECT_DIR$/valhalla/common/isochrones_core.py" />
@@ -278,16 +263,28 @@
         <option value="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_pedestrian.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_bicycle.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_truck.py" />
-        <option value="$PROJECT_DIR$/valhalla/proc/provider.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_bicycle.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_pedestrian.py" />
-        <option value="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_bicycle.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_truck.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_pedestrian.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/valhalla/utils/maptools.py" />
+        <option value="$PROJECT_DIR$/valhalla/config.yml" />
+        <option value="$PROJECT_DIR$/valhalla/metadata.txt" />
+        <option value="$PROJECT_DIR$/valhalla/common/directions_core.py" />
+        <option value="$PROJECT_DIR$/valhalla/gui/ValhallaDialog.py" />
+        <option value="$PROJECT_DIR$/valhalla/common/matrix_core.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/request_builder.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py" />
         <option value="$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py" />
-        <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_bicycle.py" />
-        <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_pedestrian.py" />
-        <option value="$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_truck.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/matrix/matrix_auto.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/matrix/matrix_bicycle.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/matrix/matrix_truck.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/matrix/matrix_pedestrian.py" />
+        <option value="$PROJECT_DIR$/valhalla/proc/provider.py" />
       </list>
     </option>
   </component>
@@ -308,6 +305,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -336,12 +334,6 @@
               <item name="valhalla-qgis-plugin" type="462c0819:PsiDirectoryNode" />
               <item name="valhalla" type="462c0819:PsiDirectoryNode" />
               <item name="gui" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="valhalla-qgis-plugin" type="b2602c69:ProjectViewProjectNode" />
-              <item name="valhalla-qgis-plugin" type="462c0819:PsiDirectoryNode" />
-              <item name="valhalla" type="462c0819:PsiDirectoryNode" />
-              <item name="help" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="valhalla-qgis-plugin" type="b2602c69:ProjectViewProjectNode" />
@@ -377,11 +369,23 @@
               <item name="proc" type="462c0819:PsiDirectoryNode" />
               <item name="isochrones" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="valhalla-qgis-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="valhalla-qgis-plugin" type="462c0819:PsiDirectoryNode" />
+              <item name="valhalla" type="462c0819:PsiDirectoryNode" />
+              <item name="proc" type="462c0819:PsiDirectoryNode" />
+              <item name="matrix" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="valhalla-qgis-plugin" type="b2602c69:ProjectViewProjectNode" />
+              <item name="valhalla-qgis-plugin" type="462c0819:PsiDirectoryNode" />
+              <item name="valhalla" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -392,19 +396,19 @@
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="$PROJECT_DIR$/valhalla/proc/isochrones" />
-      <recent name="$PROJECT_DIR$/valhalla/proc/directions_points_layers" />
-      <recent name="$PROJECT_DIR$/valhalla/proc/direction_point_layer" />
-      <recent name="$PROJECT_DIR$/valhalla/proc/directions_lines" />
-      <recent name="$PROJECT_DIR$" />
-    </key>
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/valhalla/proc/matrix" />
       <recent name="$PROJECT_DIR$/valhalla/proc/isochrones" />
       <recent name="$PROJECT_DIR$/valhalla/proc/directions_points_layers" />
       <recent name="$PROJECT_DIR$/valhalla/proc/directions_point_layer" />
       <recent name="$PROJECT_DIR$/valhalla/proc/directions_lines" />
-      <recent name="$PROJECT_DIR$/valhalla/gui" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/" />
+      <recent name="$PROJECT_DIR$/valhalla/proc/matrix" />
+      <recent name="$PROJECT_DIR$/proc/matrix" />
+      <recent name="$PROJECT_DIR$/valhalla/proc/isochrones" />
+      <recent name="$PROJECT_DIR$/valhalla/proc/directions_points_layers" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -434,8 +438,9 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="67" y="25" width="1853" height="1055" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.26342005" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26674044" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -448,14 +453,14 @@
       <window_info anchor="bottom" id="Docker" order="7" />
       <window_info anchor="bottom" id="Version Control" order="8" show_stripe_button="false" />
       <window_info anchor="bottom" id="Database Changes" order="9" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="11" visible="true" weight="0.23243243" />
-      <window_info anchor="bottom" id="Python Console" order="12" weight="0.32972974" />
+      <window_info anchor="bottom" id="Event Log" order="10" sideWeight="0.5002767" side_tool="true" visible="true" weight="0.23243243" />
+      <window_info anchor="bottom" id="Terminal" order="11" sideWeight="0.4997233" visible="true" weight="0.23243243" />
+      <window_info anchor="bottom" id="Python Console" order="12" sideWeight="0.4997233" weight="0.32972974" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="SciView" order="3" />
-      <window_info anchor="right" x="0" y="0" width="413" height="855" id="Documentation" order="4" side_tool="true" weight="0.23851688" />
+      <window_info anchor="right" x="0" y="0" width="413" height="855" id="Documentation" order="4" side_tool="true" visible="true" weight="0.23851688" />
       <window_info anchor="right" id="Database" order="5" />
     </layout>
   </component>
@@ -466,63 +471,6 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/valhalla/gui/ValhallaDialogConfigUI.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/gui/ValhallaDialogConfig.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="196">
-          <caret line="35" column="63" selection-start-line="35" selection-start-column="63" selection-end-line="35" selection-end-column="63" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/gui/img/icon_orstools.svg" />
-    <entry file="file://$PROJECT_DIR$/valhalla/utils/convert.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1800">
-          <caret line="120" column="44" selection-start-line="120" selection-start-column="44" selection-end-line="120" selection-end-column="44" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/metadata.txt">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="285">
-          <caret line="19" column="30" selection-start-line="19" selection-start-column="30" selection-end-line="19" selection-end-column="30" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file:///usr/lib/python3.6/configparser.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="10050">
-          <caret line="678" column="8" selection-start-line="678" selection-start-column="8" selection-end-line="678" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-2066100795/PyQt5/QtNetwork/QNetworkRequest.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-1875">
-          <caret line="10" column="6" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/common/networkaccessmanager.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="152" column="13" selection-start-line="152" selection-start-column="13" selection-end-line="152" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/utils/maptools.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-7">
-          <caret line="48" column="55" selection-start-line="48" selection-start-column="55" selection-end-line="48" selection-end-column="55" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/python3/dist-packages/qgis/PyQt/QtCore.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="486">
@@ -540,48 +488,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/gui/matrix_gui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="945">
-          <caret line="64" column="36" selection-start-line="64" selection-start-column="36" selection-end-line="64" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/common/matrix_core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1560">
-          <caret line="112" column="18" selection-start-line="112" selection-start-column="18" selection-end-line="112" selection-end-column="18" />
-          <folding>
-            <element signature="e#1441#1452#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix_proc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4230">
-          <caret line="302" column="21" selection-start-line="302" selection-start-column="21" selection-end-line="302" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/utils/exceptions.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="341">
-          <caret line="82" column="8" selection-start-line="82" selection-start-column="8" selection-end-line="82" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/valhalla/gui/ValhallaDialogUI.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="150">
           <caret line="822" column="56" selection-start-line="822" selection-start-column="40" selection-end-line="822" selection-end-column="56" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/config.yml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="150">
-          <caret line="10" column="6" lean-forward="true" selection-start-line="10" selection-start-column="6" selection-end-line="10" selection-end-column="6" />
         </state>
       </provider>
     </entry>
@@ -603,16 +513,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/valhalla/gui/img/icon_directions.png">
       <provider selected="true" editor-type-id="images" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/__init__.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="47" selection-start-line="47" selection-end-line="47" />
-          <folding>
-            <element signature="e#1441#1455#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
     </entry>
     <entry file="file://$USER_HOME$/.PyCharm2018.2/system/python_stubs/-2066100795/qgis/_core/QgsProcessing.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -638,16 +538,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/gui/common_gui.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="53" column="4" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="4" />
-          <folding>
-            <marker date="1570358674213" expanded="true" signature="2178:2183" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/valhalla/common/client.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-975">
@@ -669,96 +559,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/common/directions_core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="225">
-          <caret line="54" column="42" selection-start-line="54" selection-start-column="42" selection-end-line="54" selection-end-column="42" />
-          <folding>
-            <element signature="e#1441#1470#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_truck.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="420">
-          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
-          <folding>
-            <element signature="e#1440#1513#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_bicycle.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="485">
-          <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
-          <folding>
-            <element signature="e#1440#1513#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_pedestrian.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="555">
-          <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
-          <folding>
-            <element signature="e#1440#1513#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/costing_params.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="262">
-          <caret line="159" column="18" selection-start-line="159" selection-start-column="18" selection-end-line="159" selection-end-column="18" />
-          <folding>
-            <element signature="e#0#204#0" expanded="true" />
-            <marker date="1570813099094" expanded="true" signature="328:334" ph="..." />
-            <marker date="1570813099094" expanded="true" signature="328:1524" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/request_builder.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="4" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#14#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/gui/ValhallaDialog.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="218">
-          <caret line="297" column="44" selection-start-line="297" selection-start-column="44" selection-end-line="297" selection-end-column="44" />
-          <folding>
-            <element signature="e#1441#1450#0" expanded="true" />
-            <marker date="1570712837991" expanded="true" signature="6632:6900" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/common/isochrones_core.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="123" column="73" selection-start-line="123" selection-start-column="73" selection-end-line="123" selection-end-column="73" />
-          <folding>
-            <element signature="e#1442#1475#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_pedestrian.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="520">
           <caret line="37" column="26" lean-forward="true" selection-start-line="37" selection-start-column="26" selection-end-line="37" selection-end-column="26" />
-          <folding>
-            <element signature="e#1440#1486#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -766,9 +570,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="460">
           <caret line="34" column="36" selection-start-line="34" selection-start-column="36" selection-end-line="34" selection-end-column="36" />
-          <folding>
-            <element signature="e#1440#1483#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -776,9 +577,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="460">
           <caret line="34" column="34" selection-start-line="34" selection-start-column="34" selection-end-line="34" selection-end-column="34" />
-          <folding>
-            <element signature="e#1440#1481#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -796,9 +594,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="510">
           <caret line="34" column="59" selection-start-line="34" selection-start-column="59" selection-end-line="34" selection-end-column="59" />
-          <folding>
-            <element signature="e#1440#1515#0" expanded="true" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -806,60 +601,25 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="555">
           <caret line="37" column="22" selection-start-line="37" selection-start-column="22" selection-end-line="37" selection-end-column="22" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_truck.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="340">
+          <caret line="27" column="3" selection-start-line="27" selection-start-column="3" selection-end-line="27" selection-end-column="3" />
           <folding>
-            <element signature="e#1440#1515#0" expanded="true" />
+            <element signature="e#1440#1486#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/provider.py">
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_pedestrian.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="415">
-          <caret line="69" column="39" lean-forward="true" selection-start-line="69" selection-start-column="39" selection-end-line="69" selection-end-column="39" />
+        <state relative-caret-position="340">
+          <caret line="27" column="3" selection-start-line="27" selection-start-column="3" selection-end-line="27" selection-end-column="3" />
           <folding>
-            <element signature="e#1441#1470#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="188">
-          <caret line="55" column="41" lean-forward="true" selection-start-line="55" selection-start-column="41" selection-end-line="55" selection-end-column="41" />
-          <folding>
-            <element signature="e#1441#1455#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="486">
-          <caret line="55" column="41" lean-forward="true" selection-start-line="55" selection-start-column="41" selection-end-line="55" selection-end-column="41" />
-          <folding>
-            <element signature="e#1441#1455#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2153">
-          <caret line="195" column="75" selection-start-line="195" selection-start-column="75" selection-end-line="195" selection-end-column="75" />
-          <folding>
-            <element signature="e#1440#1454#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="56" column="41" lean-forward="true" selection-start-line="56" selection-start-column="41" selection-end-line="56" selection-end-column="41" />
-          <folding>
-            <element signature="e#1441#1455#0" expanded="true" />
-            <marker date="1570819757947" expanded="true" signature="2412:2418" ph="..." />
-            <marker date="1570819757947" expanded="true" signature="6345:6351" ph="..." />
+            <element signature="e#1440#1486#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -874,22 +634,258 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_pedestrian.py">
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_truck.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="55" column="54" selection-start-line="55" selection-start-column="54" selection-end-line="55" selection-end-column="54" />
+        <state relative-caret-position="420">
+          <caret line="28" lean-forward="true" selection-start-line="28" selection-end-line="28" />
+          <folding>
+            <element signature="e#1440#1513#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/utils/convert.py" />
+    <entry file="file://$PROJECT_DIR$/valhalla/utils/transform.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_bicycle.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="33" column="52" selection-start-line="33" selection-start-column="52" selection-end-line="33" selection-end-column="52" />
+          <folding>
+            <element signature="e#1440#1513#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/config.yml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="195">
+          <caret line="13" column="99" selection-start-line="13" selection-start-column="99" selection-end-line="13" selection-end-column="99" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/metadata.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="270">
+          <caret line="18" column="16" selection-start-line="18" selection-start-column="16" selection-end-line="18" selection-end-column="16" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="6" selection-start-column="6" selection-end-column="6" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/utils/exceptions.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1230">
+          <caret line="82" column="8" selection-start-line="82" selection-start-column="8" selection-end-line="82" selection-end-column="8" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/utils/logger.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/utils/maptools.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1020">
+          <caret line="75" column="31" selection-start-line="75" selection-start-column="31" selection-end-line="75" selection-end-column="31" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_pedestrian.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="540">
+          <caret line="37" lean-forward="true" selection-start-line="37" selection-end-line="37" />
+          <folding>
+            <element signature="e#1440#1513#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/__init__.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="53" selection-start-line="53" selection-end-line="53" />
           <folding>
             <element signature="e#1441#1455#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_truck.py">
+    <entry file="file://$PROJECT_DIR$/valhalla/gui/common_gui.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="460">
-          <caret line="56" column="49" selection-start-line="56" selection-start-column="49" selection-end-line="56" selection-end-column="49" />
+        <state relative-caret-position="685">
+          <caret line="53" column="4" selection-start-line="53" selection-start-column="4" selection-end-line="53" selection-end-column="4" />
+          <folding>
+            <marker date="1570358674213" expanded="true" signature="2178:2183" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/common/directions_core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="155" column="35" selection-start-line="155" selection-start-column="35" selection-end-line="155" selection-end-column="35" />
+          <folding>
+            <element signature="e#1441#1470#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/common/isochrones_core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="38">
+          <caret line="94" column="8" selection-start-line="94" selection-start-column="8" selection-end-line="94" selection-end-column="8" />
+          <folding>
+            <element signature="e#1442#1475#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/gui/matrix_gui.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="655">
+          <caret line="62" column="9" selection-start-line="62" selection-start-column="9" selection-end-line="62" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/common/matrix_core.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="505">
+          <caret line="106" column="41" selection-start-line="106" selection-start-column="41" selection-end-line="106" selection-end-column="41" />
+          <folding>
+            <element signature="e#1441#1452#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/gui/ValhallaDialog.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="218">
+          <caret line="312" column="63" selection-start-line="312" selection-start-column="63" selection-end-line="312" selection-end-column="63" />
+          <folding>
+            <element signature="e#1441#1450#0" expanded="true" />
+            <marker date="1570875438969" expanded="true" signature="6632:6900" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/costing_params.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="9" column="19" lean-forward="true" selection-start-line="9" selection-start-column="19" selection-end-line="9" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#204#0" expanded="true" />
+            <marker date="1570813099094" expanded="true" signature="328:334" ph="..." />
+            <marker date="1570813099094" expanded="true" signature="328:1524" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/request_builder.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="4" selection-start-line="7" selection-start-column="4" selection-end-line="7" selection-end-column="4" />
+          <folding>
+            <element signature="e#0#14#0" expanded="true" />
+            <marker date="1570887925741" expanded="true" signature="1167:1819" ph="..." />
+            <marker date="1570887925741" expanded="true" signature="1856:1861" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_lines/directions_lines_auto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="105" column="66" lean-forward="true" selection-start-line="105" selection-start-column="66" selection-end-line="106" selection-end-column="54" />
           <folding>
             <element signature="e#1441#1455#0" expanded="true" />
+            <marker date="1570888530253" expanded="true" signature="2414:2420" ph="..." />
+            <marker date="1570888530253" expanded="true" signature="8379:8385" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_point_layer/directions_points_layer_auto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="201">
+          <caret line="105" column="54" selection-start-line="105" selection-start-column="54" selection-end-line="105" selection-end-column="54" />
+          <folding>
+            <element signature="e#1441#1455#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/directions_points_layers/directions_points_layers_auto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="488">
+          <caret line="134" column="54" selection-start-line="134" selection-start-column="54" selection-end-line="134" selection-end-column="54" />
+          <folding>
+            <element signature="e#1441#1455#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/isochrones/isochrones_layer_auto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="420">
+          <caret line="151" column="54" selection-start-line="151" selection-start-column="54" selection-end-line="151" selection-end-column="54" />
+          <folding>
+            <element signature="e#1440#1454#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_auto.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="263">
+          <caret line="124" column="54" selection-start-line="124" selection-start-column="54" selection-end-line="124" selection-end-column="54" />
+          <folding>
+            <element signature="e#1441#1455#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_truck.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="520">
+          <caret line="37" column="21" lean-forward="true" selection-start-line="37" selection-start-column="21" selection-end-line="37" selection-end-column="21" />
+          <folding>
+            <element signature="e#1440#1486#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_bicycle.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="555">
+          <caret line="37" column="22" selection-start-line="37" selection-start-column="22" selection-end-line="37" selection-end-column="22" />
+          <folding>
+            <element signature="e#1440#1486#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/matrix/matrix_pedestrian.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="480">
+          <caret line="32" column="58" lean-forward="true" selection-start-line="32" selection-start-column="58" selection-end-line="32" selection-end-column="58" />
+          <folding>
+            <element signature="e#1440#1486#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/valhalla/proc/provider.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="385">
+          <caret line="73" column="54" lean-forward="true" selection-start-line="73" selection-start-column="54" selection-end-line="73" selection-end-column="54" />
+          <folding>
+            <element signature="e#1441#1470#0" expanded="true" />
           </folding>
         </state>
       </provider>

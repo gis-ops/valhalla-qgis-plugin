@@ -1,15 +1,15 @@
 [general]
 name=Valhalla
 qgisMinimumVersion=3.0
-description=valhalla routing, isochrones and matrix calculations for QGIS
+description=Valhalla routing, isochrones and matrix calculations for QGIS
 
 version=1.0.0
 author=GIS • OPS UG
 email=nils@gis-ops.com
 
-about=ORS Tools provides access to most of the functions of openrouteservice.org, based on OpenStreetMap. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
+about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2019/10/05 v0.1 first version
+changelog=2019/10/05 v1.0.0 first version
 
 tracker=https://github.com/gis-ops/valhalla-qgis-plugin/issues
 repository=https://github.com/gis-ops/valhalla-qgis-plugin.git
