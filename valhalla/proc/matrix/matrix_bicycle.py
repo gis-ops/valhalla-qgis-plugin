@@ -32,6 +32,7 @@ from ..costing_params import CostingBicycle
 class ValhallaMatrixBicycleAlgo(ValhallaMatrixCarAlgo):
 
     ALGO_NAME = 'matrix_bicycle'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     COSTING = CostingBicycle
     PROFILE = 'bicycle'

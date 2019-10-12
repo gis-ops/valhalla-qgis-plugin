@@ -32,6 +32,7 @@ from .isochrones_layer_auto import ValhallaIsochronesCarAlgo
 class ValhallaIsochronesTruckAlgo(ValhallaIsochronesCarAlgo):
 
     ALGO_NAME = 'isochrones_truck'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     COSTING = CostingTruck
     PROFILE = 'truck'

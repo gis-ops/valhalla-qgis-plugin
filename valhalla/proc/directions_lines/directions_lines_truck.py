@@ -33,6 +33,7 @@ class ValhallaRouteLinesTruckAlgo(ValhallaRouteLinesCarAlgo):
     """Algorithm class for Directions Lines."""
 
     ALGO_NAME = 'directions_from_polylines_truck'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     COSTING = CostingPedestrian
     PROFILE = 'truck'

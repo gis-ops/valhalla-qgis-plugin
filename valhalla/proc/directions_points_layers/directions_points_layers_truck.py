@@ -32,6 +32,7 @@ from ..costing_params import CostingPedestrian
 class ValhallaRoutePointsLayersTruckAlgo(ValhallaRoutePointsLayersCarAlgo):
 
     ALGO_NAME = 'directions_from_points_2_layers_truck'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     COSTING = CostingPedestrian
     PROFILE = 'truck'

@@ -31,6 +31,7 @@ from ..costing_params import CostingBicycle
 class ValhallaRoutePointsLayerBicycleAlgo(ValhallaRoutePointsLayerCarAlgo):
 
     ALGO_NAME = 'directions_from_point_layer_bicycle'
+    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
     COSTING = CostingBicycle
     PROFILE = 'bicycle'
