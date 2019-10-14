@@ -26,7 +26,7 @@
  ***************************************************************************/
 """
 from .directions_points_layers_auto import ValhallaRoutePointsLayersCarAlgo
-from ..costing_params import CostingPedestrian
+from ..costing_params import CostingTruck
 
 
 class ValhallaRoutePointsLayersTruckAlgo(ValhallaRoutePointsLayersCarAlgo):
@@ -34,7 +34,7 @@ class ValhallaRoutePointsLayersTruckAlgo(ValhallaRoutePointsLayersCarAlgo):
     ALGO_NAME = 'directions_from_points_2_layers_truck'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
 
-    COSTING = CostingPedestrian
+    COSTING = CostingTruck
     PROFILE = 'truck'
 
     def createInstance(self):

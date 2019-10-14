@@ -207,7 +207,7 @@
             </item>
             <item>
              <property name="text">
-              <string>optimized_route</string>
+              <string>locate</string>
              </property>
             </item>
            </widget>
@@ -1444,7 +1444,7 @@
      </widget>
      <widget class="QWidget" name="batch_tab">
       <attribute name="title">
-       <string>empty</string>
+       <string>Locate</string>
       </attribute>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>

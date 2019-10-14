@@ -25,16 +25,40 @@
  *                                                                         *
  ***************************************************************************/
 """
-from .directions_points_layer_auto import ValhallaRoutePointsLayerCarAlgo
-from ..costing_params import CostingTruck
+import json
 
-class ValhallaRoutePointsLayerTruckAlgo(ValhallaRoutePointsLayerCarAlgo):
+from PyQt5 import QtWidgets
+from PyQt5.QtCore import QMetaObject, pyqtSignal
+from PyQt5.QtWidgets import QDialog, QInputDialog
 
-    ALGO_NAME = 'directions_from_point_layer_truck'
-    ALGO_NAME_LIST = ALGO_NAME.split('_')
+from qgis.gui import QgsCollapsibleGroupBox
 
-    COSTING = CostingTruck
-    PROFILE = 'truck'
+from .ValhallaLocateDialog import Ui_VahallaLocateDialog
+from valhalla.utils import configmanager
 
-    def createInstance(self):
-        return ValhallaRoutePointsLayerTruckAlgo()
+
+class ValhallaDialogLocateMain(QDialog, Ui_VahallaLocateDialog):
+    """Builds provider config dialog."""
+
+    responseArrived = pyqtSignal(list)
+
+    def __init__(self, parent=None):
+        """
+        :param parent: Parent window for modality.
+        :type parent: QDialog
+        """
+        QDialog.__init__(self, parent)
+
+        self.setupUi(self)
+
+        # Setup signal
+        self.responseArrived.connect(self.print_response)
+
+    def print_response(self, response):
+        """
+        Slot to print response to text box.
+
+        :param text:
+        :return:
+        """
+        self.locate_text.setText(json.dumps(response, indent=2))

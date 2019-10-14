@@ -25,16 +25,45 @@
  *                                                                         *
  ***************************************************************************/
 """
-from .directions_points_layer_auto import ValhallaRoutePointsLayerCarAlgo
-from ..costing_params import CostingTruck
 
-class ValhallaRoutePointsLayerTruckAlgo(ValhallaRoutePointsLayerCarAlgo):
+from valhalla.gui.common_gui import get_locations, get_costing_options
 
-    ALGO_NAME = 'directions_from_point_layer_truck'
-    ALGO_NAME_LIST = ALGO_NAME.split('_')
 
-    COSTING = CostingTruck
-    PROFILE = 'truck'
+class Locate:
+    """Extended functionality for directions endpoint for GUI."""
+    def __init__(self, dlg):
+        """
+        :param dlg: Main GUI dialog.
+        :type dlg: QDialog
+        """
+        self.dlg = dlg
 
-    def createInstance(self):
-        return ValhallaRoutePointsLayerTruckAlgo()
+        self.locations = None
+        self.costing_options = dict()
+
+    def get_parameters(self):
+        """
+        Builds parameters across directions functionalities.
+
+        :returns: All parameter mappings except for coordinates.
+        :rtype: dict
+        """
+
+        # API parameters
+        profile = self.dlg.routing_travel_combo.currentText()
+
+        params = {
+            'costing': profile,
+            'verbose': True,
+            'id': 1,
+        }
+
+        self.locations = get_locations(self.dlg.routing_fromline_list)
+        params['locations'] = self.locations
+
+        # Get Advanced parameters
+        if self.dlg.routing_costing_options_group.isChecked():
+            params['costing_options'] = dict()
+            self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
+
+        return params

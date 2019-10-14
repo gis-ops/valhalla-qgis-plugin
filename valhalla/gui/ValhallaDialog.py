@@ -49,11 +49,12 @@ from . import resources_rc
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
 from valhalla.utils import exceptions, maptools, logger, configmanager, transform
 from valhalla.common import client, directions_core, isochrones_core, matrix_core
-from valhalla.gui import directions_gui, isochrones_gui, matrix_gui
+from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui
 from valhalla.gui.common_gui import get_locations
 
 from .ValhallaDialogUI import Ui_ValhallaDialogBase
 from .ValhallaDialogConfig import ValhallaDialogConfigMain
+from .ValhallaDialogLocate import ValhallaDialogLocateMain
 
 
 def on_config_click(parent):
@@ -257,6 +258,7 @@ class ValhallaDialogMain:
         method = self.dlg.routing_method.currentText()
         profile = self.dlg.routing_travel_combo.currentText()
         params = {}
+        is_layer_response = True
         try:
             if method == 'route':
                 layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_Valhalla", "memory")
@@ -276,7 +278,7 @@ class ValhallaDialogMain:
                 layer_out.dataProvider().addFeature(feat)
                 layer_out.updateExtents()
 
-            if method == 'isochrone':
+            elif method == 'isochrone':
                 geometry_type = self.dlg.polygons.currentText()
                 isochrones = isochrones_core.Isochrones()
                 isochrones.set_parameters(profile, geometry_type)
@@ -298,7 +300,7 @@ class ValhallaDialogMain:
                 layer_out.updateExtents()
                 isochrones.stylePoly(layer_out)
 
-            if method == 'sources_to_targets':
+            elif method == 'sources_to_targets':
                 layer_out = QgsVectorLayer("None", 'Matrix_Valhalla', "memory")
                 layer_out.dataProvider().addAttributes(matrix_core.get_fields())
                 layer_out.updateFields()
@@ -315,7 +317,20 @@ class ValhallaDialogMain:
                 for feat in feats:
                     layer_out.dataProvider().addFeature(feat)
 
-            self.project.addMapLayer(layer_out)
+            elif method == 'locate':
+                is_layer_response = False
+                locate_dlg = ValhallaDialogLocateMain()
+
+                locate = locate_gui.Locate(self.dlg)
+                params = locate.get_parameters()
+                response = clnt.request('/locate', post_json=params)
+
+                locate_dlg.responseArrived.emit(response)
+
+                locate_dlg.exec_()
+
+            if is_layer_response:
+                self.project.addMapLayer(layer_out)
 
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"
@@ -345,7 +360,6 @@ class ValhallaDialogMain:
 
         finally:
             # Set URL in debug window
-
             clnt_msg += '<a href="{0}">{0}</a><br>Parameters:<br>{1}<br><b>timing</b>: {2:.3f} secs'.format(clnt.url, json.dumps(params, indent=2), clnt.response_time)
             self.dlg.debug_text.setHtml(clnt_msg)
 

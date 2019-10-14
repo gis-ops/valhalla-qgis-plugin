@@ -3,13 +3,16 @@ name=Valhalla
 qgisMinimumVersion=3.0
 description=Valhalla routing, isochrones and matrix calculations for QGIS
 
-version=1.0.1
+version=1.1.1
 author=GIS • OPS UG
 email=nils@gis-ops.com
 
 about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2019/10/05 v1.0.1 rename processing algos
+changelog=2019/10/14 v1.1.1 Truck costing was pedestrian in some algos
+    2019/10/14 v1.1.0 implemented locate endpoint
+    2019/10/05 v1.0.2 width/length are now in feet, as Valhalla expects it (off..)
+    2019/10/05 v1.0.1 rename processing algos
     2019/10/05 v1.0.0 first version
 
 tracker=https://github.com/gis-ops/valhalla-qgis-plugin/issues
