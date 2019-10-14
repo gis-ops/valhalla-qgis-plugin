@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>462</width>
-    <height>1088</height>
+    <height>1163</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -210,6 +210,11 @@
               <string>locate</string>
              </property>
             </item>
+            <item>
+             <property name="text">
+              <string>identify</string>
+             </property>
+            </item>
            </widget>
           </item>
          </layout>
@@ -381,6 +386,9 @@
                <property name="collapsed">
                 <bool>true</bool>
                </property>
+               <property name="saveCollapsedState">
+                <bool>false</bool>
+               </property>
                <layout class="QGridLayout" name="gridLayout_16">
                 <item row="2" column="0">
                  <widget class="QLabel" name="label_7">
@@ -452,6 +460,38 @@
                     <string>Polygon</string>
                    </property>
                   </item>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QgsCollapsibleGroupBox" name="identify_group">
+               <property name="title">
+                <string>Identify</string>
+               </property>
+               <property name="collapsed">
+                <bool>true</bool>
+               </property>
+               <property name="saveCollapsedState">
+                <bool>false</bool>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout">
+                <item>
+                 <widget class="QLabel" name="label_14">
+                  <property name="text">
+                   <string>PBF Path</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QgsFileWidget" name="pbf_file">
+                  <property name="fullUrl">
+                   <bool>true</bool>
+                  </property>
+                  <property name="filter">
+                   <string>*.pbf</string>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -1599,6 +1639,11 @@
    <extends>QGroupBox</extends>
    <header>qgscollapsiblegroupbox.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QgsFileWidget</class>
+   <extends>QWidget</extends>
+   <header>qgsfilewidget.h</header>
   </customwidget>
   <customwidget>
    <class>QgsFilterLineEdit</class>

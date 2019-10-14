@@ -25,22 +25,16 @@
  *                                                                         *
  ***************************************************************************/
 """
-import json
-
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import QMetaObject, pyqtSignal
-from PyQt5.QtWidgets import QDialog, QInputDialog
-
-from qgis.gui import QgsCollapsibleGroupBox
+from PyQt5.QtCore import pyqtSignal
+from PyQt5.QtWidgets import QDialog
 
 from .ValhallaLocateDialog import Ui_VahallaLocateDialog
-from valhalla.utils import configmanager
 
 
 class ValhallaDialogLocateMain(QDialog, Ui_VahallaLocateDialog):
     """Builds provider config dialog."""
 
-    responseArrived = pyqtSignal(list)
+    responseArrived = pyqtSignal(str)
 
     def __init__(self, parent=None):
         """
@@ -54,11 +48,11 @@ class ValhallaDialogLocateMain(QDialog, Ui_VahallaLocateDialog):
         # Setup signal
         self.responseArrived.connect(self.print_response)
 
-    def print_response(self, response):
+    def print_response(self, text):
         """
         Slot to print response to text box.
 
-        :param text:
-        :return:
+        :param text: The text to be output in the QTextBrowser
+        :type text: str
         """
-        self.locate_text.setText(json.dumps(response, indent=2))
+        self.locate_text.setText(text)

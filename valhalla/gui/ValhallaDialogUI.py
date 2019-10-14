@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ValhallaDialogBase(object):
     def setupUi(self, ValhallaDialogBase):
         ValhallaDialogBase.setObjectName("ValhallaDialogBase")
-        ValhallaDialogBase.resize(462, 1088)
+        ValhallaDialogBase.resize(462, 1163)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -113,6 +113,7 @@ class Ui_ValhallaDialogBase(object):
         self.routing_method.addItem("")
         self.routing_method.addItem("")
         self.routing_method.addItem("")
+        self.routing_method.addItem("")
         self.gridLayout_14.addWidget(self.routing_method, 0, 1, 1, 1)
         self.gridLayout_14.setColumnStretch(0, 1)
         self.gridLayout_14.setColumnStretch(1, 2)
@@ -200,6 +201,7 @@ class Ui_ValhallaDialogBase(object):
         sizePolicy.setHeightForWidth(self.isochrone_group.sizePolicy().hasHeightForWidth())
         self.isochrone_group.setSizePolicy(sizePolicy)
         self.isochrone_group.setCollapsed(True)
+        self.isochrone_group.setSaveCollapsedState(False)
         self.isochrone_group.setObjectName("isochrone_group")
         self.gridLayout_16 = QtWidgets.QGridLayout(self.isochrone_group)
         self.gridLayout_16.setObjectName("gridLayout_16")
@@ -235,6 +237,20 @@ class Ui_ValhallaDialogBase(object):
         self.polygons.addItem("")
         self.gridLayout_16.addWidget(self.polygons, 2, 1, 1, 3)
         self.verticalLayout_9.addWidget(self.isochrone_group)
+        self.identify_group = QgsCollapsibleGroupBox(self.mGroupBox_11)
+        self.identify_group.setCollapsed(True)
+        self.identify_group.setSaveCollapsedState(False)
+        self.identify_group.setObjectName("identify_group")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.identify_group)
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label_14 = QtWidgets.QLabel(self.identify_group)
+        self.label_14.setObjectName("label_14")
+        self.horizontalLayout.addWidget(self.label_14)
+        self.pbf_file = QgsFileWidget(self.identify_group)
+        self.pbf_file.setFullUrl(True)
+        self.pbf_file.setObjectName("pbf_file")
+        self.horizontalLayout.addWidget(self.pbf_file)
+        self.verticalLayout_9.addWidget(self.identify_group)
         self.verticalLayout_3.addWidget(self.mGroupBox_11)
         self.routing_costing_options_group = QgsCollapsibleGroupBox(self.advanced_group)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred, QtWidgets.QSizePolicy.Fixed)
@@ -804,6 +820,7 @@ class Ui_ValhallaDialogBase(object):
         self.routing_method.setItemText(1, _translate("ValhallaDialogBase", "isochrone"))
         self.routing_method.setItemText(2, _translate("ValhallaDialogBase", "sources_to_targets"))
         self.routing_method.setItemText(3, _translate("ValhallaDialogBase", "locate"))
+        self.routing_method.setItemText(4, _translate("ValhallaDialogBase", "identify"))
         self.routing_fromline_map.setToolTip(_translate("ValhallaDialogBase", "<html><head/><body><p>Add wayoints interactively from the map canvas.</p><p>Double-click will terminate waypoint selection.</p></body></html>"))
         self.routing_fromline_list.setToolTip(_translate("ValhallaDialogBase", "Select waypoints from the map!"))
         self.routing_fromline_clear.setToolTip(_translate("ValhallaDialogBase", "<html><head/><body><p>If waypoints are selected in the list, only these will be deleted. Else all waypoints will be deleted.</p></body></html>"))
@@ -817,6 +834,9 @@ class Ui_ValhallaDialogBase(object):
         self.contours.setToolTip(_translate("ValhallaDialogBase", "Comma separated list of whole number times in minutes for the contours."))
         self.polygons.setItemText(0, _translate("ValhallaDialogBase", "LineString"))
         self.polygons.setItemText(1, _translate("ValhallaDialogBase", "Polygon"))
+        self.identify_group.setTitle(_translate("ValhallaDialogBase", "Identify"))
+        self.label_14.setText(_translate("ValhallaDialogBase", "PBF Path"))
+        self.pbf_file.setFilter(_translate("ValhallaDialogBase", "*.pbf"))
         self.routing_costing_options_group.setToolTip(_translate("ValhallaDialogBase", "Avoid certain road attributes."))
         self.routing_costing_options_group.setTitle(_translate("ValhallaDialogBase", "Costing options"))
         self.mGroupBox.setTitle(_translate("ValhallaDialogBase", "Penalties"))
@@ -895,6 +915,7 @@ class Ui_ValhallaDialogBase(object):
         self.about_button.setText(_translate("ValhallaDialogBase", "About"))
 
 from qgscollapsiblegroupbox import QgsCollapsibleGroupBox
+from qgsfilewidget import QgsFileWidget
 from qgsfilterlineedit import QgsFilterLineEdit
 from qgsmaplayercombobox import QgsMapLayerComboBox
 from . import resources_rc

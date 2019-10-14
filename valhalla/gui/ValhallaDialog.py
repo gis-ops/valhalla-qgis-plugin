@@ -27,6 +27,8 @@
 """
 import json
 import webbrowser
+from shutil import which
+import time
 
 from PyQt5.QtWidgets import (QAction,
                              QDialog,
@@ -49,7 +51,7 @@ from . import resources_rc
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
 from valhalla.utils import exceptions, maptools, logger, configmanager, transform
 from valhalla.common import client, directions_core, isochrones_core, matrix_core
-from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui
+from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui, identify_gui
 from valhalla.gui.common_gui import get_locations
 
 from .ValhallaDialogUI import Ui_ValhallaDialogBase
@@ -320,14 +322,60 @@ class ValhallaDialogMain:
             elif method == 'locate':
                 is_layer_response = False
                 locate_dlg = ValhallaDialogLocateMain()
+                locate_dlg.setWindowTitle('Locate Response')
 
                 locate = locate_gui.Locate(self.dlg)
                 params = locate.get_parameters()
                 response = clnt.request('/locate', post_json=params)
 
-                locate_dlg.responseArrived.emit(response)
+                locate_dlg.responseArrived.emit(json.dumps(response, indent=4))
 
                 locate_dlg.exec_()
+
+            elif method == 'identify':
+                if not which('osmium'):
+                    QMessageBox.critical(
+                        self.dlg,
+                        "ModuleNotFoundError",
+                        """<a href="https://osmcode.org/osmium-tool/">osmium</a> wasn\'t found in your PATH. <br>Please install before trying again."""
+                    )
+                    return
+                if not self.dlg.pbf_file.filePath():
+                    QMessageBox.critical(
+                        self.dlg,
+                        "FileNotFoundError",
+                        """Seems like you forgot to set a PBF file path in the configuration for the Identity tool."""
+                    )
+                    return
+
+                is_layer_response = False
+                # identify_dlg = ValhallaDialogLocateMain()
+                # identify_dlg.setWindowTitle('Identify Ways')
+
+                identify = identify_gui.Identify(self.dlg)
+                params = identify.get_locate_parameters()
+                response = clnt.request('/locate', post_json=params)
+                way_dict = identify.get_tags(response)
+
+                # msg = ''
+
+                for way_id in way_dict:
+                    way = way_dict[way_id]
+                    # msg += f'<b>Way ID {way_id}</b><br>{"<br>".join(way["tags"])}<br><br>'
+
+                    layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Way " + str(way_id), "memory")
+                    layer_out.dataProvider().addAttributes(identify.get_fields(way["tags"]))
+                    layer_out.updateFields()
+
+                    feat = identify.get_output_feature(way)
+                    layer_out.dataProvider().addFeature(feat)
+                    layer_out.updateExtents()
+
+                    self.project.addMapLayer(layer_out)
+
+                # time.sleep(1)
+                # identify_dlg.responseArrived.emit(msg)
+                # identify_dlg.exec_()
 
             if is_layer_response:
                 self.project.addMapLayer(layer_out)
