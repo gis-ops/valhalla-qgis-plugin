@@ -278,10 +278,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             try:
                 # Populate features from response
                 response = clnt.request('/isochrone', post_json=params)
-
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
+            except (exceptions.ApiError) as e:
                 msg = "Feature ID {} caused a {}:\n{}".format(
                     params['id'],
                     e.__class__.__name__,
@@ -289,6 +286,12 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg, 2)
                 continue
+            except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
+                msg = "{}:\n{}".format(
+                    e.__class__.__name__,
+                    str(e))
+                logger.log(msg)
+                raise
 
             options = {}
             if params.get('costing_options'):

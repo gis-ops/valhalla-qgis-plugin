@@ -280,34 +280,30 @@ class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
                 # Make request and catch ApiError
                 try:
                     response = clnt.request('/sources_to_targets', post_json=params)
-
-                    feats = matrix_core.get_output_features_matrix(
-                        response,
-                        self.PROFILE,
-                        costing_params,
-                        source_attributes,
-                        destination_attributes
-                    )
-
-                    for feat in feats:
-                        sink.addFeature(feat)
-
-                except (exceptions.ApiError,
-                        exceptions.InvalidKey,
-                        exceptions.GenericServerError) as e:
+                except (exceptions.ApiError) as e:
                     msg = "{}: {}".format(
                         e.__class__.__name__,
                         str(e))
                     feedback.reportError(msg)
                     logger.log(msg)
-
-                except Exception as e:
-                    msg = "{}: {}".format(
+                    continue
+                except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
+                    msg = "{}:\n{}".format(
                         e.__class__.__name__,
                         str(e))
-                    feedback.reportError(msg)
                     logger.log(msg)
                     raise
+
+                feats = matrix_core.get_output_features_matrix(
+                    response,
+                    self.PROFILE,
+                    costing_params,
+                    source_attributes,
+                    destination_attributes
+                )
+
+                for feat in feats:
+                    sink.addFeature(feat)
 
         return {self.OUT: dest_id}
 

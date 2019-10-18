@@ -186,9 +186,8 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
         params = dict()
         # Sets all advanced parameters as attributes of self.costing_options
         self.costing_options.set_costing_options(self, parameters, context)
-        avoid_param = get_avoid_locations(avoid_layer)
-        if avoid_param:
-            params['avoid_locations'] = avoid_param
+        if avoid_layer:
+            params['avoid_locations'] = get_avoid_locations(avoid_layer)
 
         (sink, dest_id) = self.parameterAsSink(parameters, self.OUT, context,
                                                directions_core.get_fields(from_type=source.fields().field(source_field_name).type(),
@@ -203,23 +202,12 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            try:
-                params.update(get_directions_params(line, self.PROFILE, self.costing_options))
-                params['id'] = field_value
-                response = clnt.request('/route', post_json=params)
-                options = {}
-                if params.get('costing_options'):
-                    options = params['costing_options']
+            params.update(get_directions_params(line, self.PROFILE, self.costing_options))
+            params['id'] = field_value
 
-                sink.addFeature(directions_core.get_output_feature_directions(
-                    response,
-                    self.PROFILE,
-                    options.get(self.PROFILE),
-                    from_value=field_value
-                ))
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
+            try:
+                response = clnt.request('/route', post_json=params)
+            except (exceptions.ApiError) as e:
                 msg = "Feature ID {} caused a {}:\n{}".format(
                     field_value,
                     e.__class__.__name__,
@@ -227,6 +215,24 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
+
+            except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
+                msg = "{}:\n{}".format(
+                    e.__class__.__name__,
+                    str(e))
+                logger.log(msg)
+                raise
+
+            options = {}
+            if params.get('costing_options'):
+                options = params['costing_options']
+
+            sink.addFeature(directions_core.get_output_feature_directions(
+                response,
+                self.PROFILE,
+                options.get(self.PROFILE),
+                from_value=field_value
+            ))
 
             feedback.setProgress(int(100.0 / count * num))
 

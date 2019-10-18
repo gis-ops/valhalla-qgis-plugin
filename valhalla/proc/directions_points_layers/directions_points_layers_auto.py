@@ -269,9 +269,7 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
 
             try:
                 response = clnt.request('/route', post_json=params)
-            except (exceptions.ApiError,
-                    exceptions.InvalidKey,
-                    exceptions.GenericServerError) as e:
+            except (exceptions.ApiError) as e:
                 msg = "Route from {} to {} caused a {}:\n{}".format(
                     values[0],
                     values[1],
@@ -280,6 +278,13 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
                 feedback.reportError(msg)
                 logger.log(msg)
                 continue
+
+            except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
+                msg = "{}:\n{}".format(
+                    e.__class__.__name__,
+                    str(e))
+                logger.log(msg)
+                raise
 
             options = {}
             if params.get('costing_options'):
