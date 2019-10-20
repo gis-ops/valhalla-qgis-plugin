@@ -279,6 +279,7 @@ class ValhallaDialogMain:
                 )
                 layer_out.dataProvider().addFeature(feat)
                 layer_out.updateExtents()
+                self.project.addMapLayer(layer_out)
 
             elif method == 'isochrone':
                 geometry_type = self.dlg.polygons.currentText()
@@ -301,6 +302,7 @@ class ValhallaDialogMain:
 
                 layer_out.updateExtents()
                 isochrones.stylePoly(layer_out)
+                self.project.addMapLayer(layer_out)
 
             elif method == 'sources_to_targets':
                 layer_out = QgsVectorLayer("None", 'Matrix_Valhalla', "memory")
@@ -310,7 +312,6 @@ class ValhallaDialogMain:
                 matrix = matrix_gui.Matrix(self.dlg)
                 params = matrix.get_parameters()
                 response = clnt.request('/sources_to_targets', post_json=params)
-                # TODO: output matrix is mixed up on IDs
                 feats = matrix_core.get_output_features_matrix(
                     response,
                     profile,
@@ -319,8 +320,9 @@ class ValhallaDialogMain:
                 for feat in feats:
                     layer_out.dataProvider().addFeature(feat)
 
+                self.project.addMapLayer(layer_out)
+
             elif method == 'locate':
-                is_layer_response = False
                 locate_dlg = ValhallaDialogLocateMain()
                 locate_dlg.setWindowTitle('Locate Response')
 
@@ -348,20 +350,13 @@ class ValhallaDialogMain:
                     )
                     return
 
-                is_layer_response = False
-                # identify_dlg = ValhallaDialogLocateMain()
-                # identify_dlg.setWindowTitle('Identify Ways')
-
                 identify = identify_gui.Identify(self.dlg)
                 params = identify.get_locate_parameters()
                 response = clnt.request('/locate', post_json=params)
                 way_dict = identify.get_tags(response)
 
-                # msg = ''
-
                 for way_id in way_dict:
                     way = way_dict[way_id]
-                    # msg += f'<b>Way ID {way_id}</b><br>{"<br>".join(way["tags"])}<br><br>'
 
                     layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Way " + str(way_id), "memory")
                     layer_out.dataProvider().addAttributes(identify.get_fields(way["tags"]))
@@ -372,13 +367,6 @@ class ValhallaDialogMain:
                     layer_out.updateExtents()
 
                     self.project.addMapLayer(layer_out)
-
-                # time.sleep(1)
-                # identify_dlg.responseArrived.emit(msg)
-                # identify_dlg.exec_()
-
-            if is_layer_response:
-                self.project.addMapLayer(layer_out)
 
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"
