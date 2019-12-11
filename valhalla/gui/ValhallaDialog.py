@@ -294,10 +294,12 @@ class ValhallaDialogMain:
                 params = isochrones_ui.get_parameters()
                 locations = get_locations(self.dlg.routing_fromline_list)
 
-                for location in locations:
-                    params['locations'] = [location]
+                aggregate = self.dlg.iso_aggregate.isChecked()
+                locations = [locations] if aggregate else locations
+                for i, location in enumerate(locations):
+                    params['locations'] = location if aggregate else [location]
                     response = clnt.request('/isochrone', {}, post_json=params)
-                    for feat in  isochrones.get_features(response, "{}, {}".format(location['lon'], location['lat']), isochrones_ui.costing_options):
+                    for feat in isochrones.get_features(response, str(i), isochrones_ui.costing_options):
                         layer_out.dataProvider().addFeature(feat)
 
                 layer_out.updateExtents()
