@@ -32,6 +32,7 @@ from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
 
 from qgis.core import (QgsPointXY,
+                       QgsMultiPoint,
                        QgsFeature,
                        QgsField,
                        QgsFields,
@@ -52,6 +53,7 @@ class Isochrones():
         self.geometry = None
         self.id_field_type = None
         self.id_field_name = None
+        self.response = None
 
     def set_parameters(self, profile, geometry_param='LineString', id_field_type=QVariant.String, id_field_name='ID'):
         """
@@ -74,6 +76,15 @@ class Isochrones():
         self.id_field_type = id_field_type
         self.id_field_name = id_field_name
 
+    def set_response(self, response):
+        """
+        Set response to avoid passing it to every function
+
+        :param response: The GeoJSON response
+        :type response: dict
+        """
+        self.response = response
+
     def get_fields(self):
         """
         Set all fields for output isochrone layer.
@@ -89,12 +100,22 @@ class Isochrones():
 
         return fields
 
-    def get_features(self, response, id_field_value, options={}):
+    def get_point_fields(self):
+        """
+        Set all fields for the output point layer.
+
+        :returns: Point output fields.
+        :rtype: QgsFields
+        """
+        fields = QgsFields()
+        fields.append(QgsField("id", QVariant.String))
+        fields.append(QgsField("type", QVariant.String))
+
+        return fields
+
+    def get_features(self, id_field_value, options={}):
         """
         Generator to return output isochrone features from response.
-
-        :param response: API response
-        :type response: dict
 
         :param id_field_value: Value of ID field.
         :type id_field_value: any
@@ -106,10 +127,12 @@ class Isochrones():
         :rtype: QgsFeature
         """
 
+        features = [feature for feature in self.response['features'] if feature['geometry']['type'] in ('LineString', 'Polygon')]
+
         # Sort features based on the isochrone value, so that longest isochrone
         # is added first. This will plot the isochrones on top of each other.
         l = lambda x: x['properties']['contour']
-        for isochrone in sorted(response['features'], key=l, reverse=True):
+        for isochrone in sorted(features, key=l, reverse=True):
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
             iso_value = isochrone['properties']['contour']
@@ -124,6 +147,28 @@ class Isochrones():
                 int(iso_value),
                 self.profile,
                 json.dumps(options)
+            ])
+
+            yield feat
+
+    def get_point_features(self, id_field_value):
+        """
+        Generator to return isochrone input locations from response.
+
+        :param id_field_value: Value of ID field.
+        :type id_field_value: any
+
+        :returns: output feature
+        :rtype: QgsFeature
+        """
+        multipoints = [feature for feature in self.response['features'] if feature['geometry']['type'] == 'MultiPoint']
+        for multipoint in multipoints:
+            feat = QgsFeature()
+            coords = [QgsPointXY(*coords) for coords in multipoint['geometry']['coordinates']]
+            feat.setGeometry(QgsGeometry.fromMultiPointXY(coords))
+            feat.setAttributes([
+                id_field_value,
+                multipoint['properties']['type']
             ])
 
             yield feat

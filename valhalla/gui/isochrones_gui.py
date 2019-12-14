@@ -64,6 +64,7 @@ class Isochrones:
 
         params = {
             'costing': profile,
+            'show_locations': True,
             'contours': contours,
             'polygons': polygons,
             'id': 1,

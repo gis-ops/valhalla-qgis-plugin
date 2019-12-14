@@ -51,8 +51,8 @@ def get_directions_params(points, profile, costing_options):
     """
     params = dict(
         costing=profile,
+        show_locations=True
     )
-    params['costing'] = profile
     params['locations'] = get_locations(points)
 
     costing_params = get_costing_options(costing_options, profile)

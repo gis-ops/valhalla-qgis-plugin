@@ -37,12 +37,14 @@ from PyQt5.QtWidgets import (QAction,
                              QMessageBox,
                              QDialogButtonBox)
 from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtCore import QSizeF, QPointF
+from PyQt5.QtCore import QSizeF, QPointF, QVariant
 
 from qgis.core import (QgsProject,
                        QgsVectorLayer,
                        QgsTextAnnotation,
-                       QgsMapLayerProxyModel)
+                       QgsMapLayerProxyModel,
+                       QgsFields,
+                       QgsField)
 from qgis.gui import QgsMapCanvasAnnotationItem
 import processing
 
@@ -286,9 +288,16 @@ class ValhallaDialogMain:
                 isochrones = isochrones_core.Isochrones()
                 isochrones.set_parameters(profile, geometry_type)
 
+                no_points = self.dlg.iso_no_points.isChecked()
+
                 layer_out = QgsVectorLayer(f"{geometry_type}?crs=EPSG:4326", "Isochrone_Valhalla", "memory")
                 layer_out.dataProvider().addAttributes(isochrones.get_fields())
                 layer_out.updateFields()
+                if not no_points:
+                    multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", "Isochrone_Valhalla_Points", "memory")
+
+                    multipoint_layer.dataProvider().addAttributes(isochrones.get_point_fields())
+                    multipoint_layer.updateFields()
 
                 isochrones_ui = isochrones_gui.Isochrones(self.dlg)
                 params = isochrones_ui.get_parameters()
@@ -298,13 +307,19 @@ class ValhallaDialogMain:
                 locations = [locations] if aggregate else locations
                 for i, location in enumerate(locations):
                     params['locations'] = location if aggregate else [location]
-                    response = clnt.request('/isochrone', {}, post_json=params)
-                    for feat in isochrones.get_features(response, str(i), isochrones_ui.costing_options):
+                    isochrones.set_response(clnt.request('/isochrone', {}, post_json=params))
+                    for feat in isochrones.get_features(str(i), isochrones_ui.costing_options):
                         layer_out.dataProvider().addFeature(feat)
+                    if not no_points:
+                        for feat in isochrones.get_point_features(str(i)):
+                            multipoint_layer.dataProvider().addFeature(feat)
 
                 layer_out.updateExtents()
                 isochrones.stylePoly(layer_out)
                 self.project.addMapLayer(layer_out)
+                if not no_points:
+                    multipoint_layer.updateExtents()
+                    self.project.addMapLayer(multipoint_layer)
 
             elif method == 'sources_to_targets':
                 layer_out = QgsVectorLayer("None", 'Matrix_Valhalla', "memory")

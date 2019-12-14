@@ -36,6 +36,7 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingUtils,
                        QgsProcessingAlgorithm,
                        QgsProcessingParameterField,
+                       QgsProcessingParameterBoolean,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
                        QgsProcessingParameterFeatureSink,
@@ -68,15 +69,18 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
     IN_POINTS = "INPUT_POINT_LAYER"
     IN_FIELD = "INPUT_FIELD"
     IN_INTERVALS = 'contours'
+    IN_SHOW_LOCATIONS = 'show_locations'
     IN_DENOISE = 'denoise'
     IN_GENERALIZE = 'generalize'
     IN_GEOMETRY = 'polygons'
     IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
+    POINTS = 'OUTPUT_POINTS'
 
     # Save some important references
-    isochrones = isochrones_core.Isochrones()
     dest_id = None
+    points_id = None
+    isochrones = isochrones_core.Isochrones()
     crs_out = QgsCoordinateReferenceSystem(4326)
 
     def __init__(self):
@@ -116,6 +120,14 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 name=self.IN_INTERVALS,
                 description="Comma-separated intervals [mins]",
                 defaultValue="5, 10"
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterBoolean(
+                name=self.IN_SHOW_LOCATIONS,
+                description="Return input locations as MultiPoint",
+                defaultValue=False
             )
         )
 
@@ -163,6 +175,14 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
                 description="Valhalla_Isochrones_" + self.PROFILE,
+                createByDefault=False
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                name=self.POINTS,
+                description="Valhalla_Isochrones_Points_" + self.PROFILE,
                 createByDefault=False
             )
         )
@@ -218,6 +238,9 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         if generalize:
             params[self.IN_GENERALIZE] = generalize
 
+        show_locations = self.parameterAsBool(parameters, self.IN_SHOW_LOCATIONS, context)
+        print(show_locations)
+
         intervals_raw = self.parameterAsString(parameters, self.IN_INTERVALS, context)
         params['contours'] = [{"time": int(x)} for x in intervals_raw.split(',')]
 
@@ -230,9 +253,8 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             self.IN_AVOID,
             context
         )
-        avoid_param = get_avoid_locations(avoid_layer)
-        if avoid_param:
-            params['avoid_locations'] = avoid_param
+        if avoid_layer:
+            params['avoid_locations'] = get_avoid_locations(avoid_layer)
 
         # Get ID field properties
         id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
@@ -269,6 +291,10 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                                                     self.isochrones.get_fields(),
                                                     geometry_type,
                                                     self.crs_out)
+        (sink_points, self.points_id) = self.parameterAsSink(parameters,self.POINTS, context,
+                                                             self.isochrones.get_point_fields(),
+                                                             QgsWkbTypes.MultiPoint,
+                                                             self.crs_out)
 
         for num, params in enumerate(requests):
             if feedback.isCanceled():
@@ -297,11 +323,18 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             if params.get('costing_options'):
                 options = params['costing_options']
 
-            for isochrone in self.isochrones.get_features(response, params['id'], options.get(self.PROFILE)):
+            self.isochrones.set_response(response)
+            for isochrone in self.isochrones.get_features(params['id'], options.get(self.PROFILE)):
                 sink.addFeature(isochrone)
+            if show_locations:
+                print(response)
+                for point_feat in self.isochrones.get_point_features(params['id']):
+                    sink_points.addFeature(point_feat)
 
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
+        if show_locations:
+            return {self.OUT: self.dest_id, self.POINTS: self.points_id}
         return {self.OUT: self.dest_id}
 
     def postProcessAlgorithm(self, context, feedback):
