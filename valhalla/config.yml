@@ -1,14 +1,7 @@
----
 providers:
-- name: Staging - TomTom
-  base_url: http://82.165.29.155:9000
-  key:
-- name: Staging - OSM
-  base_url: http://82.165.29.155:8000
-  key:
-- name: localhost
-  base_url: http://localhost:8002
-  key:
-- name: Mapbox
-  base_url: https://api.mapbox.com/valhalla/v1
-  key:
+- base_url: http://localhost:8002
+  key: ''
+  name: localhost
+- base_url: https://api.mapbox.com/valhalla/v1
+  key: ''
+  name: Mapbox

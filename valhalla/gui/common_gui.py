@@ -45,7 +45,7 @@ def get_locations(routing_fromline_list):
         param, coords = item.split(":")
         coords = coords.split(', ')
 
-        locations.append({'lon': float(coords[0]), 'lat': float(coords[1])})
+        locations.append({'lon': float(coords[0]), 'lat': float(coords[1]), 'radius': 200})
 
     return locations
 

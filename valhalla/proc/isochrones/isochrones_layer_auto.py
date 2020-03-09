@@ -75,11 +75,13 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
     IN_GEOMETRY = 'polygons'
     IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
-    POINTS = 'OUTPUT_POINTS'
+    POINTS_SNAPPED = 'OUTPUT_SNAPPED_POINTS'
+    POINTS_INPUT = 'OUTPUT_INPUT_POINTS'
 
     # Save some important references
     dest_id = None
-    points_id = None
+    points_snapped_id = None
+    points_input_id = None
     isochrones = isochrones_core.Isochrones()
     crs_out = QgsCoordinateReferenceSystem(4326)
 
@@ -181,8 +183,16 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterFeatureSink(
-                name=self.POINTS,
-                description="Valhalla_Isochrones_Points_" + self.PROFILE,
+                name=self.POINTS_SNAPPED,
+                description="Valhalla_Isochrones_Snapped_Points_" + self.PROFILE,
+                createByDefault=False
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterFeatureSink(
+                name=self.POINTS_INPUT,
+                description="Valhalla_Isochrones_Input_Points_" + self.PROFILE,
                 createByDefault=False
             )
         )
@@ -239,7 +249,6 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             params[self.IN_GENERALIZE] = generalize
 
         show_locations = self.parameterAsBool(parameters, self.IN_SHOW_LOCATIONS, context)
-        print(show_locations)
 
         intervals_raw = self.parameterAsString(parameters, self.IN_INTERVALS, context)
         params['contours'] = [{"time": int(x)} for x in intervals_raw.split(',')]
@@ -291,10 +300,14 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                                                     self.isochrones.get_fields(),
                                                     geometry_type,
                                                     self.crs_out)
-        (sink_points, self.points_id) = self.parameterAsSink(parameters,self.POINTS, context,
-                                                             self.isochrones.get_point_fields(),
-                                                             QgsWkbTypes.MultiPoint,
-                                                             self.crs_out)
+        (sink_snapped_points, self.points_snapped_id) = self.parameterAsSink(parameters, self.POINTS_SNAPPED, context,
+                                                                     self.isochrones.get_point_fields(),
+                                                                     QgsWkbTypes.MultiPoint,
+                                                                     self.crs_out)
+        (sink_input_points, self.points_input_id) = self.parameterAsSink(parameters, self.POINTS_INPUT, context,
+                                                                   self.isochrones.get_point_fields(),
+                                                                   QgsWkbTypes.Point,
+                                                                   self.crs_out)
 
         for num, params in enumerate(requests):
             if feedback.isCanceled():
@@ -327,14 +340,15 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             for isochrone in self.isochrones.get_features(params['id'], options.get(self.PROFILE)):
                 sink.addFeature(isochrone)
             if show_locations:
-                print(response)
+                for point_feat in self.isochrones.get_multipoint_features(params['id']):
+                    sink_snapped_points.addFeature(point_feat)
                 for point_feat in self.isochrones.get_point_features(params['id']):
-                    sink_points.addFeature(point_feat)
+                    sink_input_points.addFeature(point_feat)
 
             feedback.setProgress(int(100.0 / source.featureCount() * num))
 
         if show_locations:
-            return {self.OUT: self.dest_id, self.POINTS: self.points_id}
+            return {self.OUT: self.dest_id, self.POINTS_SNAPPED: self.points_snapped_id, self.POINTS_INPUT: self.points_input_id}
         return {self.OUT: self.dest_id}
 
     def postProcessAlgorithm(self, context, feedback):

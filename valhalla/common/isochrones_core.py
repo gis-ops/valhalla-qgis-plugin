@@ -151,9 +151,9 @@ class Isochrones():
 
             yield feat
 
-    def get_point_features(self, id_field_value):
+    def get_multipoint_features(self, id_field_value):
         """
-        Generator to return isochrone input locations from response.
+        Generator to return isochrone snapped locations from response.
 
         :param id_field_value: Value of ID field.
         :type id_field_value: any
@@ -169,6 +169,28 @@ class Isochrones():
             feat.setAttributes([
                 id_field_value,
                 multipoint['properties']['type']
+            ])
+
+            yield feat
+
+    def get_point_features(self, id_field_value):
+        """
+        Generator to return isochrone input locations from response.
+
+        :param id_field_value: Value of ID field.
+        :type id_field_value: any
+
+        :returns: output feature
+        :rtype: QgsFeature
+        """
+        points = [feature for feature in self.response['features'] if feature['geometry']['type'] == 'Point']
+        for point in points:
+            feat = QgsFeature()
+            coords = QgsPointXY(*point['geometry']['coordinates'])
+            feat.setGeometry(QgsGeometry.fromPointXY(coords))
+            feat.setAttributes([
+                id_field_value,
+                point['properties']['type']
             ])
 
             yield feat

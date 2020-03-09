@@ -294,10 +294,13 @@ class ValhallaDialogMain:
                 layer_out.dataProvider().addAttributes(isochrones.get_fields())
                 layer_out.updateFields()
                 if not no_points:
-                    multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", "Isochrone_Valhalla_Points", "memory")
+                    multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", "Isochrone_Valhalla_Snapped_Points", "memory")
+                    point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Isochrone_Valhalla_Input_Points", "memory")
 
                     multipoint_layer.dataProvider().addAttributes(isochrones.get_point_fields())
                     multipoint_layer.updateFields()
+                    point_layer.dataProvider().addAttributes(isochrones.get_point_fields())
+                    point_layer.updateFields()
 
                 isochrones_ui = isochrones_gui.Isochrones(self.dlg)
                 params = isochrones_ui.get_parameters()
@@ -311,15 +314,19 @@ class ValhallaDialogMain:
                     for feat in isochrones.get_features(str(i), isochrones_ui.costing_options):
                         layer_out.dataProvider().addFeature(feat)
                     if not no_points:
-                        for feat in isochrones.get_point_features(str(i)):
+                        for feat in isochrones.get_multipoint_features(str(i)):
                             multipoint_layer.dataProvider().addFeature(feat)
+                        for feat in isochrones.get_point_features(str(i)):
+                            point_layer.dataProvider().addFeature(feat)
 
                 layer_out.updateExtents()
                 isochrones.stylePoly(layer_out)
                 self.project.addMapLayer(layer_out)
                 if not no_points:
                     multipoint_layer.updateExtents()
+                    point_layer.updateExtents()
                     self.project.addMapLayer(multipoint_layer)
+                    self.project.addMapLayer(point_layer)
 
             elif method == 'sources_to_targets':
                 layer_out = QgsVectorLayer("None", 'Matrix_Valhalla', "memory")
