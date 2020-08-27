@@ -51,6 +51,7 @@ class Directions:
 
         # API parameters
         profile = self.dlg.routing_travel_combo.currentText()
+        mode = self.dlg.routing_mode_combo.currentText()
 
         params = {
             'costing': profile,
@@ -61,9 +62,11 @@ class Directions:
         params['locations'] = get_locations(self.dlg.routing_fromline_list)
 
         # Get Advanced parameters
-        if self.dlg.routing_costing_options_group.isChecked():
+        if self.dlg.routing_costing_options_group.isChecked() or mode == 'shortest':
             params['costing_options'] = dict()
             self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
+            if mode == 'shortest':
+                params['costing_options'][profile]['shortest'] = True
 
         if self.dlg.avoidlocation_group.isChecked():
             layer = self.dlg.avoidlocation_dropdown.currentLayer()

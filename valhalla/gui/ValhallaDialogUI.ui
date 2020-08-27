@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>460</width>
+    <width>519</width>
     <height>1163</height>
    </rect>
   </property>
@@ -147,6 +147,13 @@
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Method</string>
+            </property>
+           </widget>
+          </item>
           <item row="1" column="1">
            <widget class="QComboBox" name="routing_travel_combo">
             <property name="toolTip">
@@ -155,6 +162,11 @@
             <item>
              <property name="text">
               <string>auto</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>auto_shorter</string>
              </property>
             </item>
             <item>
@@ -172,20 +184,6 @@
               <string>pedestrian</string>
              </property>
             </item>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QLabel" name="routing_travel_label">
-            <property name="text">
-             <string>Go with</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Method</string>
-            </property>
            </widget>
           </item>
           <item row="0" column="1">
@@ -213,6 +211,34 @@
             <item>
              <property name="text">
               <string>identify</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="routing_travel_label">
+            <property name="text">
+             <string>Go with</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
+            <property name="text">
+             <string>Mode</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QComboBox" name="routing_mode_combo">
+            <item>
+             <property name="text">
+              <string>fastest</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>shortest</string>
              </property>
             </item>
            </widget>
@@ -332,7 +358,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>23</height>
+           <height>16777215</height>
           </size>
          </property>
          <property name="title">
@@ -345,7 +371,7 @@
           <bool>false</bool>
          </property>
          <property name="collapsed">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="saveCollapsedState">
           <bool>false</bool>
@@ -1465,7 +1491,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>23</height>
+              <height>22</height>
              </size>
             </property>
             <property name="toolTip">
@@ -1544,7 +1570,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>23</height>
+       <height>22</height>
       </size>
      </property>
      <property name="title">

@@ -54,6 +54,7 @@ class Isochrones:
         polygons = self.dlg.polygons.currentText()
         denoise = self.dlg.denoise.value()
         generalize = self.dlg.generalize.value()
+        mode = self.dlg.routing_mode_combo.currentText()
 
         try:
             contours = [{'time': int(interval)} for interval in contours.split(',')]
@@ -76,8 +77,10 @@ class Isochrones:
             params['generalize'] = generalize
 
         # Get Advanced parameters
-        if self.dlg.routing_costing_options_group.isChecked():
+        if self.dlg.routing_costing_options_group.isChecked() or mode == 'shortest':
             params['costing_options'] = dict()
             self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
+            if mode == 'shortest':
+                params['costing_options'][profile]['shortest'] = True
 
         return params
