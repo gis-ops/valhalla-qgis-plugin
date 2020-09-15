@@ -59,6 +59,7 @@ from valhalla.gui.common_gui import get_locations
 from .ValhallaDialogUI import Ui_ValhallaDialogBase
 from .ValhallaDialogConfig import ValhallaDialogConfigMain
 from .ValhallaDialogLocate import ValhallaDialogLocateMain
+from .ValhallaExtraParamsDialog import ValhallaDialogExtraParams
 
 
 def on_config_click(parent):
@@ -217,6 +218,8 @@ class ValhallaDialogMain:
     def run_gui_control(self):
         """Slot function for OK button of main dialog."""
 
+        self.dlg: ValhallaDialog
+
         # Associate annotations with map layer, so they get deleted when layer is deleted
         for annotation in self.dlg.annotations:
             # Has the potential to be pretty cool: instead of deleting, associate with mapLayer, you can change order after optimization
@@ -262,7 +265,11 @@ class ValhallaDialogMain:
         method = self.dlg.routing_method.currentText()
         profile = self.dlg.routing_travel_combo.currentText()
         params = {}
-        is_layer_response = True
+        # Add extra params
+        extra_params_text = self.dlg.dlg_params.extra_params_text.toPlainText()
+        extra_params = {}
+        if extra_params_text:
+            extra_params = json.loads(extra_params_text)
         try:
             if method == 'route':
                 layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_Valhalla", "memory")
@@ -271,6 +278,7 @@ class ValhallaDialogMain:
 
                 directions = directions_gui.Directions(self.dlg)
                 params = directions.get_parameters()
+                params.update(extra_params)
                 response = clnt.request('/route', {}, post_json=params)
                 feat = directions_core.get_output_feature_directions(
                     response,
@@ -304,6 +312,7 @@ class ValhallaDialogMain:
 
                 isochrones_ui = isochrones_gui.Isochrones(self.dlg)
                 params = isochrones_ui.get_parameters()
+                params.update(extra_params)
                 locations = get_locations(self.dlg.routing_fromline_list)
 
                 aggregate = self.dlg.iso_aggregate.isChecked()
@@ -335,6 +344,7 @@ class ValhallaDialogMain:
 
                 matrix = matrix_gui.Matrix(self.dlg)
                 params = matrix.get_parameters()
+                params.update(extra_params)
                 response = clnt.request('/sources_to_targets', post_json=params)
                 feats = matrix_core.get_output_features_matrix(
                     response,
@@ -352,6 +362,7 @@ class ValhallaDialogMain:
 
                 locate = locate_gui.Locate(self.dlg)
                 params = locate.get_parameters()
+                params.update(extra_params)
                 response = clnt.request('/locate', post_json=params)
 
                 locate_dlg.responseArrived.emit(json.dumps(response, indent=4))
@@ -458,6 +469,9 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         self.global_buttons.button(QDialogButtonBox.Ok).setText('Apply')
         self.global_buttons.button(QDialogButtonBox.Cancel).setText('Close')
 
+        # Add extra params dialog
+        self.dlg_params = ValhallaDialogExtraParams(parent=self)
+
         #### Set up signals/slots ####
 
         # Config/Help dialogs
@@ -469,6 +483,9 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+
+        # Extra params
+        self.extra_params_button.clicked.connect(self.dlg_params.exec_)
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""

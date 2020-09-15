@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>519</width>
-    <height>1163</height>
+    <width>569</width>
+    <height>1368</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1491,7 +1491,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>22</height>
+              <height>28</height>
              </size>
             </property>
             <property name="toolTip">
@@ -1524,6 +1524,22 @@
               </widget>
              </item>
             </layout>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="extra_params_button">
+            <property name="toolTip">
+             <string>Use this to override/add additional parameters to the request in JSON form.</string>
+            </property>
+            <property name="statusTip">
+             <string>Use this to override/add additional parameters to the request in JSON form.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Use this to override/add additional parameters to the request in JSON form.</string>
+            </property>
+            <property name="text">
+             <string>Extra parameters</string>
+            </property>
            </widget>
           </item>
          </layout>
@@ -1570,7 +1586,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>22</height>
+       <height>28</height>
       </size>
      </property>
      <property name="title">

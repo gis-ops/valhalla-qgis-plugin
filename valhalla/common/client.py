@@ -33,7 +33,9 @@ from urllib.parse import urlencode
 import random
 import json
 
-from PyQt5.QtCore import QObject, pyqtSignal
+from qgis.PyQt.QtCore import QObject, pyqtSignal, QUrl, QJsonDocument
+from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
+from qgis.core import QgsNetworkAccessManager, QgsNetworkReplyContent
 
 from valhalla import __version__
 from valhalla.common import networkaccessmanager
@@ -62,7 +64,7 @@ class Client(QObject):
         self.base_url = provider['base_url']
         
         # self.session = requests.Session()
-        self.nam = networkaccessmanager.NetworkAccessManager(debug=False)
+        self.nam = QgsNetworkAccessManager()
 
         self.retry_timeout = timedelta(seconds=retry_timeout)
         self.headers = {
@@ -117,74 +119,49 @@ class Client(QObject):
             # Jitter this value by 50% and pause.
             time.sleep(delay_seconds * (random.random() + 0.5))
 
+        # Define the request
         params = {'access_token': self.key}
-
         authed_url = self._generate_auth_url(url,
                                              params,
                                              )
-        self.url = self.base_url + authed_url
-
-        # Default to the client-level self.requests_kwargs, with method-level
-        # requests_kwargs arg overriding.
-        # final_requests_kwargs = self.requests_kwargs
-        
-        # Determine GET/POST
-        # requests_method = self.session.get
-        requests_method = 'GET'
-        body = None
-        if post_json is not None:
-            # requests_method = self.session.post
-            # final_requests_kwargs["json"] = post_json
-            body = post_json
-            requests_method = 'POST'
+        url_object = QUrl(self.base_url + authed_url)
+        self.url = url_object.url()
+        body = QJsonDocument.fromJson(json.dumps(post_json).encode())
+        request = QNetworkRequest(url_object)
+        request.setHeader(QNetworkRequest.ContentTypeHeader, 'application/json')
 
         logger.log(
             "url: {}\nParameters: {}".format(
                 self.url,
                 # final_requests_kwargs
-                json.dumps(body, indent=2)
+                json.dumps(post_json, indent=2)
             ),
             0
         )
 
         start = time.time()
+        response: QgsNetworkReplyContent = self.nam.blockingPost(request, body.toJson())
+        self.response_time = time.time() - start
 
         try:
-            response, content = self.nam.request(self.url,
-                                           method=requests_method,
-                                           body=body,
-                                           headers=self.headers,
-                                           blocking=True)
+            self.handle_response(response, post_json['id'])
+        except exceptions.OverQueryLimit:
+            # Let the instances know smth happened
+            self.overQueryLimit.emit()
+            return self.request(url, first_request_time, retry_counter + 1, post_json)
 
-        except networkaccessmanager.RequestsExceptionTimeout:
-            raise exceptions.Timeout
+        response_content = json.loads(bytes(response.content()))
 
-        except networkaccessmanager.RequestsException:
-            try:
-                # result = self._get_body(response)
-                self._check_status()
+        # Mapbox treats 400 errors with a 200 status code
+        if 'error' in response_content:
+            raise exceptions.ApiError(
+                str(response_content['status_code']),
+                response_content['error']
+            )
 
-            except exceptions.OverQueryLimit as e:
+        return response_content
 
-                # Let the instances know smth happened
-                self.overQueryLimit.emit()
-                logger.log("{}: {}".format(e.__class__.__name__, str(e)), 1)
-
-                return self.request(url, first_request_time, retry_counter + 1, post_json)
-
-            except exceptions.ApiError as e:
-                logger.log("Feature ID {} caused a {}: {}".format(post_json['id'], e.__class__.__name__, str(e)), 2)
-                raise
-
-            except Exception as e:
-                raise e
-        finally:
-            self.response_time = time.time() - start
-            self.status_code = self.nam.http_call_result.status_code
-
-        return json.loads(content.decode('utf-8'))
-
-    def _check_status(self):
+    def handle_response(self, response, feat_id):
         """
         Casts JSON response to dict
 
@@ -197,36 +174,48 @@ class Client(QObject):
         :rtype: dict
         """
 
-        status_code = self.nam.http_call_result.status_code
-        message = self.nam.http_call_result.text if self.nam.http_call_result.text != '' else self.nam.http_call_result.reason
+        self.status_code = response.attribute(QNetworkRequest.HttpStatusCodeAttribute)
+        if response.error():
+            # First try non-HTTP error codes
+            error_code = response.error()
+            error_msg = response.errorString()
+            if error_code in (QNetworkReply.ConnectionRefusedError, QNetworkReply.HostNotFoundError):
+                raise exceptions.GenericServerError(1, f"Host {self.base_url} not valid.")
+            elif error_code == QNetworkReply.TimeoutError:
+                raise exceptions.Timeout("Request timed out.")
 
-        if status_code == 401:
-            raise exceptions.InvalidKey(
-                str(status_code),
-                # error,
-                message
-            )
-
-        elif status_code == 429:
-            raise exceptions.OverQueryLimit(
-                str(status_code),
-                # error,
-                message
-            )
-        # Internal error message for Bad Request
-        elif status_code and 400 <= status_code < 500:
-            raise exceptions.ApiError(
-                str(status_code),
-                # error,
-                message
-            )
-        # Other HTTP errors have different formatting
-        else:
-            raise exceptions.GenericServerError(
-                "Connection error",
-                # error,
-                message
-            )
+            print(self.status_code)
+            if self.status_code == 401:
+                raise exceptions.InvalidKey(
+                    str(self.status_code),
+                    error_msg
+                )
+            elif self.status_code == 429:
+                logger.log("{}: {}".format(
+                    exceptions.OverQueryLimit.__name__,
+                    "Query limit exceeded"
+                ))
+                raise exceptions.OverQueryLimit(
+                    str(429),
+                    error_msg
+                )
+            # Internal error message for Bad Request
+            elif self.status_code and 400 <= self.status_code < 500:
+                logger.log("Feature ID {} caused a {}: {}".format(
+                    feat_id,
+                    exceptions.ApiError.__name__,
+                    error_msg,
+                    2
+                ))
+                raise exceptions.ApiError(
+                    str(self.status_code),
+                    error_msg
+                )
+            else:
+                raise exceptions.GenericServerError(
+                    str(self.status_code),
+                    error_msg
+                )
 
     def _generate_auth_url(self, path, params):
         """Returns the path and query string portion of the request URL, first

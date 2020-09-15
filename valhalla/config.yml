@@ -8,3 +8,6 @@ providers:
 - base_url: https://valhalla.gis-ops.com/tomtom
   key: ''
   name: server osm
+- base_url: http://78.47.100.144:8002
+  key: ''
+  name: server
