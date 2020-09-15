@@ -3,13 +3,14 @@ name=Valhalla
 qgisMinimumVersion=3.0
 description=Valhalla routing, isochrones and matrix calculations for QGIS
 
-version=1.4.1
+version=1.5.0
 author=GIS • OPS UG
 email=nils@gis-ops.com
 
 about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-changelog=2020/08/27 v1.4.1 Implement shortest for valhalla dev
+changelog=2020/09/15 v1.5.0 Change to QgsNetworkAccessManager; add Extra Params dialog
+    2020/08/27 v1.4.1 Implement shortest for valhalla dev
     2019/12/14 v1.4.0 Implement Point output for isochrones' show_locations
     2019/11/20 v1.3.0 Add support to aggregate isochrones for multiple locations
     2019/10/20 v1.2.2 Lines proc algo had a minor avoid_layer bug
