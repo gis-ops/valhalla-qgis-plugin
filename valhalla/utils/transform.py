@@ -10,12 +10,6 @@
         email                : nils@gis-ops.com
  ***************************************************************************/
 
- This plugin provides access to the various APIs from OpenRouteService
- (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using
- this plugin you agree to the ORS terms of service
- (https://openrouteservice.org/terms-of-service/).
-
 /***************************************************************************
  *                                                                         *
  *   This program is free software; you can redistribute it and/or modify  *
@@ -42,7 +36,7 @@ def transformToWGS(old_crs):
     :returns: transformer to use in various modules.
     :rtype: QgsCoordinateTransform
     """
-    outCrs = QgsCoordinateReferenceSystem(4326)
+    outCrs = QgsCoordinateReferenceSystem('EPSG:4326')
     xformer = QgsCoordinateTransform(old_crs, outCrs, QgsProject.instance())
 
     return xformer

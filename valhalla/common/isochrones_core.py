@@ -55,7 +55,7 @@ class Isochrones():
         self.id_field_name = None
         self.response = None
 
-    def set_parameters(self, profile, geometry_param='LineString', id_field_type=QVariant.String, id_field_name='ID'):
+    def set_parameters(self, profile, geometry_param='Polygon', id_field_type=QVariant.String, id_field_name='ID'):
         """
         Sets all parameters defined in __init__, because processing algorithm calls this class when it doesn't know its parameters yet.
 

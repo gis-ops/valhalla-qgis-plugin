@@ -51,22 +51,31 @@ class Isochrones:
         # API parameters<
         profile = self.dlg.routing_travel_combo.currentText()
         contours = self.dlg.contours.value()
+        contours_distance = self.dlg.contours_distance.value()
         polygons = self.dlg.polygons.currentText()
         denoise = self.dlg.denoise.value()
         generalize = self.dlg.generalize.value()
         mode = self.dlg.routing_mode_combo.currentText()
 
         try:
-            contours = [{'time': int(interval)} for interval in contours.split(',')]
+            contours = [float(interval) for interval in contours.split(',')]
+            contours_distance = [float(interval) for interval in contours_distance.split(',')]
         except ValueError:
-            raise ValueError("Isochrone intervals need to be a comma-separated list of whole numbers.")
+            raise ValueError("Isochrone intervals need to be a comma-separated list of numbers (decimal or whole).")
+
+        contour_obj = list()
+        for i in range(max(len(contours), len(contours_distance))):
+            time = 0 if i > len(contours) else contours[i]
+            dist = 0 if i > len(contours_distance) else contours_distance[i]
+
+            contour_obj.append({'time': time, 'distance': dist})
 
         polygons = True if polygons == 'Polygon' else False
 
         params = {
             'costing': profile,
             'show_locations': True,
-            'contours': contours,
+            'contours': contour_obj,
             'polygons': polygons,
             'id': 1,
         }
