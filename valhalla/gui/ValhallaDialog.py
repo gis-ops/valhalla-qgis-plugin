@@ -28,23 +28,21 @@
 import json
 import webbrowser
 from shutil import which
-import time
 
-from PyQt5.QtWidgets import (QAction,
+from qgis.PyQt.QtWidgets import (QAction,
                              QDialog,
                              QApplication,
                              QMenu,
                              QMessageBox,
                              QDialogButtonBox)
-from PyQt5.QtGui import QIcon, QTextDocument
-from PyQt5.QtCore import QSizeF, QPointF, QVariant
+from qgis.PyQt.QtGui import QIcon, QTextDocument
+from qgis.PyQt.QtCore import QSizeF, QPointF
 
 from qgis.core import (QgsProject,
                        QgsVectorLayer,
                        QgsTextAnnotation,
                        QgsMapLayerProxyModel,
-                       QgsFields,
-                       QgsField)
+                       QgsCoordinateReferenceSystem)
 from qgis.gui import QgsMapCanvasAnnotationItem
 import processing
 
@@ -295,43 +293,52 @@ class ValhallaDialogMain:
                 geometry_type = self.dlg.polygons.currentText()
                 isochrones = isochrones_core.Isochrones()
                 isochrones.set_parameters(profile, geometry_type)
+                locations = get_locations(self.dlg.routing_fromline_list)
+
+                aggregate = self.dlg.iso_aggregate.isChecked()
+                locations = [locations] if aggregate else locations
 
                 no_points = self.dlg.iso_no_points.isChecked()
 
-                layer_out = QgsVectorLayer(f"{geometry_type}?crs=EPSG:4326", "Isochrone_Valhalla", "memory")
-                layer_out.dataProvider().addAttributes(isochrones.get_fields())
-                layer_out.updateFields()
+                metrics = []
+                if self.dlg.contours_distance.text():
+                    metrics.append('distance')
+                if self.dlg.contours.text():
+                    metrics.append('time')
+
+                for metric in metrics:
+                    isochrones_ui = isochrones_gui.Isochrones(self.dlg)
+                    params = isochrones_ui.get_parameters(metric)
+                    params.update(extra_params)
+
+                    name = 'Isodistance' if metric == 'distance' else 'Isochrone'
+                    layer_out = QgsVectorLayer(f"{geometry_type}?crs=EPSG:4326", f"{name} {params['costing']}", "memory")
+                    layer_out.dataProvider().addAttributes(isochrones.get_fields())
+                    layer_out.updateFields()
+
+                    for i, location in enumerate(locations):
+                        params['locations'] = location if aggregate else [location]
+                        isochrones.set_response(clnt.request('/isochrone', {}, post_json=params))
+                        for feat in isochrones.get_features(str(i), isochrones_ui.costing_options):
+                            layer_out.dataProvider().addFeature(feat)
+
+                    layer_out.updateExtents()
+                    isochrones.stylePoly(layer_out, metric)
+                    self.project.addMapLayer(layer_out)
+
                 if not no_points:
-                    multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", "Isochrone_Valhalla_Snapped_Points", "memory")
-                    point_layer = QgsVectorLayer("Point?crs=EPSG:4326", "Isochrone_Valhalla_Input_Points", "memory")
+                    multipoint_layer = QgsVectorLayer("MultiPoint?crs=EPSG:4326", f"Snapped Points {params['costing']}", "memory")
+                    point_layer = QgsVectorLayer("Point?crs=EPSG:4326", f"Input Points {params['costing']}", "memory")
 
                     multipoint_layer.dataProvider().addAttributes(isochrones.get_point_fields())
                     multipoint_layer.updateFields()
                     point_layer.dataProvider().addAttributes(isochrones.get_point_fields())
                     point_layer.updateFields()
 
-                isochrones_ui = isochrones_gui.Isochrones(self.dlg)
-                params = isochrones_ui.get_parameters()
-                params.update(extra_params)
-                locations = get_locations(self.dlg.routing_fromline_list)
-
-                aggregate = self.dlg.iso_aggregate.isChecked()
-                locations = [locations] if aggregate else locations
-                for i, location in enumerate(locations):
-                    params['locations'] = location if aggregate else [location]
-                    isochrones.set_response(clnt.request('/isochrone', {}, post_json=params))
-                    for feat in isochrones.get_features(str(i), isochrones_ui.costing_options):
-                        layer_out.dataProvider().addFeature(feat)
-                    if not no_points:
-                        for feat in isochrones.get_multipoint_features(str(i)):
-                            multipoint_layer.dataProvider().addFeature(feat)
-                        for feat in isochrones.get_point_features(str(i)):
-                            point_layer.dataProvider().addFeature(feat)
-
-                layer_out.updateExtents()
-                isochrones.stylePoly(layer_out)
-                self.project.addMapLayer(layer_out)
-                if not no_points:
+                    for feat in isochrones.get_multipoint_features('0'):
+                        multipoint_layer.dataProvider().addFeature(feat)
+                    for feat in isochrones.get_point_features('0'):
+                        point_layer.dataProvider().addFeature(feat)
                     multipoint_layer.updateExtents()
                     point_layer.updateExtents()
                     self.project.addMapLayer(multipoint_layer)
@@ -458,11 +465,11 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
 
         self._iface = iface
         self.project = QgsProject.instance()  # invoke a QgsProject instance
-        self.map_crs = self._iface.mapCanvas().mapSettings().destinationCrs()
+        self.map_crs: QgsCoordinateReferenceSystem = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         # Set things around the custom map tool
         self.line_tool = None
-        self.last_maptool = self._iface.mapCanvas().mapTool()
+        self.last_maptool = None
         self.annotations = []
 
         # Change OK and Cancel button names
@@ -519,8 +526,8 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
 
         annotation.setDocument(c)
 
-        annotation.setFrameSize(QSizeF(27, 20))
-        annotation.setFrameOffsetFromReferencePoint(QPointF(5, 5))
+        annotation.setFrameSizeMm(QSizeF(5,8))
+        annotation.setFrameOffsetFromReferencePointMm(QPointF(5, 5))
         annotation.setMapPosition(point)
         annotation.setMapPositionCrs(self.map_crs)
 
@@ -539,6 +546,8 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         self.routing_fromline_list.clear()
         # Remove all annotations which were added (if any)
         self._clear_annotations()
+
+        self.last_maptool = self._iface.mapCanvas().mapTool()
 
         self.line_tool = maptools.LineTool(self._iface.mapCanvas())
         self._iface.mapCanvas().setMapTool(self.line_tool)
@@ -567,5 +576,5 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         self.line_tool.pointDrawn.disconnect()
         self.line_tool.doubleClicked.disconnect()
         QApplication.restoreOverrideCursor()
-        self._iface.mapCanvas().setMapTool(self.last_maptool)
         self.show()
+        self._iface.mapCanvas().setMapTool(self.last_maptool)

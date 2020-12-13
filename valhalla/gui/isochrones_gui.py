@@ -40,7 +40,7 @@ class Isochrones:
 
         self.costing_options = dict()
 
-    def get_parameters(self):
+    def get_parameters(self, metric):
         """
         Builds parameters across directions functionalities.
 
@@ -50,32 +50,26 @@ class Isochrones:
 
         # API parameters<
         profile = self.dlg.routing_travel_combo.currentText()
-        contours = self.dlg.contours.value()
-        contours_distance = self.dlg.contours_distance.value()
+        contours = self.dlg.contours.value() if metric == 'time' else self.dlg.contours_distance.value()
         polygons = self.dlg.polygons.currentText()
         denoise = self.dlg.denoise.value()
         generalize = self.dlg.generalize.value()
         mode = self.dlg.routing_mode_combo.currentText()
 
+        contours_obj = list()
         try:
             contours = [float(interval) for interval in contours.split(',')]
-            contours_distance = [float(interval) for interval in contours_distance.split(',')]
+            for c in contours:
+                contours_obj.append({metric: c})
         except ValueError:
             raise ValueError("Isochrone intervals need to be a comma-separated list of numbers (decimal or whole).")
-
-        contour_obj = list()
-        for i in range(max(len(contours), len(contours_distance))):
-            time = 0 if i > len(contours) else contours[i]
-            dist = 0 if i > len(contours_distance) else contours_distance[i]
-
-            contour_obj.append({'time': time, 'distance': dist})
 
         polygons = True if polygons == 'Polygon' else False
 
         params = {
             'costing': profile,
-            'show_locations': True,
-            'contours': contour_obj,
+            'show_locations': not self.dlg.iso_no_points.isChecked(),
+            'contours': contours_obj,
             'polygons': polygons,
             'id': 1,
         }

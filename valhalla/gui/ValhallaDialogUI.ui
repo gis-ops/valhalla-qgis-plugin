@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>1460</height>
+    <width>430</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -143,15 +143,37 @@
        </property>
        <item>
         <widget class="QWidget" name="routing_travel_group" native="true">
-         <layout class="QGridLayout" name="gridLayout_14" columnstretch="1,2">
+         <layout class="QGridLayout" name="gridLayout_14" columnstretch="1,0">
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_2">
-            <property name="text">
-             <string>Method</string>
-            </property>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="routing_method">
+            <item>
+             <property name="text">
+              <string>route</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>isochrone</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>sources_to_targets</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>locate</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>extract-osm</string>
+             </property>
+            </item>
            </widget>
           </item>
           <item row="1" column="1">
@@ -186,33 +208,11 @@
             </item>
            </widget>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="routing_method">
-            <item>
-             <property name="text">
-              <string>route</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>isochrone</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>sources_to_targets</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>locate</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>identify</string>
-             </property>
-            </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Method</string>
+            </property>
            </widget>
           </item>
           <item row="1" column="0">
@@ -270,26 +270,6 @@
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
-          <item row="0" column="0">
-           <widget class="QPushButton" name="routing_fromline_map">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-            </property>
-            <property name="text">
-             <string/>
-            </property>
-            <property name="icon">
-             <iconset resource="resources.qrc">
-              <normaloff>:/plugins/Valhalla/img/icon_add.png</normaloff>:/plugins/Valhalla/img/icon_add.png</iconset>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="2" rowspan="3">
            <widget class="QListWidget" name="routing_fromline_list">
             <property name="sizePolicy">
@@ -341,6 +321,26 @@
             <property name="icon">
              <iconset resource="resources.qrc">
               <normaloff>:/plugins/Valhalla/img/icon_clear.png</normaloff>:/plugins/Valhalla/img/icon_clear.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="routing_fromline_map">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add wayoints interactively from the map canvas.&lt;/p&gt;&lt;p&gt;Double-click will terminate waypoint selection.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="resources.qrc">
+              <normaloff>:/plugins/Valhalla/img/icon_add.png</normaloff>:/plugins/Valhalla/img/icon_add.png</iconset>
             </property>
            </widget>
           </item>
@@ -542,8 +542,17 @@
              </item>
              <item>
               <widget class="QgsCollapsibleGroupBox" name="identify_group">
+               <property name="toolTip">
+                <string>If you have a OSM PBF file locally you can extract street segments with &quot;extract-osm&quot; method. Needs osmium installed!</string>
+               </property>
+               <property name="statusTip">
+                <string>If you have a OSM PBF file locally you can extract street segments with &quot;extract-osm&quot; method. Needs osmium installed!</string>
+               </property>
+               <property name="whatsThis">
+                <string>If you have a OSM PBF file locally you can extract street segments with &quot;extract-osm&quot; method. Needs osmium installed!</string>
+               </property>
                <property name="title">
-                <string>Identify</string>
+                <string>Extract OSM</string>
                </property>
                <property name="collapsed">
                 <bool>true</bool>
@@ -584,7 +593,16 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>Avoid certain road attributes.</string>
+             <string>Add profile-specific costing options.</string>
+            </property>
+            <property name="statusTip">
+             <string>Add profile-specific costing options.</string>
+            </property>
+            <property name="whatsThis">
+             <string>Add profile-specific costing options.</string>
+            </property>
+            <property name="accessibleName">
+             <string/>
             </property>
             <property name="title">
              <string>Costing options</string>
@@ -1521,7 +1539,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a (Multi-)Polygon layer. &lt;/p&gt;&lt;p&gt;Does &lt;span style=&quot; font-weight:600;&quot;&gt;not work&lt;/span&gt; for memory (scratch) Polygon layers!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;, only the first feature of the layer will be respected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a Point layer. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="title">
              <string>Avoid locations</string>
@@ -1570,26 +1588,6 @@
           </item>
          </layout>
         </widget>
-       </item>
-      </layout>
-     </widget>
-     <widget class="QWidget" name="batch_tab">
-      <attribute name="title">
-       <string>Locate</string>
-      </attribute>
-      <layout class="QVBoxLayout" name="verticalLayout">
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>

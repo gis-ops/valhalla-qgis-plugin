@@ -32,7 +32,7 @@ from PyQt5.QtCore import QVariant
 from PyQt5.QtGui import QColor
 
 from qgis.core import (QgsPointXY,
-                       QgsMultiPoint,
+                       QgsVectorLayer,
                        QgsFeature,
                        QgsField,
                        QgsFields,
@@ -97,6 +97,7 @@ class Isochrones():
         fields.append(QgsField('contour', QVariant.Int))  # Dimension field
         fields.append(QgsField("profile", QVariant.String))
         fields.append(QgsField('options', QVariant.String))
+        fields.append(QgsField('metric', QVariant.String))
 
         return fields
 
@@ -136,6 +137,7 @@ class Isochrones():
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
             iso_value = isochrone['properties']['contour']
+            metric = isochrone['properties']['metric']
             if self.geometry == 'Polygon':
                 qgis_coords = [[QgsPointXY(coord[0], coord[1]) for coord in coordinates[0]]]
                 feat.setGeometry(QgsGeometry.fromPolygonXY(qgis_coords))
@@ -146,7 +148,8 @@ class Isochrones():
                 id_field_value,
                 int(iso_value),
                 self.profile,
-                json.dumps(options)
+                json.dumps(options),
+                metric
             ])
 
             yield feat
@@ -195,27 +198,42 @@ class Isochrones():
 
             yield feat
 
-    def stylePoly(self, layer):
+    def stylePoly(self, layer, metric: str):
         """
         Style isochrone polygon layer.
 
-        :param layer: Polygon layer to be styled.
-        :type layer: QgsMapLayer
+        :param QgsVectorLayer layer: Polygon layer to be styled.
+        :param str metric: distance or time.
         """
-
         field = layer.fields().lookupField('contour')
         unique_values = sorted(layer.uniqueValues(field))
 
-        colors = {0: QColor('#2b83ba'),
-                  1: QColor('#64abb0'),
-                  2: QColor('#9dd3a7'),
-                  3: QColor('#c7e9ad'),
-                  4: QColor('#edf8b9'),
-                  5: QColor('#ffedaa'),
-                  6: QColor('#fec980'),
-                  7: QColor('#f99e59'),
-                  8: QColor('#e85b3a'),
-                  9: QColor('#d7191c')}
+        colors = {
+            "distance": {
+                0: QColor('#FCF0EE'),
+                1: QColor('#F9E1DC'),
+                2: QColor('#F6D2CB'),
+                3: QColor('#F3C3BA'),
+                4: QColor('#F0B3A8'),
+                5: QColor('#EDA396'),
+                6: QColor('#EA9485'),
+                7: QColor('#E78573'),
+                8: QColor('#E47662'),
+                9: QColor('#E16651')
+            },
+            "time": {
+                0: QColor('#2b83ba'),
+                1: QColor('#64abb0'),
+                2: QColor('#9dd3a7'),
+                3: QColor('#c7e9ad'),
+                4: QColor('#edf8b9'),
+                5: QColor('#ffedaa'),
+                6: QColor('#fec980'),
+                7: QColor('#f99e59'),
+                8: QColor('#e85b3a'),
+                9: QColor('#d7191c')
+            }
+        }
 
         categories = []
 
@@ -224,7 +242,7 @@ class Isochrones():
             symbol = QgsSymbol.defaultSymbol(layer.geometryType())
 
             # configure a symbol layer
-            symbol_layer = QgsSimpleFillSymbolLayer(color=colors[cid],
+            symbol_layer = QgsSimpleFillSymbolLayer(color=colors[metric][cid],
                                                     strokeColor=QColor('#000000'))
 
             # replace default symbol layer with the configured one

@@ -39,11 +39,12 @@ from qgis.core import (QgsWkbTypes,
                        QgsProcessingParameterBoolean,
                        QgsProcessingParameterFeatureSource,
                        QgsProcessingParameterEnum,
-                       QgsProcessingParameterFeatureSink,
+                       QgsVectorLayer,
                        QgsProcessingParameterString,
                        QgsProcessingParameterDefinition,
                        QgsProcessingException,
-                       QgsProcessingParameterMapLayer,
+                       QgsProcessingOutputVectorLayer,
+QgsProcessingContext
                        )
 from .. import HELP_DIR
 from valhalla import RESOURCE_PREFIX, __help__
@@ -68,27 +69,33 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_POINTS = "INPUT_POINT_LAYER"
     IN_FIELD = "INPUT_FIELD"
-    IN_INTERVALS = 'contours'
+    IN_INTERVALS_TIME = 'contours'
+    IN_INTERVALS_DISTANCE = 'contours_distance'
     IN_SHOW_LOCATIONS = 'show_locations'
     IN_DENOISE = 'denoise'
     IN_GENERALIZE = 'generalize'
     IN_GEOMETRY = 'polygons'
     IN_AVOID = "avoid_locations"
-    OUT = 'OUTPUT'
+    OUT_TIME = 'OUTPUT_TIME'
+    OUT_DISTANCE = 'OUTPUT_DISTANCE'
     POINTS_SNAPPED = 'OUTPUT_SNAPPED_POINTS'
     POINTS_INPUT = 'OUTPUT_INPUT_POINTS'
 
     # Save some important references
-    dest_id = None
+    isos_time_id = None
+    isos_dist_id = None
     points_snapped_id = None
     points_input_id = None
     isochrones = isochrones_core.Isochrones()
-    crs_out = QgsCoordinateReferenceSystem(4326)
+    crs_out = QgsCoordinateReferenceSystem('ESPG:4326')
 
     def __init__(self):
         super(ValhallaIsochronesCarAlgo, self).__init__()
         self.providers = configmanager.read_config()['providers']
         self.costing_options = self.COSTING()
+        self.intervals = None  # will be populated with the intervals available
+        self.isos_time_id, self.isos_dist_id, self.points_input_id, self.points_snapped_id= None, None, None, None
+
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
         providers = [provider['name'] for provider in self.providers]
@@ -119,16 +126,26 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterString(
-                name=self.IN_INTERVALS,
-                description="Comma-separated intervals [mins]",
-                defaultValue="5, 10"
+                name=self.IN_INTERVALS_TIME,
+                description="Comma-separated time intervals [mins]",
+                defaultValue="5,10",
+                optional=True
+            )
+        )
+
+        self.addParameter(
+            QgsProcessingParameterString(
+                name=self.IN_INTERVALS_DISTANCE,
+                description="Comma-separated distance intervals [km]",
+                defaultValue="5,10",
+                optional=True
             )
         )
 
         self.addParameter(
             QgsProcessingParameterBoolean(
                 name=self.IN_SHOW_LOCATIONS,
-                description="Return input locations as MultiPoint",
+                description="Return input locations as (Multi)Point",
                 defaultValue=False
             )
         )
@@ -153,6 +170,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             QgsProcessingParameterEnum(
                 name=self.IN_GEOMETRY,
                 options=self.GEOMETRY_TYPES,
+                defaultValue=self.GEOMETRY_TYPES[0],
                 description="Output geometry type",
                 optional=True
             )
@@ -173,27 +191,35 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             p.setFlags(p.flags() | QgsProcessingParameterDefinition.FlagAdvanced)
             self.addParameter(p)
 
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
-                name=self.OUT,
-                description="Valhalla_Isochrones_" + self.PROFILE,
-                createByDefault=False
+        self.addOutput(
+            QgsProcessingOutputVectorLayer(
+                name=self.OUT_TIME,
+                description="Isochrones " + self.PROFILE,
+                type=QgsProcessing.TypeVectorAnyGeometry
             )
         )
 
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
+        self.addOutput(
+            QgsProcessingOutputVectorLayer(
+                name=self.OUT_DISTANCE,
+                description="Isodistances " + self.PROFILE,
+                type=QgsProcessing.TypeVectorAnyGeometry
+            )
+        )
+
+        self.addOutput(
+            QgsProcessingOutputVectorLayer(
                 name=self.POINTS_SNAPPED,
-                description="Valhalla_Isochrones_Snapped_Points_" + self.PROFILE,
-                createByDefault=False
+                description="",
+                type=QgsProcessing.TypeVectorAnyGeometry
             )
         )
 
-        self.addParameter(
-            QgsProcessingParameterFeatureSink(
+        self.addOutput(
+            QgsProcessingOutputVectorLayer(
                 name=self.POINTS_INPUT,
                 description="Valhalla_Isochrones_Input_Points_" + self.PROFILE,
-                createByDefault=False
+                type=QgsProcessing.TypeVectorAnyGeometry
             )
         )
 
@@ -240,30 +266,13 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         params = dict()
 
-        denoise = self.parameterAsDouble(parameters, self.IN_DENOISE, context)
-        if denoise:
-            params[self.IN_DENOISE] = denoise
-
-        generalize = self.parameterAsDouble(parameters, self.IN_GENERALIZE, context)
-        if generalize:
-            params[self.IN_GENERALIZE] = generalize
-
-        show_locations = self.parameterAsBool(parameters, self.IN_SHOW_LOCATIONS, context)
-
-        intervals_raw = self.parameterAsString(parameters, self.IN_INTERVALS, context)
-        params['contours'] = [{"time": int(x)} for x in intervals_raw.split(',')]
+        geometry_param = self.GEOMETRY_TYPES[self.parameterAsEnum(parameters, self.IN_GEOMETRY, context)]
+        geometry_type = QgsWkbTypes.Polygon if geometry_param == 'Polygon' else QgsWkbTypes.LineString
+        params[self.IN_GEOMETRY] = True if geometry_param == 'Polygon' else False
 
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
         if source.wkbType() == 4:
             raise QgsProcessingException("TypeError: Multipoint Layers are not accepted. Please convert to single geometry layer.")
-
-        avoid_layer = self.parameterAsLayer(
-            parameters,
-            self.IN_AVOID,
-            context
-        )
-        if avoid_layer:
-            params['avoid_locations'] = get_avoid_locations(avoid_layer)
 
         # Get ID field properties
         id_field_name = self.parameterAsString(parameters, self.IN_FIELD, context)
@@ -273,91 +282,206 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             id_field_name = source.fields().field(id_field_id).name()
         id_field = source.fields().field(id_field_id)
 
-        geometry_param = self.GEOMETRY_TYPES[self.parameterAsEnum(parameters, self.IN_GEOMETRY, context)]
-        geometry_type = QgsWkbTypes.Polygon if geometry_param == 'Polygon' else QgsWkbTypes.LineString
-        params[self.IN_GEOMETRY] = True if geometry_param == 'Polygon' else False
-
         # Populate iso_layer instance with parameters
         self.isochrones.set_parameters(self.PROFILE, geometry_param, id_field.type(), id_field_name)
+
+        # (time_sink, self.isos_time_id) = self.parameterAsSink(parameters, self.OUT_TIME, context,
+        #                                             self.isochrones.get_fields(),
+        #                                             geometry_type,
+        #                                             self.crs_out)
+        #
+        # (dist_sink, self.isos_time_id) = self.parameterAsSink(parameters, self.OUT_DISTANCE, context,
+        #                                             self.isochrones.get_fields(),
+        #                                             geometry_type,
+        #                                             self.crs_out)
+        # (sink_snapped_points, self.points_snapped_id) = self.parameterAsSink(parameters, self.POINTS_SNAPPED, context,
+        #                                                              self.isochrones.get_point_fields(),
+        #                                                              QgsWkbTypes.MultiPoint,
+        #                                                              self.crs_out)
+        # (sink_input_points, self.points_input_id) = self.parameterAsSink(parameters, self.POINTS_INPUT, context,
+        #                                                            self.isochrones.get_point_fields(),
+        #                                                            QgsWkbTypes.Point,
+        #                                                            self.crs_out)
+
+        layer_time = QgsVectorLayer(
+            f'{geometry_param}?crs=EPSG:4326',
+            f'Isochrones {self.PROFILE}',
+            'memory'
+        )
+        self.isos_time_id = layer_time.id()
+        layer_time_pr = layer_time.dataProvider()
+        layer_time_pr.addAttributes(self.isochrones.get_fields())
+        layer_time.updateFields()
+
+        layer_dist = QgsVectorLayer(
+            f'{geometry_param}?crs=EPSG:4326',
+            f'Isodistances {self.PROFILE}',
+            'memory'
+        )
+        self.isos_dist_id = layer_dist.id()
+        layer_dist_pr = layer_dist.dataProvider()
+        layer_dist_pr.addAttributes(self.isochrones.get_fields())
+        layer_dist.updateFields()
+
+        layer_snapped_points = QgsVectorLayer(
+            f'MultiPoint?crs=EPSG:4326',
+            f'Snapped Points {self.PROFILE}',
+            'memory'
+        )
+        self.points_snapped_id = layer_snapped_points.id()
+        layer_snapped_points_pr = layer_snapped_points.dataProvider()
+        layer_snapped_points_pr.addAttributes(self.isochrones.get_point_fields())
+        layer_snapped_points.updateFields()
+
+        layer_input_points = QgsVectorLayer(
+            f'Point?crs=EPSG:4326',
+            f'Input Points {self.PROFILE}',
+            'memory'
+        )
+        self.points_input_id = layer_input_points.id()
+        layer_input_points_pr = layer_input_points.dataProvider()
+        layer_input_points_pr.addAttributes(self.isochrones.get_point_fields())
+        layer_input_points.updateFields()
+
+        denoise = self.parameterAsDouble(parameters, self.IN_DENOISE, context)
+        if denoise:
+            params[self.IN_DENOISE] = denoise
+
+        generalize = self.parameterAsDouble(parameters, self.IN_GENERALIZE, context)
+        if generalize:
+            params[self.IN_GENERALIZE] = generalize
+
+        avoid_layer = self.parameterAsLayer(
+            parameters,
+            self.IN_AVOID,
+            context
+        )
+        if avoid_layer:
+            params['avoid_locations'] = get_avoid_locations(avoid_layer)
+
+        show_locations = self.parameterAsBool(parameters, self.IN_SHOW_LOCATIONS, context)
 
         # Sets all advanced parameters as attributes of self.costing_options
         self.costing_options.set_costing_options(self, parameters, context)
 
-        # Make the actual requests
-        requests = []
-        for properties in self.get_sorted_feature_parameters(source):
-            # Stop the algorithm if cancel button has been clicked
+        intervals_time = self.parameterAsString(parameters, self.IN_INTERVALS_TIME, context)
+        intervals_distance = self.parameterAsString(parameters, self.IN_INTERVALS_DISTANCE, context)
+
+        feat_count = source.featureCount() if not intervals_time or not intervals_distance else source.featureCount() * 2
+
+        self.intervals = {
+            "time": [{"time": int(x)} for x in intervals_time.split(',')] if intervals_time else [],
+            "distance": [{"distance": int(x)} for x in intervals_distance.split(',')] if intervals_distance else []
+        }
+
+        counter = 0
+
+        for metric, interv in self.intervals.items():
             if feedback.isCanceled():
                 break
-
-            # Get transformed coordinates and feature
-            locations, feat = properties
-            params.update(get_directions_params(locations, self.PROFILE, self.costing_options))
-            params['id'] = feat[id_field_name]
-            requests.append(deepcopy(params))
-
-        (sink, self.dest_id) = self.parameterAsSink(parameters, self.OUT, context,
-                                                    self.isochrones.get_fields(),
-                                                    geometry_type,
-                                                    self.crs_out)
-        (sink_snapped_points, self.points_snapped_id) = self.parameterAsSink(parameters, self.POINTS_SNAPPED, context,
-                                                                     self.isochrones.get_point_fields(),
-                                                                     QgsWkbTypes.MultiPoint,
-                                                                     self.crs_out)
-        (sink_input_points, self.points_input_id) = self.parameterAsSink(parameters, self.POINTS_INPUT, context,
-                                                                   self.isochrones.get_point_fields(),
-                                                                   QgsWkbTypes.Point,
-                                                                   self.crs_out)
-
-        for num, params in enumerate(requests):
-            if feedback.isCanceled():
-                break
-
-            # If feature causes error, report and continue with next
-            try:
-                # Populate features from response
-                response = clnt.request('/isochrone', post_json=params)
-            except (exceptions.ApiError) as e:
-                msg = "Feature ID {} caused a {}:\n{}".format(
-                    params['id'],
-                    e.__class__.__name__,
-                    str(e))
-                feedback.reportError(msg)
-                logger.log(msg, 2)
+            if not interv:
                 continue
-            except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
-                msg = "{}:\n{}".format(
-                    e.__class__.__name__,
-                    str(e))
-                logger.log(msg)
-                raise
+            # Make the actual requests
+            requests = []
+            for properties in self.get_sorted_feature_parameters(source):
+                if feedback.isCanceled():
+                    break
+                r_params = deepcopy(params)
+                r_params['contours'] = interv
+                # Get transformed coordinates and feature
+                locations, feat = properties
+                r_params.update(get_directions_params(locations, self.PROFILE, self.costing_options))
+                r_params['id'] = feat[id_field_name]
+                requests.append(r_params)
 
-            options = {}
-            if params.get('costing_options'):
-                options = params['costing_options']
+            for params in requests:
+                counter += 1
+                if feedback.isCanceled():
+                    break
+                # If feature causes error, report and continue with next
+                try:
+                    # Populate features from response
+                    response = clnt.request('/isochrone', post_json=params)
+                except (exceptions.ApiError) as e:
+                    msg = "Feature ID {} caused a {}:\n{}".format(
+                        params['id'],
+                        e.__class__.__name__,
+                        str(e))
+                    feedback.reportError(msg)
+                    logger.log(msg, 2)
+                    continue
+                except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
+                    msg = "{}:\n{}".format(
+                        e.__class__.__name__,
+                        str(e))
+                    feedback.reportError(msg)
+                    logger.log(msg)
+                    raise
 
-            self.isochrones.set_response(response)
-            for isochrone in self.isochrones.get_features(params['id'], options.get(self.PROFILE)):
-                sink.addFeature(isochrone)
-            if show_locations:
-                for point_feat in self.isochrones.get_multipoint_features(params['id']):
-                    sink_snapped_points.addFeature(point_feat)
-                for point_feat in self.isochrones.get_point_features(params['id']):
-                    sink_input_points.addFeature(point_feat)
+                options = {}
+                if params.get('costing_options'):
+                    options = params['costing_options']
 
-            feedback.setProgress(int(100.0 / source.featureCount() * num))
+                self.isochrones.set_response(response)
+                for isochrone in self.isochrones.get_features(params['id'], options.get(self.PROFILE)):
+                    if metric == 'time':
+                        layer_time_pr.addFeature(isochrone)
+                    elif metric == 'distance':
+                        layer_dist_pr.addFeature(isochrone)
 
+                if show_locations:
+                    for point_feat in self.isochrones.get_multipoint_features(params['id']):
+                        layer_snapped_points_pr.addFeature(point_feat)
+                    for point_feat in self.isochrones.get_point_features(params['id']):
+                        layer_input_points_pr.addFeature(point_feat)
+
+                feedback.setProgress(int((counter / feat_count) * 100))
+
+        temp = []
+        if layer_time.hasFeatures():
+            layer_time.updateExtents()
+            context.temporaryLayerStore().addMapLayer(layer_time)
+            temp.append(("Isochrones " + self.PROFILE, self.OUT_TIME, layer_time.id()))
+        if layer_dist.hasFeatures():
+            layer_dist.updateExtents()
+            context.temporaryLayerStore().addMapLayer(layer_dist)
+            temp.append(("Isodistances " + self.PROFILE, self.OUT_DISTANCE, layer_dist.id()))
         if show_locations:
-            return {self.OUT: self.dest_id, self.POINTS_SNAPPED: self.points_snapped_id, self.POINTS_INPUT: self.points_input_id}
-        return {self.OUT: self.dest_id}
+            layer_snapped_points.updateExtents()
+            context.temporaryLayerStore().addMapLayer(layer_snapped_points)
+            temp.append(("Snapped Points " + self.PROFILE, self.POINTS_SNAPPED, layer_snapped_points.id()))
+            layer_input_points.updateExtents()
+            context.temporaryLayerStore().addMapLayer(layer_input_points)
+            temp.append(("Input Points " + self.PROFILE, self.POINTS_INPUT, layer_input_points.id()))
+
+        results = dict()
+        for l_name, e_id, l_id in temp:
+            results[e_id] = l_id
+            context.addLayerToLoadOnCompletion(
+                l_id,
+                QgsProcessingContext.LayerDetails(l_name,
+                                                  context.project(),
+                                                  l_name))
+
+        return results
 
     def postProcessAlgorithm(self, context, feedback):
         """Style polygon layer in post-processing step."""
-        # processed_layer = self.isochrones.calculate_difference(self.dest_id, context)
-        processed_layer= QgsProcessingUtils.mapLayerFromString(self.dest_id, context)
-        self.isochrones.stylePoly(processed_layer)
+        result = dict()
+        for metric in self.intervals:
+            if metric == 'time':
+                layer_id = self.isos_time_id
+                out_id = self.OUT_TIME
+            else:
+                layer_id = self.isos_dist_id
+                out_id = self.OUT_DISTANCE
+            processed_layer = QgsProcessingUtils.mapLayerFromString(layer_id, context)
 
-        return {self.OUT: self.dest_id}
+            if processed_layer:
+                self.isochrones.stylePoly(processed_layer, metric)
+                result[out_id] = layer_id
+
+        return result
 
     def get_sorted_feature_parameters(self, layer):
         """
@@ -374,4 +498,3 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             x_point = xformer.transform(feat.geometry().asPoint())
 
             yield ([x_point], feat)
-
