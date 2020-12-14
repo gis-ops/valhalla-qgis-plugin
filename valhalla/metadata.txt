@@ -10,6 +10,7 @@ email=nils@gis-ops.com
 
 experimental=False
 deprecated=False
+hasProcessingProvider=True
 
 about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine.
     The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from Point/LineString files within the processing framework.
@@ -38,7 +39,7 @@ repository=https://github.com/gis-ops/valhalla-qgis-plugin.git
 help=https://gis-ops.com/valhalla-qgis-plugin/
 
 homepage=https://github.com/gis-ops/valhalla-qgis-plugin/
-category=Plugins
+category=Web
 icon=gui/img/icon_valhalla.png
 
 tags=routing, OSM, openstreetmap, valhalla, isochrone, route, matrix, processing

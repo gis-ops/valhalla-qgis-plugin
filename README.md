@@ -9,3 +9,6 @@ The plugin accesses remote or local Valhalla HTTP APIs. It has Mapbox and `local
 If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
 
 There is a guide on [our blog](https://gis-ops.com/valhalla-qgis-plugin) on how to use this plugin.
+
+In case it's not (yet) available on the main QGIS plugin repository, you can add our URL to your QGIS repositories:
+https://qgisrepo.gis-ops.com.
