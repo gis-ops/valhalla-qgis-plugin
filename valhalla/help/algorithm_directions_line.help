@@ -1,4 +1,4 @@
-The Line Directions algorithm calculates least-cost routes for multiple waypoints along one or multiple LineString(s). Each LineString can have up to 50 waypoints.
+The Line Directions algorithm calculates least-cost routes for multiple waypoints along one or multiple LineString(s). Each LineString can have up to 20-50 waypoints.
 
 You need to have a server running Valhalla or a <b>valid API key</b> for at least one provider (Web ► Valhalla ► Configuration), e.g. <a href="https://mapbox.com">Mapbox</a>.
 
@@ -8,7 +8,7 @@ The layer ID field can be used to join the input layer afterwards.
 
 Specify points to be avoided during routing with <b>Avoid layer</b> parameter. Only Point layers are allowed, <b>not MultiPoint</b>.
 
+The output layer is a LineString layer with multiple route attributes.
+
 Valhalla has a dynamic cost model. You can set an extensive amount of costing options in the <b>Advanced Parameters</b> section. Refer to
 <a href="https://github.com/valhalla/valhalla/blob/master/docs/api/turn-by-turn/api-reference.md">the documentation</a> for an in-depth explanation.
-
-The output layer is a LineString layer with multiple route attributes.

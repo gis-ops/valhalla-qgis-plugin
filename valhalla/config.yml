@@ -2,3 +2,6 @@ providers:
 - base_url: http://localhost:8002
   key: ''
   name: localhost
+- base_url: https://api.mapbox.com/valhalla/v1
+  key:
+  name: Mapbox

@@ -6,15 +6,13 @@
                               -------------------
         begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Nils Nolde
+        copyright            : (C) 2020 by Nils Nolde
         email                : nils@gis-ops.com
  ***************************************************************************/
 
- This plugin provides access to the various APIs from OpenRouteService
- (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using
- this plugin you agree to the ORS terms of service
- (https://openrouteservice.org/terms-of-service/).
+ This plugin provides access to some of the APIs from Valhalla
+ (https://github.com/valhalla/valhalla), developed and
+ maintained by https://gis-ops.com, Berlin, Germany.
 
 /***************************************************************************
  *                                                                         *
@@ -64,7 +62,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
     COSTING = CostingAuto
     PROFILE = 'auto'
 
-    GEOMETRY_TYPES = ['LineString', 'Polygon']
+    GEOMETRY_TYPES = ['Polygon', 'LineString']
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_POINTS = "INPUT_POINT_LAYER"
@@ -218,7 +216,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         self.addOutput(
             QgsProcessingOutputVectorLayer(
                 name=self.POINTS_INPUT,
-                description="Valhalla_Isochrones_Input_Points_" + self.PROFILE,
+                description="",
                 type=QgsProcessing.TypeVectorAnyGeometry
             )
         )
@@ -285,27 +283,9 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         # Populate iso_layer instance with parameters
         self.isochrones.set_parameters(self.PROFILE, geometry_param, id_field.type(), id_field_name)
 
-        # (time_sink, self.isos_time_id) = self.parameterAsSink(parameters, self.OUT_TIME, context,
-        #                                             self.isochrones.get_fields(),
-        #                                             geometry_type,
-        #                                             self.crs_out)
-        #
-        # (dist_sink, self.isos_time_id) = self.parameterAsSink(parameters, self.OUT_DISTANCE, context,
-        #                                             self.isochrones.get_fields(),
-        #                                             geometry_type,
-        #                                             self.crs_out)
-        # (sink_snapped_points, self.points_snapped_id) = self.parameterAsSink(parameters, self.POINTS_SNAPPED, context,
-        #                                                              self.isochrones.get_point_fields(),
-        #                                                              QgsWkbTypes.MultiPoint,
-        #                                                              self.crs_out)
-        # (sink_input_points, self.points_input_id) = self.parameterAsSink(parameters, self.POINTS_INPUT, context,
-        #                                                            self.isochrones.get_point_fields(),
-        #                                                            QgsWkbTypes.Point,
-        #                                                            self.crs_out)
-
         layer_time = QgsVectorLayer(
             f'{geometry_param}?crs=EPSG:4326',
-            f'Isochrones {self.PROFILE}',
+            f'Isochrones {self.PROFILE.capitalize()}',
             'memory'
         )
         self.isos_time_id = layer_time.id()
@@ -315,7 +295,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         layer_dist = QgsVectorLayer(
             f'{geometry_param}?crs=EPSG:4326',
-            f'Isodistances {self.PROFILE}',
+            f'Isodistances {self.PROFILE.capitalize()}',
             'memory'
         )
         self.isos_dist_id = layer_dist.id()
@@ -325,7 +305,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         layer_snapped_points = QgsVectorLayer(
             f'MultiPoint?crs=EPSG:4326',
-            f'Snapped Points {self.PROFILE}',
+            f'Snapped Points {self.PROFILE.capitalize()}',
             'memory'
         )
         self.points_snapped_id = layer_snapped_points.id()
@@ -335,7 +315,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
 
         layer_input_points = QgsVectorLayer(
             f'Point?crs=EPSG:4326',
-            f'Input Points {self.PROFILE}',
+            f'Input Points {self.PROFILE.capitalize()}',
             'memory'
         )
         self.points_input_id = layer_input_points.id()
@@ -441,18 +421,18 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         if layer_time.hasFeatures():
             layer_time.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_time)
-            temp.append(("Isochrones " + self.PROFILE, self.OUT_TIME, layer_time.id()))
+            temp.append(("Isochrones " + self.PROFILE.capitalize(), self.OUT_TIME, layer_time.id()))
         if layer_dist.hasFeatures():
             layer_dist.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_dist)
-            temp.append(("Isodistances " + self.PROFILE, self.OUT_DISTANCE, layer_dist.id()))
+            temp.append(("Isodistances " + self.PROFILE.capitalize(), self.OUT_DISTANCE, layer_dist.id()))
         if show_locations:
             layer_snapped_points.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_snapped_points)
-            temp.append(("Snapped Points " + self.PROFILE, self.POINTS_SNAPPED, layer_snapped_points.id()))
+            temp.append(("Snapped Points " + self.PROFILE.capitalize(), self.POINTS_SNAPPED, layer_snapped_points.id()))
             layer_input_points.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_input_points)
-            temp.append(("Input Points " + self.PROFILE, self.POINTS_INPUT, layer_input_points.id()))
+            temp.append(("Input Points " + self.PROFILE.capitalize(), self.POINTS_INPUT, layer_input_points.id()))
 
         results = dict()
         for l_name, e_id, l_id in temp:

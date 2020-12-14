@@ -1,15 +1,24 @@
 [general]
 name=Valhalla
 qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
 description=Valhalla routing, isochrones and matrix calculations for QGIS
 
-version=1.6.1
+version=2.0.0
 author=GIS • OPS UG
 email=nils@gis-ops.com
 
-about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine. The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from point files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
+experimental=False
+deprecated=False
 
-changelog=2020/12/01 v1.6.1 Properly implement isodistances
+about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine.
+    The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from Point/LineString files within the processing framework.
+    Extensive attributes are set for output files, incl. duration, length and start/end locations.
+
+    The plugin accesses remote or local Valhalla HTTP APIs. If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
+
+changelog=2020/12/01 v2.0.0 Publish QGIS Plugin
+    2020/12/01 v1.6.1 Properly implement isodistances
     2020/12/01 v1.6.0 Implement isodistances
     2020/09/15 v1.5.0 Change to QgsNetworkAccessManager; add Extra Params dialog
     2020/08/27 v1.4.1 Implement shortest for valhalla dev
@@ -26,13 +35,10 @@ changelog=2020/12/01 v1.6.1 Properly implement isodistances
 
 tracker=https://github.com/gis-ops/valhalla-qgis-plugin/issues
 repository=https://github.com/gis-ops/valhalla-qgis-plugin.git
-help=https://github.com/valhalla/valhalla/tree/master/docs/api
+help=
 
-homepage=https://github.com/valhalla/valhalla
+homepage=https://github.com/gis-ops/valhalla-qgis-plugin/
 category=Plugins
 icon=gui/img/icon_valhalla.png
-experimental=False
 
-deprecated=False
-
-tags=routing, OSM, openstreetmap, openrouteservice, service area, accessibility, route, isochrones, matrix, ORS, processing
+tags=routing, OSM, openstreetmap, valhalla, isochrone, route, matrix, processing

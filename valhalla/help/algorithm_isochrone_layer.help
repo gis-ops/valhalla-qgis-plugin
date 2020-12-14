@@ -6,7 +6,9 @@ Choose an input Point Layer. Only Point layers are allowed, <b>not MultiPoint</b
 
 The ID field can be used to join the input layer afterwards.
 
-The <b>intervals</b> for which to calculate isochrones are in minutes. By default, up to 4 intervals are allowed.
+The <b>intervals</b> for which to calculate isochrones OR isodistances are in minutes. Isochrones and isodistances will be returned in separate layers.
+
+Optionally, the <b>center points</b> for the isochrones/-distances can be returned: one Point layer for the Input Points and one MultiPoint layer for the snapped points Valhalla used to calculate the reachability.
 
 <b>Denoise</b> refers to retention of small parts of the resulting isochrone.
 

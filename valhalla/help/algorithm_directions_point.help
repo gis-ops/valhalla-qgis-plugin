@@ -8,9 +8,7 @@ The layer ID field can be used to join the input layer afterwards.
 
 Specify points to be avoided during routing with <b>Avoid layer</b> parameter. Only Point layers are allowed, <b>not MultiPoint</b>.
 
-Valhalla has a dynamic cost model. You can set an extensive amount of costing options in the <b>Advanced Parameters</b> section. Refer to
-<a href="https://github.com/valhalla/valhalla/blob/master/docs/api/turn-by-turn/api-reference.md">the documentation</a> for an in-depth explanation.
-
 The output layer is a LineString layer with multiple route attributes.
 
-For current restrictions, please see <a href="https://openrouteservice.org/restrictions/">https://openrouteservice.org/restrictions/</a>.
+Valhalla has a dynamic cost model. You can set an extensive amount of costing options in the <b>Advanced Parameters</b> section. Refer to
+<a href="https://github.com/valhalla/valhalla/blob/master/docs/api/turn-by-turn/api-reference.md">the documentation</a> for an in-depth explanation.

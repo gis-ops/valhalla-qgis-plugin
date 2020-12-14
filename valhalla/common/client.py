@@ -6,15 +6,13 @@
                               -------------------
         begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Nils Nolde
+        copyright            : (C) 2020 by Nils Nolde
         email                : nils@gis-ops.com
  ***************************************************************************/
 
- This plugin provides access to the various APIs from OpenRouteService
- (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using
- this plugin you agree to the ORS terms of service
- (https://openrouteservice.org/terms-of-service/).
+ This plugin provides access to some of the APIs from Valhalla
+ (https://github.com/valhalla/valhalla), developed and
+ maintained by https://gis-ops.com, Berlin, Germany.
 
 /***************************************************************************
  *                                                                         *
@@ -38,7 +36,6 @@ from qgis.PyQt.QtNetwork import QNetworkRequest, QNetworkReply
 from qgis.core import QgsNetworkAccessManager, QgsNetworkReplyContent
 
 from valhalla import __version__
-from valhalla.common import networkaccessmanager
 from valhalla.utils import exceptions, logger
 
 _USER_AGENT = "ValhallaQGISClient@v{}".format(__version__)
@@ -184,7 +181,6 @@ class Client(QObject):
             elif error_code == QNetworkReply.TimeoutError:
                 raise exceptions.Timeout("Request timed out.")
 
-            print(self.status_code)
             if self.status_code == 401:
                 raise exceptions.InvalidKey(
                     str(self.status_code),

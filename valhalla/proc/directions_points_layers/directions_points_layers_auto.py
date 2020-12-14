@@ -6,15 +6,13 @@
                               -------------------
         begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Nils Nolde
+        copyright            : (C) 2020 by Nils Nolde
         email                : nils@gis-ops.com
  ***************************************************************************/
 
- This plugin provides access to the various APIs from OpenRouteService
- (https://openrouteservice.org), developed and
- maintained by GIScience team at University of Heidelberg, Germany. By using
- this plugin you agree to the ORS terms of service
- (https://openrouteservice.org/terms-of-service/).
+ This plugin provides access to some of the APIs from Valhalla
+ (https://github.com/valhalla/valhalla), developed and
+ maintained by https://gis-ops.com, Berlin, Germany.
 
 /***************************************************************************
  *                                                                         *
@@ -145,7 +143,7 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
         self.addParameter(
             QgsProcessingParameterFeatureSink(
                 name=self.OUT,
-                description="Valhalla_Routing_Points_" + self.PROFILE,
+                description="Routing " + self.PROFILE.capitalize() + " From 2 Points",
                 createByDefault=False
             )
         )

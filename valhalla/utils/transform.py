@@ -6,9 +6,13 @@
                               -------------------
         begin                : 2019-10-12
         git sha              : $Format:%H$
-        copyright            : (C) 2019 by Nils Nolde
+        copyright            : (C) 2020 by Nils Nolde
         email                : nils@gis-ops.com
  ***************************************************************************/
+
+ This plugin provides access to some of the APIs from Valhalla
+ (https://github.com/valhalla/valhalla), developed and
+ maintained by https://gis-ops.com, Berlin, Germany.
 
 /***************************************************************************
  *                                                                         *
