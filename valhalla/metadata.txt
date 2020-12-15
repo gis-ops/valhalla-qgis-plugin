@@ -4,7 +4,7 @@ qgisMinimumVersion=3.0
 qgisMaximumVersion=3.99
 description=Valhalla routing, isochrones and matrix calculations for QGIS
 
-version=2.0.0
+version=2.0.1
 author=GIS • OPS UG
 email=nils@gis-ops.com
 
@@ -18,7 +18,8 @@ about=Valhalla provides access to most of the functions of the open-source Valha
 
     The plugin accesses remote or local Valhalla HTTP APIs. If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
 
-changelog=2020/12/01 v2.0.0 Publish QGIS Plugin
+changelog=2020/12/15 v2.0.1 Some UI elements were not compiled to latest
+    2020/12/01 v2.0.0 Publish QGIS Plugin
     2020/12/01 v1.6.1 Properly implement isodistances
     2020/12/01 v1.6.0 Implement isodistances
     2020/09/15 v1.5.0 Change to QgsNetworkAccessManager; add Extra Params dialog
