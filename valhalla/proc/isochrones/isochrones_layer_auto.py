@@ -131,14 +131,14 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             )
         )
 
-        self.addParameter(
-            QgsProcessingParameterString(
-                name=self.IN_INTERVALS_DISTANCE,
-                description="Comma-separated distance intervals [km]",
-                defaultValue="5,10",
-                optional=True
-            )
-        )
+        #self.addParameter(
+        #    QgsProcessingParameterString(
+        #        name=self.IN_INTERVALS_DISTANCE,
+         #       description="Comma-separated distance intervals [km]",
+        #        defaultValue="5,10",
+        #        optional=True
+        #    )
+        #)
 
         self.addParameter(
             QgsProcessingParameterBoolean(
@@ -293,15 +293,15 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         layer_time_pr.addAttributes(self.isochrones.get_fields())
         layer_time.updateFields()
 
-        layer_dist = QgsVectorLayer(
-            f'{geometry_param}?crs=EPSG:4326',
-            f'Isodistances {self.PROFILE.capitalize()}',
-            'memory'
-        )
-        self.isos_dist_id = layer_dist.id()
-        layer_dist_pr = layer_dist.dataProvider()
-        layer_dist_pr.addAttributes(self.isochrones.get_fields())
-        layer_dist.updateFields()
+        # layer_dist = QgsVectorLayer(
+        #     f'{geometry_param}?crs=EPSG:4326',
+        #     f'Isodistances {self.PROFILE.capitalize()}',
+        #     'memory'
+        # )
+        # self.isos_dist_id = layer_dist.id()
+        # layer_dist_pr = layer_dist.dataProvider()
+        # layer_dist_pr.addAttributes(self.isochrones.get_fields())
+        # layer_dist.updateFields()
 
         layer_snapped_points = QgsVectorLayer(
             f'MultiPoint?crs=EPSG:4326',
@@ -345,13 +345,13 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         self.costing_options.set_costing_options(self, parameters, context)
 
         intervals_time = self.parameterAsString(parameters, self.IN_INTERVALS_TIME, context)
-        intervals_distance = self.parameterAsString(parameters, self.IN_INTERVALS_DISTANCE, context)
+        # intervals_distance = self.parameterAsString(parameters, self.IN_INTERVALS_DISTANCE, context)
 
-        feat_count = source.featureCount() if not intervals_time or not intervals_distance else source.featureCount() * 2
+        feat_count = source.featureCount() if not intervals_time else source.featureCount() * 2
 
         self.intervals = {
             "time": [{"time": int(x)} for x in intervals_time.split(',')] if intervals_time else [],
-            "distance": [{"distance": int(x)} for x in intervals_distance.split(',')] if intervals_distance else []
+            # "distance": [{"distance": int(x)} for x in intervals_distance.split(',')] if intervals_distance else []
         }
 
         counter = 0
@@ -406,8 +406,8 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 for isochrone in self.isochrones.get_features(params['id'], options.get(self.PROFILE)):
                     if metric == 'time':
                         layer_time_pr.addFeature(isochrone)
-                    elif metric == 'distance':
-                        layer_dist_pr.addFeature(isochrone)
+                    # elif metric == 'distance':
+                    #     layer_dist_pr.addFeature(isochrone)
 
                 if show_locations:
                     for point_feat in self.isochrones.get_multipoint_features(params['id']):
@@ -422,10 +422,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             layer_time.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_time)
             temp.append(("Isochrones " + self.PROFILE.capitalize(), self.OUT_TIME, layer_time.id()))
-        if layer_dist.hasFeatures():
-            layer_dist.updateExtents()
-            context.temporaryLayerStore().addMapLayer(layer_dist)
-            temp.append(("Isodistances " + self.PROFILE.capitalize(), self.OUT_DISTANCE, layer_dist.id()))
+        # if layer_dist.hasFeatures():
         if show_locations:
             layer_snapped_points.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_snapped_points)

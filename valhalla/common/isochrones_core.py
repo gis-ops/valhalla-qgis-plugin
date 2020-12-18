@@ -135,7 +135,7 @@ class Isochrones():
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
             iso_value = isochrone['properties']['contour']
-            metric = isochrone['properties']['metric']
+            #metric = isochrone['properties']['metric']
             if self.geometry == 'Polygon':
                 qgis_coords = [[QgsPointXY(coord[0], coord[1]) for coord in coordinates[0]]]
                 feat.setGeometry(QgsGeometry.fromPolygonXY(qgis_coords))
@@ -147,7 +147,7 @@ class Isochrones():
                 int(iso_value),
                 self.profile,
                 json.dumps(options),
-                metric
+                'time'
             ])
 
             yield feat

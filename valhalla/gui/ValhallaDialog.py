@@ -268,7 +268,7 @@ class ValhallaDialogMain:
             extra_params = json.loads(extra_params_text)
         try:
             if method == 'route':
-                layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", "Route_Valhalla", "memory")
+                layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", f"Route {profile.capitalize()}", "memory")
                 layer_out.dataProvider().addAttributes(directions_core.get_fields())
                 layer_out.updateFields()
 
@@ -306,7 +306,9 @@ class ValhallaDialogMain:
 
                 for metric in metrics:
                     isochrones_ui = isochrones_gui.Isochrones(self.dlg)
-                    params = isochrones_ui.get_parameters(metric)
+                    params = isochrones_ui.get_parameters('time')  # change once isodistances are there too
+                    if metric == 'distance':
+                        raise NotImplemented("Isodistances are not implemented yet.")
                     params.update(extra_params)
 
                     name = 'Isodistance' if metric == 'distance' else 'Isochrone'
@@ -407,6 +409,32 @@ class ValhallaDialogMain:
                     layer_out.updateExtents()
 
                     self.project.addMapLayer(layer_out)
+            #
+            # elif method == 'centroid':
+            #     layer_routes = QgsVectorLayer("LineString?crs=EPSG:4326", f"Gravity Routes {profile}", "memory")
+            #     layer_gravity = QgsVectorLayer("Point?crs=EPSG:4326", f"Gravity Point {profile}", "memory")
+            #     layer_routes.dataProvider().addAttributes(gravity_core.get_fields())
+            #     layer_gravity.dataProvider().addAttributes(gravity_core.get_fields())
+            #     layer_routes.updateFields()
+            #     layer_gravity.updateFields()
+            #
+            #     directions = directions_gui.Directions(self.dlg)
+            #     params = directions.get_parameters()
+            #     params.update(extra_params)
+            #     response = clnt.request('/centroid', {}, post_json=params)
+            #     line_feats, point_feat = gravity_core.get_output_feature_gravity(
+            #         response,
+            #         profile,
+            #         directions.costing_options
+            #     )
+            #     layer_routes.dataProvider().addFeatures(line_feats)
+            #     layer_gravity.dataProvider().addFeature(point_feat)
+            #
+            #     layer_routes.updateExtents()
+            #     layer_gravity.updateExtents()
+            #
+            #     self.project.addMapLayer(layer_routes)
+            #     self.project.addMapLayer(layer_gravity)
 
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"
