@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_ValhallaDialogBase(object):
     def setupUi(self, ValhallaDialogBase):
         ValhallaDialogBase.setObjectName("ValhallaDialogBase")
-        ValhallaDialogBase.resize(569, 524)
+        ValhallaDialogBase.resize(569, 536)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Expanding)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -104,6 +104,7 @@ class Ui_ValhallaDialogBase(object):
         sizePolicy.setHeightForWidth(self.routing_method.sizePolicy().hasHeightForWidth())
         self.routing_method.setSizePolicy(sizePolicy)
         self.routing_method.setObjectName("routing_method")
+        self.routing_method.addItem("")
         self.routing_method.addItem("")
         self.routing_method.addItem("")
         self.routing_method.addItem("")
@@ -852,7 +853,8 @@ class Ui_ValhallaDialogBase(object):
         self.routing_method.setItemText(1, _translate("ValhallaDialogBase", "isochrone"))
         self.routing_method.setItemText(2, _translate("ValhallaDialogBase", "sources_to_targets"))
         self.routing_method.setItemText(3, _translate("ValhallaDialogBase", "locate"))
-        self.routing_method.setItemText(4, _translate("ValhallaDialogBase", "extract-osm"))
+        self.routing_method.setItemText(4, _translate("ValhallaDialogBase", "centroid"))
+        self.routing_method.setItemText(5, _translate("ValhallaDialogBase", "extract-osm"))
         self.routing_travel_combo.setToolTip(_translate("ValhallaDialogBase", "Mode of travel"))
         self.routing_travel_combo.setItemText(0, _translate("ValhallaDialogBase", "auto"))
         self.routing_travel_combo.setItemText(1, _translate("ValhallaDialogBase", "truck"))
