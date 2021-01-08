@@ -57,12 +57,14 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
 
     COSTING = CostingAuto
     PROFILE = 'auto'
+    MODE_TYPES = ['Fastest', 'Shortest']
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
     IN_START_FIELD = "INPUT_START_FIELD"
     IN_END = "INPUT_END_LAYER"
     IN_END_FIELD = "INPUT_END_FIELD"
+    IN_MATRIX_MODE = "INPUT_MATRIX_MODE"
     IN_MODE = "INPUT_MODE"
     IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
@@ -118,10 +120,18 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterEnum(
-                self.IN_MODE,
+                self.IN_MATRIX_MODE,
                 "Layer mode",
                 self.MODE_SELECTION,
                 defaultValue=self.MODE_SELECTION[0]
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_MODE,
+                'Mode',
+                options=self.MODE_TYPES,
+                defaultValue=self.MODE_TYPES[0]
             )
         )
 
@@ -191,6 +201,8 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
         clnt = client.Client(provider)
         clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
+        mode = self.MODE_TYPES[self.parameterAsEnum(parameters, self.IN_MODE, context)]
+
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
@@ -213,9 +225,9 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
             context
         )
 
-        mode = self.MODE_SELECTION[self.parameterAsEnum(
+        matrix_mode = self.MODE_SELECTION[self.parameterAsEnum(
             parameters,
-            self.IN_MODE,
+            self.IN_MATRIX_MODE,
             context
         )]
 
@@ -238,7 +250,7 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
             destination_field
         )
 
-        if mode == 'Row-by-Row':
+        if matrix_mode == 'Row-by-Row':
             route_count = min([source.featureCount(), destination.featureCount()])
         else:
             route_count = source.featureCount() * destination.featureCount()
@@ -257,12 +269,12 @@ class ValhallaRoutePointsLayersCarAlgo(QgsProcessingAlgorithm):
         # Sets all advanced parameters as attributes of self.costing_options
         self.costing_options.set_costing_options(self, parameters, context)
 
-        for points, values in directions_core.get_request_point_features(route_dict, mode):
+        for points, values in directions_core.get_request_point_features(route_dict, matrix_mode):
             # Stop the algorithm if cancel button has been clicked
             if feedback.isCanceled():
                 break
 
-            params.update(get_directions_params(points, self.PROFILE, self.costing_options))
+            params.update(get_directions_params(points, self.PROFILE, self.costing_options, mode))
             params['id'] = f"{values[0]} & {values[1]}"
 
             try:

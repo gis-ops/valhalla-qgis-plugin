@@ -67,11 +67,11 @@ class Directions:
                 params['costing_options'][profile]['shortest'] = True
 
         if self.dlg.avoidlocation_group.isChecked():
-            layer = self.dlg.avoidlocation_dropdown.currentLayer()
-            if layer:
+            point_layer = self.dlg.avoidlocation_dropdown.currentLayer()
+            if point_layer:
                 locations = list()
-                transformer = transform.transformToWGS(layer.sourceCrs())
-                for feat in layer.getFeatures():
+                transformer = transform.transformToWGS(point_layer.sourceCrs())
+                for feat in point_layer.getFeatures():
                     geom = feat.geometry()
                     geom.transform(transformer)
                     point = geom.asPoint()

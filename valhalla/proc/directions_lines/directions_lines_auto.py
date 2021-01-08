@@ -57,10 +57,12 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
 
     COSTING = CostingAuto
     PROFILE = 'auto'
+    MODE_TYPES = ['Fastest', 'Shortest']
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_LINES = "INPUT_LINE_LAYER"
     IN_FIELD = "INPUT_LAYER_FIELD"
+    IN_MODE = "INPUT_MODE"
     IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
 
@@ -94,6 +96,14 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
                 name=self.IN_FIELD,
                 description="Layer ID Field",
                 parentLayerParameterName=self.IN_LINES,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_MODE,
+                'Mode',
+                options=self.MODE_TYPES,
+                defaultValue=self.MODE_TYPES[0]
             )
         )
 
@@ -180,6 +190,7 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
             self.IN_AVOID,
             context
         )
+        mode = self.MODE_TYPES[self.parameterAsEnum(parameters, self.IN_MODE, context)]
 
         params = dict()
         # Sets all advanced parameters as attributes of self.costing_options
@@ -200,7 +211,7 @@ class ValhallaRouteLinesCarAlgo(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            params.update(get_directions_params(line, self.PROFILE, self.costing_options))
+            params.update(get_directions_params(line, self.PROFILE, self.costing_options, mode))
             params['id'] = field_value
 
             try:

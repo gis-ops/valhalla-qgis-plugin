@@ -57,12 +57,14 @@ class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
 
     COSTING = CostingAuto
     PROFILE = 'auto'
+    MODE_TYPES = ['Fastest', 'Shortest']
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_START = "INPUT_START_LAYER"
     IN_START_FIELD = "INPUT_START_FIELD"
     IN_END = "INPUT_END_LAYER"
     IN_END_FIELD = "INPUT_END_FIELD"
+    IN_MODE = "INPUT_MODE"
     IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
 
@@ -114,6 +116,15 @@ class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
                 parentLayerParameterName=self.IN_END,
             )
         )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_MODE,
+                'Mode',
+                options=self.MODE_TYPES,
+                defaultValue=self.MODE_TYPES[0]
+            )
+        )
+
 
         self.addParameter(
             QgsProcessingParameterFeatureSource(
@@ -179,6 +190,8 @@ class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
         provider = providers[self.parameterAsEnum(parameters, self.IN_PROVIDER, context)]
         clnt = client.Client(provider)
         clnt.overQueryLimit.connect(lambda: feedback.reportError("OverQueryLimit: Retrying"))
+
+        mode = self.MODE_TYPES[self.parameterAsEnum(parameters, self.IN_MODE, context)]
 
         # Get parameter values
         source = self.parameterAsSource(
@@ -254,7 +267,7 @@ class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
         # Sets all advanced parameters as attributes of self.costing_options
         self.costing_options.set_costing_options(self, parameters, context)
 
-        costing_params = get_costing_options(self.costing_options, self.PROFILE)
+        costing_params = get_costing_options(self.costing_options, self.PROFILE, mode)
         if costing_params:
             params['costing_options'] = costing_params
 

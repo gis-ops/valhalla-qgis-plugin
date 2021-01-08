@@ -56,10 +56,12 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
 
     COSTING = CostingAuto
     PROFILE = 'auto'
+    MODE_TYPES = ['Fastest', 'Shortest']
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_POINT = "INPUT_LINE_LAYER"
     IN_FIELD = "INPUT_LAYER_FIELD"
+    IN_MODE = "INPUT_MODE"
     IN_AVOID = "avoid_locations"
     OUT = 'OUTPUT'
 
@@ -93,6 +95,14 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
                 name=self.IN_FIELD,
                 description="Layer ID Field",
                 parentLayerParameterName=self.IN_POINT,
+            )
+        )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_MODE,
+                'Mode',
+                options=self.MODE_TYPES,
+                defaultValue=self.MODE_TYPES[0]
             )
         )
 
@@ -161,6 +171,8 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
         clnt = client.Client(provider)
         clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
 
+        mode = self.MODE_TYPES[self.parameterAsEnum(parameters, self.IN_MODE, context)]
+
         # Get parameter values
         source = self.parameterAsSource(
             parameters,
@@ -205,10 +217,6 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
                 input_points.append(points)
                 from_values.append(feat[source_field_name])
 
-        # Init ORS client
-        clnt = client.Client(provider)
-        clnt.overQueryLimit.connect(lambda : feedback.reportError("OverQueryLimit: Retrying..."))
-
         count = source.featureCount()
 
         params = dict()
@@ -223,7 +231,7 @@ class ValhallaRoutePointsLayerCarAlgo(QgsProcessingAlgorithm):
             if feedback.isCanceled():
                 break
 
-            params.update(get_directions_params(points, self.PROFILE, self.costing_options))
+            params.update(get_directions_params(points, self.PROFILE, self.costing_options, mode))
             params['id'] = from_value
 
             try:

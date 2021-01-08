@@ -31,7 +31,7 @@ from valhalla.utils import transform
 from valhalla.common import TRUCK_COSTING
 from .costing_params import CostingAuto
 
-def get_directions_params(points, profile, costing_options):
+def get_directions_params(points, profile, costing_options, mode):
     """
     Get the full list of parameters except for avoiding points.
 
@@ -44,6 +44,9 @@ def get_directions_params(points, profile, costing_options):
     :param costing_options: costing options class with costing options as attributes
     :type costing_options: CostingAuto
 
+    :param mode: fastest or shortest
+    :type mode: str
+
     :returns: dict of Vahalla directions parameters
     :rtype: dict
     """
@@ -53,7 +56,7 @@ def get_directions_params(points, profile, costing_options):
     )
     params['locations'] = get_locations(points)
 
-    costing_params = get_costing_options(costing_options, profile)
+    costing_params = get_costing_options(costing_options, profile, mode)
 
     if costing_params:
         params['costing_options'] = costing_params
@@ -74,12 +77,18 @@ def get_locations(points):
     return [{"lon": round(point.x(), 6), "lat": round(point.y(), 6)} for point in points]
 
 
-def get_costing_options(costing_options, profile):
+def get_costing_options(costing_options, profile, mode):
     """
     Get the costing_options parameter value per profile.
 
     :param costing_options: costing options class with costing options as attributes
     :type costing_options: CostingAuto
+
+    :param profile: transportation profile
+    :type profile: str
+
+    :param mode: fastest or shortest
+    :type mode: str
 
     :returns: profile specific costing options
     :rtype: dict of dict
@@ -88,7 +97,8 @@ def get_costing_options(costing_options, profile):
 
     costing_options = inspect.getmembers(costing_options, lambda a:not(inspect.isroutine(a)))
     costing_options = [a for a in costing_options if not(a[0].startswith('__') and a[0].endswith('__'))]
-    if any([cost[1] for cost in costing_options]):
+
+    if any([cost[1] for cost in costing_options]) or mode == 'Shortest':
         params[profile] = dict()
         for cost in costing_options:
             if cost[1]:
@@ -96,6 +106,8 @@ def get_costing_options(costing_options, profile):
                     params[profile][cost[0]] = round(cost[1] / 3.28084, 2)
                 else:
                     params[profile][cost[0]] = cost[1]
+        if mode == 'Shortest':
+            params[profile]['shortest'] = True
 
     return params
 

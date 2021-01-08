@@ -63,10 +63,12 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
     PROFILE = 'auto'
 
     GEOMETRY_TYPES = ['Polygon', 'LineString']
+    MODE_TYPES = ['Fastest', 'Shortest']
 
     IN_PROVIDER = "INPUT_PROVIDER"
     IN_POINTS = "INPUT_POINT_LAYER"
     IN_FIELD = "INPUT_FIELD"
+    IN_MODE = "INPUT_MODE"
     IN_INTERVALS_TIME = 'contours'
     IN_INTERVALS_DISTANCE = 'contours_distance'
     IN_SHOW_LOCATIONS = 'show_locations'
@@ -121,6 +123,14 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 parentLayerParameterName=self.IN_POINTS
             )
         )
+        self.addParameter(
+            QgsProcessingParameterEnum(
+                self.IN_MODE,
+                'Mode',
+                options=self.MODE_TYPES,
+                defaultValue=self.MODE_TYPES[0]
+            )
+        )
 
         self.addParameter(
             QgsProcessingParameterString(
@@ -131,14 +141,14 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             )
         )
 
-        #self.addParameter(
-        #    QgsProcessingParameterString(
-        #        name=self.IN_INTERVALS_DISTANCE,
-         #       description="Comma-separated distance intervals [km]",
-        #        defaultValue="5,10",
-        #        optional=True
-        #    )
-        #)
+        self.addParameter(
+           QgsProcessingParameterString(
+               name=self.IN_INTERVALS_DISTANCE,
+               description="Comma-separated distance intervals [km]",
+               defaultValue="5,10",
+               optional=True
+           )
+        )
 
         self.addParameter(
             QgsProcessingParameterBoolean(
@@ -265,8 +275,9 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         params = dict()
 
         geometry_param = self.GEOMETRY_TYPES[self.parameterAsEnum(parameters, self.IN_GEOMETRY, context)]
-        geometry_type = QgsWkbTypes.Polygon if geometry_param == 'Polygon' else QgsWkbTypes.LineString
         params[self.IN_GEOMETRY] = True if geometry_param == 'Polygon' else False
+
+        mode = self.MODE_TYPES[self.parameterAsEnum(parameters, self.IN_MODE, context)]
 
         source = self.parameterAsSource(parameters, self.IN_POINTS, context)
         if source.wkbType() == 4:
@@ -293,15 +304,15 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         layer_time_pr.addAttributes(self.isochrones.get_fields())
         layer_time.updateFields()
 
-        # layer_dist = QgsVectorLayer(
-        #     f'{geometry_param}?crs=EPSG:4326',
-        #     f'Isodistances {self.PROFILE.capitalize()}',
-        #     'memory'
-        # )
-        # self.isos_dist_id = layer_dist.id()
-        # layer_dist_pr = layer_dist.dataProvider()
-        # layer_dist_pr.addAttributes(self.isochrones.get_fields())
-        # layer_dist.updateFields()
+        layer_dist = QgsVectorLayer(
+            f'{geometry_param}?crs=EPSG:4326',
+            f'Isodistances {self.PROFILE.capitalize()}',
+            'memory'
+        )
+        self.isos_dist_id = layer_dist.id()
+        layer_dist_pr = layer_dist.dataProvider()
+        layer_dist_pr.addAttributes(self.isochrones.get_fields())
+        layer_dist.updateFields()
 
         layer_snapped_points = QgsVectorLayer(
             f'MultiPoint?crs=EPSG:4326',
@@ -345,13 +356,13 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         self.costing_options.set_costing_options(self, parameters, context)
 
         intervals_time = self.parameterAsString(parameters, self.IN_INTERVALS_TIME, context)
-        # intervals_distance = self.parameterAsString(parameters, self.IN_INTERVALS_DISTANCE, context)
+        intervals_distance = self.parameterAsString(parameters, self.IN_INTERVALS_DISTANCE, context)
 
         feat_count = source.featureCount() if not intervals_time else source.featureCount() * 2
 
         self.intervals = {
             "time": [{"time": int(x)} for x in intervals_time.split(',')] if intervals_time else [],
-            # "distance": [{"distance": int(x)} for x in intervals_distance.split(',')] if intervals_distance else []
+            "distance": [{"distance": int(x)} for x in intervals_distance.split(',')] if intervals_distance else []
         }
 
         counter = 0
@@ -370,7 +381,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 r_params['contours'] = interv
                 # Get transformed coordinates and feature
                 locations, feat = properties
-                r_params.update(get_directions_params(locations, self.PROFILE, self.costing_options))
+                r_params.update(get_directions_params(locations, self.PROFILE, self.costing_options, mode))
                 r_params['id'] = feat[id_field_name]
                 requests.append(r_params)
 
@@ -406,8 +417,8 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 for isochrone in self.isochrones.get_features(params['id'], options.get(self.PROFILE)):
                     if metric == 'time':
                         layer_time_pr.addFeature(isochrone)
-                    # elif metric == 'distance':
-                    #     layer_dist_pr.addFeature(isochrone)
+                    elif metric == 'distance':
+                        layer_dist_pr.addFeature(isochrone)
 
                 if show_locations:
                     for point_feat in self.isochrones.get_multipoint_features(params['id']):
@@ -422,11 +433,15 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             layer_time.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_time)
             temp.append(("Isochrones " + self.PROFILE.capitalize(), self.OUT_TIME, layer_time.id()))
-        # if layer_dist.hasFeatures():
+        if layer_dist.hasFeatures():
+            layer_dist.updateExtents()
+            context.temporaryLayerStore().addMapLayer(layer_dist)
+            temp.append(("Isochrones " + self.PROFILE.capitalize(), self.OUT_DISTANCE, layer_dist.id()))
         if show_locations:
             layer_snapped_points.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_snapped_points)
             temp.append(("Snapped Points " + self.PROFILE.capitalize(), self.POINTS_SNAPPED, layer_snapped_points.id()))
+
             layer_input_points.updateExtents()
             context.temporaryLayerStore().addMapLayer(layer_input_points)
             temp.append(("Input Points " + self.PROFILE.capitalize(), self.POINTS_INPUT, layer_input_points.id()))
