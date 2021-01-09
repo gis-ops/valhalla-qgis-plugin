@@ -306,9 +306,7 @@ class ValhallaDialogMain:
 
                 for metric in metrics:
                     isochrones_ui = isochrones_gui.Isochrones(self.dlg)
-                    params = isochrones_ui.get_parameters('time')  # change once isodistances are there too
-                    if metric == 'distance':
-                        raise NotImplementedError("Isodistances are not implemented yet.")
+                    params = isochrones_ui.get_parameters(metric)  # change once isodistances are there too
                     params.update(extra_params)
 
                     name = 'Isodistance' if metric == 'distance' else 'Isochrone'
