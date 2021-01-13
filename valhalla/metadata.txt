@@ -41,7 +41,7 @@ tracker=https://github.com/gis-ops/valhalla-qgis-plugin/issues
 repository=https://github.com/gis-ops/valhalla-qgis-plugin.git
 help=https://gis-ops.com/valhalla-qgis-plugin/
 
-homepage=https://github.com/gis-ops/valhalla-qgis-plugin/
+homepage=https://gis-ops.com/valhalla-qgis-plugin/
 category=Web
 icon=gui/img/icon_valhalla.png
 
