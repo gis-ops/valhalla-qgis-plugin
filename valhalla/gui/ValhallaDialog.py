@@ -488,8 +488,8 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         self.setupUi(self)
 
         self._iface = iface
+        self._mapCanvas = self._iface.mapCanvas()
         self.project = QgsProject.instance()  # invoke a QgsProject instance
-        self.map_crs: QgsCoordinateReferenceSystem = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         # Set things around the custom map tool
         self.line_tool = None
@@ -553,7 +553,7 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         annotation.setFrameSizeMm(QSizeF(5,8))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(5, 5))
         annotation.setMapPosition(point)
-        annotation.setMapPositionCrs(self.map_crs)
+        annotation.setMapPositionCrs(self._mapCanvas.mapSettings().destinationCrs())
 
         return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
 
@@ -581,7 +581,7 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
     def _on_linetool_map_click(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
 
-        transformer = transform.transformToWGS(self.map_crs)
+        transformer = transform.transformToWGS(self._mapCanvas.mapSettings().destinationCrs())
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, point_wgs.x(), point_wgs.y()))
 
