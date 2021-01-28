@@ -201,6 +201,7 @@ class ValhallaDialogMain:
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
             self.dlg.global_buttons.rejected.connect(self._cleanup_annotations)
             self.dlg.avoidlocation_dropdown.setFilters(QgsMapLayerProxyModel.PointLayer)
+            self.dlg.avoidpolygons_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
             providers = configmanager.read_config()['providers']
             self.dlg.provider_combo.clear()
@@ -488,8 +489,8 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         self.setupUi(self)
 
         self._iface = iface
+        self._mapCanvas = self._iface.mapCanvas()
         self.project = QgsProject.instance()  # invoke a QgsProject instance
-        self.map_crs: QgsCoordinateReferenceSystem = self._iface.mapCanvas().mapSettings().destinationCrs()
 
         # Set things around the custom map tool
         self.line_tool = None
@@ -553,7 +554,7 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         annotation.setFrameSizeMm(QSizeF(5,8))
         annotation.setFrameOffsetFromReferencePointMm(QPointF(5, 5))
         annotation.setMapPosition(point)
-        annotation.setMapPositionCrs(self.map_crs)
+        annotation.setMapPositionCrs(self._mapCanvas.mapSettings().destinationCrs())
 
         return QgsMapCanvasAnnotationItem(annotation, self._iface.mapCanvas()).annotation()
 
