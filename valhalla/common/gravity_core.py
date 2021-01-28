@@ -75,45 +75,46 @@ def get_output_feature_gravity(response, profile, options=None):
     :rtype: List[QgsFeature]
     """
     trips = [response['trip']]
-    trips.extend(response['alternates'])
+    for t in response['alternates']:
+        trips.append(t['trip'])
 
     route_feats = []
     total_dist, total_time = 0, 0
+    point_feat = QgsFeature()
     for idx, trip in enumerate(trips):
         feat = QgsFeature()
         coordinates, distance, duration = [], 0, 0
         for leg in trip['legs']:
-                coordinates.extend([
-                    list(reversed(coord))
-                    for coord in convert.decode_polyline6(leg['shape'])
-                ])
-                duration += round(leg['summary']['time'] / 3600, 3)
-                distance += round(leg['summary']['length'], 3)
+            coordinates.extend([
+                list(reversed(coord))
+                for coord in convert.decode_polyline6(leg['shape'])
+            ])
+            duration += round(leg['summary']['time'] / 3600, 3)
+            distance += round(leg['summary']['length'], 3)
 
-        total_dist += distance
-        total_time += duration
+            total_dist += distance
+            total_time += duration
 
-        qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
-        feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
-        feat.setAttributes([
-            idx,
-            distance,
-            duration,
+            qgis_coords = [QgsPointXY(x, y) for x, y in coordinates]
+            feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
+            feat.setAttributes([
+                idx,
+                distance,
+                duration,
+                profile,
+                json.dumps(options)
+            ])
+
+            route_feats.append(feat)
+
+        # get point feature
+        point_feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coordinates[-1])))
+        point_feat.setAttributes([
+            0,
+            total_dist,
+            total_time,
             profile,
             json.dumps(options)
-        ])  
-
-        route_feats.append(feat)
-
-    # get point feature
-    point_feat = QgsFeature()
-    point_feat.setGeometry(QgsGeometry.fromPointXY(QgsPointXY(*coordinates[-1])))
-    point_feat.setAttributes([
-        0,
-        total_dist,
-        total_time,
-        profile,
-        json.dumps(options)
-    ])
+        ])
 
     return route_feats, point_feat
