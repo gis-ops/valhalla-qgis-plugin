@@ -177,7 +177,7 @@
             </item>
             <item>
              <property name="text">
-              <string>centroid</string>
+              <string>centroid [experimental]</string>
              </property>
             </item>
             <item>

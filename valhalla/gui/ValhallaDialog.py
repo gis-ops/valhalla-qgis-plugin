@@ -407,7 +407,7 @@ class ValhallaDialogMain:
                     layer_out.updateExtents()
 
                     self.project.addMapLayer(layer_out)
-            elif method == 'centroid':
+            elif method == 'centroid [experimental]':
                 layer_routes = QgsVectorLayer("LineString?crs=EPSG:4326", f"Centroid Routes {profile}", "memory")
                 layer_gravity = QgsVectorLayer("Point?crs=EPSG:4326", f"Centroid Point {profile}", "memory")
                 layer_routes.dataProvider().addAttributes(gravity_core.get_fields())

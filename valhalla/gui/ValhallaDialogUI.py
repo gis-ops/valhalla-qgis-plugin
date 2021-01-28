@@ -853,7 +853,7 @@ class Ui_ValhallaDialogBase(object):
         self.routing_method.setItemText(1, _translate("ValhallaDialogBase", "isochrone"))
         self.routing_method.setItemText(2, _translate("ValhallaDialogBase", "sources_to_targets"))
         self.routing_method.setItemText(3, _translate("ValhallaDialogBase", "locate"))
-        self.routing_method.setItemText(4, _translate("ValhallaDialogBase", "centroid"))
+        self.routing_method.setItemText(4, _translate("ValhallaDialogBase", "centroid [experimental]"))
         self.routing_method.setItemText(5, _translate("ValhallaDialogBase", "extract-osm"))
         self.routing_travel_combo.setToolTip(_translate("ValhallaDialogBase", "Mode of travel"))
         self.routing_travel_combo.setItemText(0, _translate("ValhallaDialogBase", "auto"))
