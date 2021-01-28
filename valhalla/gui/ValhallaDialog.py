@@ -48,7 +48,7 @@ from . import resources_rc
 
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
 from valhalla.utils import exceptions, maptools, logger, configmanager, transform
-from valhalla.common import client, directions_core, isochrones_core, matrix_core
+from valhalla.common import client, directions_core, isochrones_core, matrix_core, gravity_core
 from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui, identify_gui
 from valhalla.gui.common_gui import get_locations
 
@@ -408,32 +408,31 @@ class ValhallaDialogMain:
                     layer_out.updateExtents()
 
                     self.project.addMapLayer(layer_out)
-            #
-            # elif method == 'centroid':
-            #     layer_routes = QgsVectorLayer("LineString?crs=EPSG:4326", f"Gravity Routes {profile}", "memory")
-            #     layer_gravity = QgsVectorLayer("Point?crs=EPSG:4326", f"Gravity Point {profile}", "memory")
-            #     layer_routes.dataProvider().addAttributes(gravity_core.get_fields())
-            #     layer_gravity.dataProvider().addAttributes(gravity_core.get_fields())
-            #     layer_routes.updateFields()
-            #     layer_gravity.updateFields()
-            #
-            #     directions = directions_gui.Directions(self.dlg)
-            #     params = directions.get_parameters()
-            #     params.update(extra_params)
-            #     response = clnt.request('/centroid', {}, post_json=params)
-            #     line_feats, point_feat = gravity_core.get_output_feature_gravity(
-            #         response,
-            #         profile,
-            #         directions.costing_options
-            #     )
-            #     layer_routes.dataProvider().addFeatures(line_feats)
-            #     layer_gravity.dataProvider().addFeature(point_feat)
-            #
-            #     layer_routes.updateExtents()
-            #     layer_gravity.updateExtents()
-            #
-            #     self.project.addMapLayer(layer_routes)
-            #     self.project.addMapLayer(layer_gravity)
+            elif method == 'centroid [experimental]':
+                layer_routes = QgsVectorLayer("LineString?crs=EPSG:4326", f"Centroid Routes {profile}", "memory")
+                layer_gravity = QgsVectorLayer("Point?crs=EPSG:4326", f"Centroid Point {profile}", "memory")
+                layer_routes.dataProvider().addAttributes(gravity_core.get_fields())
+                layer_gravity.dataProvider().addAttributes(gravity_core.get_fields())
+                layer_routes.updateFields()
+                layer_gravity.updateFields()
+
+                directions = directions_gui.Directions(self.dlg)
+                params = directions.get_parameters()
+                params.update(extra_params)
+                response = clnt.request('/centroid', {}, post_json=params)
+                line_feats, point_feat = gravity_core.get_output_feature_gravity(
+                    response,
+                    profile,
+                    directions.costing_options
+                )
+                layer_routes.dataProvider().addFeatures(line_feats)
+                layer_gravity.dataProvider().addFeature(point_feat)
+
+                layer_routes.updateExtents()
+                layer_gravity.updateExtents()
+
+                self.project.addMapLayer(layer_routes)
+                self.project.addMapLayer(layer_gravity)
 
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"
@@ -582,7 +581,7 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
     def _on_linetool_map_click(self, point, idx):
         """Adds an item to QgsListWidget and annotates the point in the map canvas"""
 
-        transformer = transform.transformToWGS(self.map_crs)
+        transformer = transform.transformToWGS(self._mapCanvas.mapSettings().destinationCrs())
         point_wgs = transformer.transform(point)
         self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, point_wgs.x(), point_wgs.y()))
 

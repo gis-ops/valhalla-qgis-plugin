@@ -177,6 +177,11 @@
             </item>
             <item>
              <property name="text">
+              <string>centroid [experimental]</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>extract-osm</string>
              </property>
             </item>
