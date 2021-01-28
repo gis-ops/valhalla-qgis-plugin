@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>1478</height>
+    <width>445</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -1692,7 +1692,7 @@
              <item row="1" column="0">
               <widget class="QLabel" name="label_44">
                <property name="text">
-                <string>Polygons</string>
+                <string>Polygons [experimental</string>
                </property>
               </widget>
              </item>
