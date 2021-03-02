@@ -24,7 +24,7 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtWidgets import QComboBox, QSpinBox, QDoubleSpinBox
+from PyQt5.QtWidgets import QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox
 
 
 def get_locations(routing_fromline_list):
@@ -75,6 +75,8 @@ def get_costing_options(costing_group, profile):
                 costing_options[param_name] = widget.value()
         if isinstance(widget, QComboBox):
             if widget.currentText():
-                costing_options[param_name] = eval(widget.currentText())
+                costing_options[param_name] = widget.currentText()
+        if isinstance(widget, QCheckBox):
+            costing_group[param_name] = widget.isChecked()
 
     return costing_options
