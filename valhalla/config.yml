@@ -3,5 +3,5 @@ providers:
   key: ''
   name: localhost
 - base_url: https://api.mapbox.com/valhalla/v1
-  key:
+  key: pk.eyJ1Ijoibmlsc25vbGRlIiwiYSI6ImNqc2V4MHdwaDBxNXM0OXRoenMxZ3dna2cifQ.vMOhvQpImGwRBqkVi3J_mQ
   name: Mapbox

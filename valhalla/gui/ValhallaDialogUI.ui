@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>536</height>
+    <width>430</width>
+    <height>564</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -147,6 +147,40 @@
           <property name="sizeConstraint">
            <enum>QLayout::SetDefaultConstraint</enum>
           </property>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="routing_travel_combo">
+            <property name="toolTip">
+             <string>Mode of travel</string>
+            </property>
+            <item>
+             <property name="text">
+              <string>auto</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>truck</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bicycle</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>pedestrian</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_2">
+            <property name="text">
+             <string>Method</string>
+            </property>
+           </widget>
+          </item>
           <item row="0" column="1">
            <widget class="QComboBox" name="routing_method">
             <property name="sizePolicy">
@@ -187,37 +221,10 @@
             </item>
            </widget>
           </item>
-          <item row="1" column="1">
-           <widget class="QComboBox" name="routing_travel_combo">
-            <property name="toolTip">
-             <string>Mode of travel</string>
-            </property>
-            <item>
-             <property name="text">
-              <string>auto</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>truck</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>bicycle</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>pedestrian</string>
-             </property>
-            </item>
-           </widget>
-          </item>
-          <item row="0" column="0">
-           <widget class="QLabel" name="label_2">
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_16">
             <property name="text">
-             <string>Method</string>
+             <string>Mode</string>
             </property>
            </widget>
           </item>
@@ -234,13 +241,6 @@
             </property>
            </widget>
           </item>
-          <item row="2" column="0">
-           <widget class="QLabel" name="label_16">
-            <property name="text">
-             <string>Mode</string>
-            </property>
-           </widget>
-          </item>
           <item row="2" column="1">
            <widget class="QComboBox" name="routing_mode_combo">
             <item>
@@ -253,6 +253,23 @@
               <string>shortest</string>
              </property>
             </item>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="label_18">
+            <property name="text">
+             <string>Speed Limit</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSpinBox" name="routing_speed_limit">
+            <property name="maximum">
+             <number>255</number>
+            </property>
+            <property name="value">
+             <number>140</number>
+            </property>
            </widget>
           </item>
          </layout>
