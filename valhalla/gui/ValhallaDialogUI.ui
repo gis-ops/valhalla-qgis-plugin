@@ -387,7 +387,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>28</height>
+           <height>16777215</height>
           </size>
          </property>
          <property name="title">
@@ -400,7 +400,7 @@
           <bool>false</bool>
          </property>
          <property name="collapsed">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="saveCollapsedState">
           <bool>false</bool>
@@ -730,7 +730,7 @@
              <bool>false</bool>
             </property>
             <property name="collapsed">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="saveCollapsedState">
              <bool>false</bool>
@@ -748,7 +748,7 @@
                 </sizepolicy>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="tab">
                 <attribute name="title">
@@ -1093,28 +1093,11 @@
                     <item row="2" column="1">
                      <widget class="QDoubleSpinBox" name="truck_length"/>
                     </item>
-                    <item row="2" column="2">
-                     <widget class="QLabel" name="label_43">
+                    <item row="2" column="2" colspan="2">
+                     <widget class="QCheckBox" name="truck_hazmat">
                       <property name="text">
-                       <string>Haz Mat</string>
+                       <string>Hazardous materials</string>
                       </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="3">
-                     <widget class="QComboBox" name="truck_hazmat">
-                      <property name="currentText">
-                       <string>True</string>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>True</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>False</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                    </layout>
