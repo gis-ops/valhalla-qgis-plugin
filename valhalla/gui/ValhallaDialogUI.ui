@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>569</width>
-    <height>536</height>
+    <width>430</width>
+    <height>524</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -731,7 +731,7 @@
                 </sizepolicy>
                </property>
                <property name="currentIndex">
-                <number>0</number>
+                <number>1</number>
                </property>
                <widget class="QWidget" name="tab">
                 <attribute name="title">
@@ -1076,28 +1076,11 @@
                     <item row="2" column="1">
                      <widget class="QDoubleSpinBox" name="truck_length"/>
                     </item>
-                    <item row="2" column="2">
-                     <widget class="QLabel" name="label_43">
+                    <item row="2" column="2" colspan="2">
+                     <widget class="QCheckBox" name="truck_hazmat">
                       <property name="text">
-                       <string>Haz Mat</string>
+                       <string>Hazardous materials</string>
                       </property>
-                     </widget>
-                    </item>
-                    <item row="2" column="3">
-                     <widget class="QComboBox" name="truck_hazmat">
-                      <property name="currentText">
-                       <string>True</string>
-                      </property>
-                      <item>
-                       <property name="text">
-                        <string>True</string>
-                       </property>
-                      </item>
-                      <item>
-                       <property name="text">
-                        <string>False</string>
-                       </property>
-                      </item>
                      </widget>
                     </item>
                    </layout>
