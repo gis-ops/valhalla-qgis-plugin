@@ -201,6 +201,7 @@ class ValhallaDialogMain:
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
             self.dlg.global_buttons.rejected.connect(self._cleanup_annotations)
             self.dlg.avoidlocation_dropdown.setFilters(QgsMapLayerProxyModel.PointLayer)
+            self.dlg.avoidpolygons_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
             providers = configmanager.read_config()['providers']
             self.dlg.provider_combo.clear()

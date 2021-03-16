@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
+    <width>445</width>
     <height>524</height>
    </rect>
   </property>
@@ -1630,7 +1630,7 @@
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid roads by specifying a Point layer. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="title">
-             <string>Avoid locations</string>
+             <string>Avoid Geometries</string>
             </property>
             <property name="checkable">
              <bool>true</bool>
@@ -1644,14 +1644,38 @@
             <property name="saveCollapsedState">
              <bool>false</bool>
             </property>
-            <layout class="QVBoxLayout" name="verticalLayout_6">
-             <item>
+            <layout class="QGridLayout" name="gridLayout_17" columnstretch="1,3">
+             <item row="0" column="1">
               <widget class="QgsMapLayerComboBox" name="avoidlocation_dropdown">
                <property name="toolTip">
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Avoid areas by specifying a (Multi-)Polygon layer. &lt;/p&gt;&lt;p&gt;Does &lt;span style=&quot; font-weight:600;&quot;&gt;not work&lt;/span&gt; for memory (scratch) Polygon layers!&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Note&lt;/span&gt;, only the first feature of the layer will be respected.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
+               <property name="allowEmptyLayer">
+                <bool>true</bool>
+               </property>
                <property name="showCrs">
                 <bool>false</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="0">
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>Points</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="QgsMapLayerComboBox" name="avoidpolygons_dropdown">
+               <property name="allowEmptyLayer">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_44">
+               <property name="text">
+                <string>Polygons [experimental</string>
                </property>
               </widget>
              </item>
