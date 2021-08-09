@@ -44,11 +44,11 @@ from qgis.core import (QgsProject,
 from qgis.gui import QgsMapCanvasAnnotationItem
 import processing
 
-from . import resources_rc
+from . import resources_rc, roads_stats_gui
 
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
 from valhalla.utils import exceptions, maptools, logger, configmanager, transform
-from valhalla.common import client, directions_core, isochrones_core, matrix_core, gravity_core
+from valhalla.common import client, directions_core, isochrones_core, matrix_core, gravity_core, roads_stats_core
 from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui, identify_gui
 from valhalla.gui.common_gui import get_locations
 
@@ -229,8 +229,10 @@ class ValhallaDialogMain:
         provider_id = self.dlg.provider_combo.currentIndex()
         provider = configmanager.read_config()['providers'][provider_id]
 
+        method = self.dlg.routing_method.currentText()
+
         # if there are no coordinates, throw an error message
-        if not self.dlg.routing_fromline_list.count():
+        if not self.dlg.routing_fromline_list.count() and not method == 'roads_stats':
             QMessageBox.critical(
                 self.dlg,
                 "No waypoints",
@@ -259,7 +261,6 @@ class ValhallaDialogMain:
         clnt = client.Client(provider)
         clnt_msg = ''
 
-        method = self.dlg.routing_method.currentText()
         profile = self.dlg.routing_travel_combo.currentText()
         params = {}
         # Add extra params
@@ -433,6 +434,26 @@ class ValhallaDialogMain:
 
                 self.project.addMapLayer(layer_routes)
                 self.project.addMapLayer(layer_gravity)
+
+            elif method == 'roads_stats':
+                layer = QgsVectorLayer("LineString?crs:EPSG:4326", f"Roads Stats {profile}", "memory")
+                layer.dataProvider().addAttributes(roads_stats_core.get_fields())
+                layer.updateFields()
+
+                roads_stats = roads_stats_gui.RoadStats(self.dlg)
+                params = roads_stats.get_parameters()
+                params.update(extra_params)
+                response = clnt.request('/roads_stats', {}, post_json=params)
+                feats = roads_stats_core.get_output_features_roads_stats(
+                    response,
+                    profile,
+                    roads_stats.costing_options
+                )
+                layer.dataProvider().addFeatures(feats)
+
+                layer.updateFields()
+                self.project.addMapLayer(layer)
+
 
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"

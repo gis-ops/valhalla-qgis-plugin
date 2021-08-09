@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
+    <width>446</width>
     <height>524</height>
    </rect>
   </property>
@@ -178,6 +178,11 @@
             <item>
              <property name="text">
               <string>centroid [experimental]</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>roads_stats</string>
              </property>
             </item>
             <item>
@@ -676,6 +681,32 @@
                    </item>
                   </layout>
                  </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QgsCollapsibleGroupBox" name="mGroupBox_13">
+               <property name="title">
+                <string>Roads Stats</string>
+               </property>
+               <property name="collapsed">
+                <bool>true</bool>
+               </property>
+               <layout class="QVBoxLayout" name="verticalLayout_6">
+                <item>
+                 <layout class="QFormLayout" name="formLayout_2">
+                  <item row="0" column="0">
+                   <widget class="QLabel" name="label_43">
+                    <property name="text">
+                     <string>Input Polygons</string>
+                    </property>
+                   </widget>
+                  </item>
+                  <item row="0" column="1">
+                   <widget class="QgsMapLayerComboBox" name="roads_stats_polygon"/>
+                  </item>
+                 </layout>
                 </item>
                </layout>
               </widget>
