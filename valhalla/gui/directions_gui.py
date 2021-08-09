@@ -24,6 +24,7 @@
  ***************************************************************************/
 """
 from qgis.core import QgsGeometry, QgsWkbTypes, QgsVectorLayer
+from PyQt5.QtWidgets import QSpinBox
 
 from valhalla.gui.common_gui import get_locations, get_costing_options, get_avoid_polygons
 from valhalla.utils import transform
@@ -51,6 +52,7 @@ class Directions:
         # API parameters
         profile = self.dlg.routing_travel_combo.currentText()
         mode = self.dlg.routing_mode_combo.currentText()
+        legal_limit = self.dlg.routing_speed_limit.value()
 
         params = {
             'costing': profile,
@@ -61,11 +63,13 @@ class Directions:
         params['locations'] = get_locations(self.dlg.routing_fromline_list)
 
         # Get Advanced parameters
-        if self.dlg.routing_costing_options_group.isChecked() or mode == 'shortest':
+        if self.dlg.routing_costing_options_group.isChecked() or mode == 'shortest' or legal_limit:
             params['costing_options'] = dict()
             self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
             if mode == 'shortest':
                 params['costing_options'][profile]['shortest'] = True
+            if legal_limit:
+                params['costing_options'][profile]['legal_speed'] = legal_limit
 
         point_locs, poly_locs = get_avoid_polygons(self.dlg.avoidlocation_dropdown.currentLayer(),
                                                    self.dlg.avoidpolygons_dropdown.currentLayer())
