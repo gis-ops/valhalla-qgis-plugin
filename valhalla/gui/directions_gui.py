@@ -25,7 +25,7 @@
 """
 from qgis.core import QgsGeometry, QgsWkbTypes, QgsVectorLayer
 
-from valhalla.gui.common_gui import get_locations, get_costing_options
+from valhalla.gui.common_gui import get_locations, get_costing_options, get_avoid_polygons
 from valhalla.utils import transform
 
 
@@ -66,28 +66,12 @@ class Directions:
             self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
             if mode == 'shortest':
                 params['costing_options'][profile]['shortest'] = True
-        if self.dlg.avoidlocation_group.isChecked():
-            point_layer: QgsVectorLayer = self.dlg.avoidlocation_dropdown.currentLayer()
-            poly_layer: QgsVectorLayer = self.dlg.avoidpolygons_dropdown.currentLayer()
-            if point_layer:
-                locations = list()
-                transformer = transform.transformToWGS(point_layer.sourceCrs())
-                for feat in point_layer.getFeatures():
-                    geom = feat.geometry()
-                    geom.transform(transformer)
-                    point = geom.asPoint()
 
-                    locations.append({'lon': round(point.x(), 6), 'lat': round(point.y(), 6)})
-                params['avoid_locations'] = locations
-            if poly_layer:
-                if poly_layer.wkbType() in (QgsWkbTypes.MultiPolygon, QgsWkbTypes.MultiPolygonZ, QgsWkbTypes.MultiPolygonZM):
-                    raise ValueError("Only Polygon layers are allowed as AvoidPolygon layer")
-                locations = list()
-                transformer = transform.transformToWGS(poly_layer.sourceCrs())
-                for feat in poly_layer.getFeatures():
-                    geom: QgsGeometry = feat.geometry()
-                    geom.transform(transformer)
-                    locations.append([[p.x(), p.y()] for p in geom.asPolygon()[0]])
-                params['avoid_polygons'] = locations
+        point_locs, poly_locs = get_avoid_polygons(self.dlg.avoidlocation_dropdown.currentLayer(),
+                                                   self.dlg.avoidpolygons_dropdown.currentLayer())
+        if point_locs:
+            params['exclude_locations'] = point_locs
+        if poly_locs:
+            params['exclude_polygons'] = poly_locs
 
         return params

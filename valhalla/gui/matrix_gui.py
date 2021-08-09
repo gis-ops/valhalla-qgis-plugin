@@ -24,7 +24,7 @@
  ***************************************************************************/
 """
 
-from valhalla.gui.common_gui import get_locations, get_costing_options
+from valhalla.gui.common_gui import get_locations, get_costing_options, get_avoid_polygons
 
 
 class Matrix:
@@ -66,5 +66,12 @@ class Matrix:
             self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
             if mode == 'shortest':
                 params['costing_options'][profile]['shortest'] = True
+
+        point_locs, poly_locs = get_avoid_polygons(self.dlg.avoidlocation_dropdown.currentLayer(),
+                                                   self.dlg.avoidpolygons_dropdown.currentLayer())
+        if point_locs:
+            params['exclude_locations'] = point_locs
+        if poly_locs:
+            params['exclude_polygons'] = poly_locs
 
         return params

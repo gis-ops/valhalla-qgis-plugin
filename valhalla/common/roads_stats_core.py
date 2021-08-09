@@ -59,7 +59,7 @@ def get_fields():
 
     return fields
 
-def get_output_features_roads_stats(response, profile, options=None):
+def get_output_features_roads_stats(response, profile, options=None) -> List[QgsFeature]:
     feats = list()
     props = response['features'][0]['properties']
     for idx, coords in enumerate(response['features'][0]['geometry']['coordinates']):

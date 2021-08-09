@@ -25,6 +25,8 @@
 """
 
 from PyQt5.QtWidgets import QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox
+from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsGeometry
+from valhalla.utils import transform
 
 
 def get_locations(routing_fromline_list):
@@ -80,3 +82,31 @@ def get_costing_options(costing_group, profile):
             costing_group[param_name] = widget.isChecked()
 
     return costing_options
+
+
+def get_avoid_polygons(point_layer: QgsVectorLayer, poly_layer: QgsVectorLayer):
+    pt_locs, poly_locs = list(), list()
+    if point_layer:
+        transformer = transform.transformToWGS(point_layer.sourceCrs())
+        for feat in point_layer.getFeatures():
+            geom = feat.geometry()
+            geom.transform(transformer)
+            point = geom.asPoint()
+
+            pt_locs.append({'lon': round(point.x(), 6), 'lat': round(point.y(), 6)})
+    if poly_layer:
+        transformer = transform.transformToWGS(poly_layer.sourceCrs())
+        for feat in poly_layer.getFeatures():
+            geom: QgsGeometry = feat.geometry()
+            geom.transform(transformer)
+
+            if geom.wkbType() == QgsWkbTypes.Polygon:
+                # only exterior ring
+                poly_locs.append([[round(pt.x(), 6), round(pt.y(), 6)] for pt in geom.asPolygon()[0]])
+            elif geom.wkbType() == QgsWkbTypes.MultiPolygon:
+                # only exterior ring of each multipolygon sub-polygon
+                poly_locs.extend([[[round(pt.x(), 6), round(pt.y(), 6)] for pt in poly[0]] for poly in geom.asMultiPolygon()])
+            else:
+                raise ValueError(f"WKT type {QgsWkbTypes.displayString(poly_layer.wkbType())} is not supported.")
+
+    return pt_locs, poly_locs

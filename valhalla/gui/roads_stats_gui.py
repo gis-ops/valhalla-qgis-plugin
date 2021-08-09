@@ -27,9 +27,7 @@ from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsGeometry, QgsPointXY
 from qgis.gui import QgsMapLayerComboBox
 from valhalla.utils import transform
 
-from valhalla.gui.common_gui import get_locations, get_costing_options
-
-
+from valhalla.gui.common_gui import get_locations, get_costing_options, get_avoid_polygons
 
 
 class RoadStats:
@@ -55,17 +53,17 @@ class RoadStats:
 
         layer: QgsVectorLayer = self.dlg.roads_stats_polygon.currentLayer()
         if layer:
+            transformer = transform.transformToWGS(layer.crs())
             feats = layer.getFeatures()
             geoms = [f.geometry() for f in feats]
             locations = list()
-            geom: QgsGeometry
             for geom in geoms:
+                geom.transform(transformer)
                 if geom.wkbType() == QgsWkbTypes.Polygon:
                     # only exterior ring
                     coords = [[[round(pt.x(), 6), round(pt.y(), 6)] for pt in geom.asPolygon()[0]]]
                 elif geom.wkbType() == QgsWkbTypes.MultiPolygon:
-                    print(layer.wkbType())
-                    print(geom.wkbType())
+                    # only exterior ring of each multipolygon sub-polygon
                     coords = [[[round(pt.x(), 6), round(pt.y(), 6)] for pt in poly[0]] for poly in geom.asMultiPolygon()]
                 else:
                     raise ValueError(f"WKT type {QgsWkbTypes.displayString(layer.wkbType())} is not supported.")
@@ -85,27 +83,10 @@ class RoadStats:
 
         # Get Avoids in there
         if self.dlg.avoidlocation_group.isChecked():
-            point_layer: QgsVectorLayer = self.dlg.avoidlocation_dropdown.currentLayer()
-            poly_layer: QgsVectorLayer = self.dlg.avoidpolygons_dropdown.currentLayer()
-            if point_layer:
-                locations = list()
-                transformer = transform.transformToWGS(point_layer.sourceCrs())
-                for feat in point_layer.getFeatures():
-                    geom = feat.geometry()
-                    geom.transform(transformer)
-                    point = geom.asPoint()
-
-                    locations.append({'lon': round(point.x(), 6), 'lat': round(point.y(), 6)})
-                params['avoid_locations'] = locations
-            if poly_layer:
-                if poly_layer.wkbType() in (QgsWkbTypes.MultiPolygon, QgsWkbTypes.MultiPolygonZ, QgsWkbTypes.MultiPolygonZM):
-                    raise ValueError("Only Polygon layers are allowed as AvoidPolygon layer")
-                locations = list()
-                transformer = transform.transformToWGS(poly_layer.sourceCrs())
-                for feat in poly_layer.getFeatures():
-                    geom: QgsGeometry = feat.geometry()
-                    geom.transform(transformer)
-                    locations.append([[p.x(), p.y()] for p in geom.asPolygon()[0]])
-                params['avoid_polygons'] = locations
+            point_locs, poly_locs = get_avoid_polygons(self.dlg.avoidlocation_dropdown.currentLayer(), self.dlg.avoidpolygons_dropdown.currentLayer())
+            if point_locs:
+                params['exclude_locations'] = point_locs
+            if poly_locs:
+                params['exclude_polygons'] = poly_locs
 
         return params

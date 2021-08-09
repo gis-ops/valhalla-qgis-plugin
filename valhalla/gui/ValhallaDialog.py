@@ -449,6 +449,11 @@ class ValhallaDialogMain:
                     profile,
                     roads_stats.costing_options
                 )
+
+                # throw a 404 if no edges are found
+                if not feats:
+                    raise exceptions.ApiError(404, "No edges found in input polygon(s)")
+
                 layer.dataProvider().addFeatures(feats)
 
                 layer.updateFields()
