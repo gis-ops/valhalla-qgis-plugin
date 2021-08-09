@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>430</width>
-    <height>564</height>
+    <width>569</width>
+    <height>576</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -196,22 +196,17 @@
             </item>
             <item>
              <property name="text">
-              <string>roads_stats</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
-              <string>extract-osm</string>
-             </property>
-            </item>
-            <item>
-             <property name="text">
               <string>isochrone</string>
              </property>
             </item>
             <item>
              <property name="text">
               <string>sources_to_targets</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>roads_stats</string>
              </property>
             </item>
             <item>
