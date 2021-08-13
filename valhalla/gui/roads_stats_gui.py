@@ -23,6 +23,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+from PyQt5.QtWidgets import QMessageBox
 from qgis.core import QgsVectorLayer, QgsWkbTypes, QgsGeometry, QgsPointXY
 from qgis.gui import QgsMapLayerComboBox
 from valhalla.utils import transform
@@ -51,8 +52,12 @@ class RoadStats:
         # API parameters
         profile = self.dlg.routing_travel_combo.currentText()
 
-        layer: QgsVectorLayer = self.dlg.roads_stats_polygon.currentLayer()
-        if layer:
+        locations = [[[loc['lon'], loc['lat']] for loc in get_locations(self.dlg.routing_fromline_list)]]
+
+        if not locations:
+            # Try to take a polygon layer if no locations are given via UI
+            layer: QgsVectorLayer = self.dlg.roads_stats_polygon.currentLayer()
+
             transformer = transform.transformToWGS(layer.crs())
             feats = layer.getFeatures()
             geoms = [f.geometry() for f in feats]
@@ -69,17 +74,28 @@ class RoadStats:
                     raise ValueError(f"WKT type {QgsWkbTypes.displayString(layer.wkbType())} is not supported.")
 
                 locations.extend(coords)
-        else:
-            locations = [[[loc['lon'], loc['lat']] for loc in get_locations(self.dlg.routing_fromline_list)]]
+
+        if not locations:
+            QMessageBox.critical(
+                self.dlg,
+                "No Points",
+                """
+                Did you forget to set waypoints or provide a Polygon layer?
+                """
+            )
+            return
 
         params = {'costing': profile, 'stats_props': ["max_grade", "mean_elevation", "max_speed"],
                   'id': 1,
                   'stats_polygons': locations}
 
         # Get Advanced parameters
-        if self.dlg.routing_costing_options_group.isChecked():
+        legal_limit = self.dlg.routing_speed_limit.value()
+        if self.dlg.routing_costing_options_group.isChecked() or legal_limit:
             params['costing_options'] = dict()
-            params['costing_options'][profile] = self.costing_options = get_costing_options(self.dlg.routing_costing_options_group, profile)
+            self.costing_options = params['costing_options'][profile] = get_costing_options(self.dlg.routing_costing_options_group, profile)
+            if legal_limit:
+                params['costing_options'][profile]['legal_speed'] = legal_limit
 
         # Get Avoids in there
         if self.dlg.avoidlocation_group.isChecked():

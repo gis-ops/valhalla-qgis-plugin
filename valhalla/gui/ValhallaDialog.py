@@ -436,7 +436,8 @@ class ValhallaDialogMain:
                 self.project.addMapLayer(layer_gravity)
 
             elif method == 'roads_stats':
-                layer = QgsVectorLayer("LineString?crs:EPSG:4326", f"Roads Stats {profile}", "memory")
+                group_grades = self.dlg.group_grades.isChecked()
+                layer = QgsVectorLayer(f"{'LineString' if not group_grades else 'MultiLineString'}?crs:EPSG:4326", f"Roads Stats {profile}", "memory")
                 layer.dataProvider().addAttributes(roads_stats_core.get_fields())
                 layer.updateFields()
 
@@ -447,7 +448,7 @@ class ValhallaDialogMain:
                 feats = roads_stats_core.get_output_features_roads_stats(
                     response,
                     profile,
-                    roads_stats.costing_options
+                    roads_stats.costing_options,
                 )
 
                 # throw a 404 if no edges are found

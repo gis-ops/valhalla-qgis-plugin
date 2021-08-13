@@ -59,16 +59,21 @@ def get_fields():
 
     return fields
 
-def get_output_features_roads_stats(response, profile, options=None) -> List[QgsFeature]:
+
+def get_output_features_roads_stats(response, profile, options=None, group_grades=False) -> List[QgsFeature]:
     feats = list()
     props = response['features'][0]['properties']
-    for idx, coords in enumerate(response['features'][0]['geometry']['coordinates']):
-        feat = QgsFeature()
-        feat.setGeometry(QgsGeometry.fromPolylineXY([QgsPointXY(x, y) for x, y in coords]))
-        attrs = [props[f.name().lower()][idx] for f in get_fields().toList()[:-2]]
-        attrs.extend([profile, json.dumps(options)])
-        feat.setAttributes(attrs)
+    if not group_grades:
+        for idx, coords in enumerate(response['features'][0]['geometry']['coordinates']):
+            feat = QgsFeature()
+            feat.setGeometry(QgsGeometry.fromPolylineXY([QgsPointXY(x, y) for x, y in coords]))
+            attrs = [props[f.name().lower()][idx] for f in get_fields().toList()[:-2]]
+            attrs.extend([profile, json.dumps(options)])
+            feat.setAttributes(attrs)
 
-        feats.append(feat)
+            feats.append(feat)
+    else:
+        # TODO: add MultiLineString, one feature per grade bucket
+        pass
 
     return feats

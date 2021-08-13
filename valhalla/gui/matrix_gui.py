@@ -67,11 +67,12 @@ class Matrix:
             if mode == 'shortest':
                 params['costing_options'][profile]['shortest'] = True
 
-        point_locs, poly_locs = get_avoid_polygons(self.dlg.avoidlocation_dropdown.currentLayer(),
-                                                   self.dlg.avoidpolygons_dropdown.currentLayer())
-        if point_locs:
-            params['exclude_locations'] = point_locs
-        if poly_locs:
-            params['exclude_polygons'] = poly_locs
+        if self.dlg.avoidlocation_group.isChecked():
+            point_locs, poly_locs = get_avoid_polygons(self.dlg.avoidlocation_dropdown.currentLayer(),
+                                                       self.dlg.avoidpolygons_dropdown.currentLayer())
+            if point_locs:
+                params['exclude_locations'] = point_locs
+            if poly_locs:
+                params['exclude_polygons'] = poly_locs
 
         return params
