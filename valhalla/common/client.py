@@ -126,7 +126,6 @@ class Client(QObject):
         self.url = url_object.url()
         body = QJsonDocument.fromJson(json.dumps(post_json).encode())
         request = QNetworkRequest(url_object)
-        request.setTransferTimeout(360000)
         request.setHeader(QNetworkRequest.ContentTypeHeader, 'application/json')
 
         logger.log(
