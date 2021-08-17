@@ -438,28 +438,31 @@ class ValhallaDialogMain:
             elif method == 'roads_stats':
                 group_grades = self.dlg.group_grades.isChecked()
                 layer = QgsVectorLayer(f"{'LineString' if not group_grades else 'MultiLineString'}?crs:EPSG:4326", f"Roads Stats {profile}", "memory")
-                layer.dataProvider().addAttributes(roads_stats_core.get_fields())
+                layer.dataProvider().addAttributes(roads_stats_core.get_fields(group_grades))
                 layer.updateFields()
 
                 roads_stats = roads_stats_gui.RoadStats(self.dlg)
                 params = roads_stats.get_parameters()
                 params.update(extra_params)
                 response = clnt.request('/roads_stats', {}, post_json=params)
-                feats = roads_stats_core.get_output_features_roads_stats(
+
+                # generator to yield the features
+                had_feats = False
+                for feat in roads_stats_core.get_output_features_roads_stats(
                     response,
                     profile,
                     roads_stats.costing_options,
-                )
+                    group_grades
+                ):
+                    layer.dataProvider().addFeature(feat)
+                    had_feats = True
 
                 # throw a 404 if no edges are found
-                if not feats:
+                if not had_feats:
                     raise exceptions.ApiError(404, "No edges found in input polygon(s)")
-
-                layer.dataProvider().addFeatures(feats)
 
                 layer.updateFields()
                 self.project.addMapLayer(layer)
-
 
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"

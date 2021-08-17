@@ -105,4 +105,7 @@ class RoadStats:
             if poly_locs:
                 params['exclude_polygons'] = poly_locs
 
+        if self.dlg.group_grades.isChecked():
+            params['stats_aggregate'] = True
+
         return params

@@ -32,12 +32,12 @@ from qgis.core import (QgsPointXY,
                        QgsGeometry,
                        QgsFeature,
                        QgsFields,
-                       QgsField)
+                       QgsField, QgsMultiLineString, QgsLineString, QgsPoint)
 
 from valhalla.utils import convert
 
 
-def get_fields():
+def get_fields(group_grades: bool):
     """
     Builds output fields for directions response layer.
 
@@ -51,9 +51,9 @@ def get_fields():
     # the field names correspond with the GeoJSON response field names
     fields = QgsFields()
     fields.append(QgsField("MAX_GRADE", QVariant.Int))
-    # fields.append(QgsField("MAX_DOWN_GRADES", QVariant.Int))
-    fields.append(QgsField("MEAN_ELEVATION", QVariant.Int))
-    fields.append(QgsField("MAX_SPEED", QVariant.Int))
+    if not group_grades:
+        fields.append(QgsField("MEAN_ELEVATION", QVariant.Int))
+        fields.append(QgsField("MAX_SPEED", QVariant.Int))
     fields.append(QgsField("PROFILE", QVariant.String))
     fields.append(QgsField("OPTIONS", QVariant.String))
 
@@ -61,19 +61,33 @@ def get_fields():
 
 
 def get_output_features_roads_stats(response, profile, options=None, group_grades=False) -> List[QgsFeature]:
-    feats = list()
-    props = response['features'][0]['properties']
     if not group_grades:
+        props = response['features'][0]['properties']
         for idx, coords in enumerate(response['features'][0]['geometry']['coordinates']):
             feat = QgsFeature()
             feat.setGeometry(QgsGeometry.fromPolylineXY([QgsPointXY(x, y) for x, y in coords]))
-            attrs = [props[f.name().lower()][idx] for f in get_fields().toList()[:-2]]
+            attrs = [props[f.name().lower()][idx] for f in get_fields(group_grades).toList()[:-2]]
             attrs.extend([profile, json.dumps(options)])
             feat.setAttributes(attrs)
 
-            feats.append(feat)
+            yield feat
     else:
-        # TODO: add MultiLineString, one feature per grade bucket
-        pass
+        for res_feat in response['features']:
+            if not res_feat:
+                continue
 
-    return feats
+            feat = QgsFeature()
+            feat.setAttributes([
+                res_feat['properties']['max_grade'],
+                profile,
+                json.dumps(options)
+            ])
+
+            geom = QgsMultiLineString()
+            for line in res_feat['geometry']['coordinates']:
+                single = QgsLineString([QgsPointXY(x, y) for x, y in line])
+                geom.addGeometry(single)
+
+            feat.setGeometry(geom)
+
+            yield feat
