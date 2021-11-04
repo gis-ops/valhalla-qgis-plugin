@@ -52,7 +52,7 @@ from valhalla.common import client, directions_core, isochrones_core, matrix_cor
 from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui, identify_gui
 from valhalla.gui.common_gui import get_locations
 
-from .ValhallaDialogUI import Ui_ValhallaDialogBase
+from .ValhallaDialogUI_ui import Ui_ValhallaDialogBase
 from .ValhallaDialogConfig import ValhallaDialogConfigMain
 from .ValhallaDialogLocate import ValhallaDialogLocateMain
 from .ValhallaExtraParamsDialog import ValhallaDialogExtraParams

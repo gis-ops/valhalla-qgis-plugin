@@ -30,7 +30,7 @@ from PyQt5.QtWidgets import QDialog, QInputDialog
 
 from qgis.gui import QgsCollapsibleGroupBox
 
-from .ValhallaDialogConfigUI import Ui_ValhallaDialogConfigBase
+from .ValhallaDialogConfigUI_ui import Ui_ValhallaDialogConfigBase
 from valhalla.utils import configmanager
 
 

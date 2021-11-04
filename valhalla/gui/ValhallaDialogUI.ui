@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>445</width>
-    <height>524</height>
+    <width>569</width>
+    <height>1669</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -370,7 +370,7 @@
          <property name="maximumSize">
           <size>
            <width>16777215</width>
-           <height>28</height>
+           <height>16777215</height>
           </size>
          </property>
          <property name="title">
@@ -383,7 +383,7 @@
           <bool>false</bool>
          </property>
          <property name="collapsed">
-          <bool>true</bool>
+          <bool>false</bool>
          </property>
          <property name="saveCollapsedState">
           <bool>false</bool>
@@ -404,7 +404,7 @@
              <string>Method configuration</string>
             </property>
             <property name="collapsed">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="saveCollapsedState">
              <bool>false</bool>
@@ -675,6 +675,83 @@
                     </widget>
                    </item>
                   </layout>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
+              <widget class="QgsCollapsibleGroupBox" name="mGroupBox_13">
+               <property name="title">
+                <string>Locate</string>
+               </property>
+               <layout class="QFormLayout" name="formLayout">
+                <item row="2" column="0">
+                 <widget class="QLabel" name="label_43">
+                  <property name="toolTip">
+                   <string>The tolerance for input locations in meters.</string>
+                  </property>
+                  <property name="text">
+                   <string>Radius</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="2" column="1">
+                 <widget class="QgsSpinBox" name="locate_radius">
+                  <property name="toolTip">
+                   <string>The tolerance for input locations in meters.</string>
+                  </property>
+                  <property name="maximum">
+                   <number>1000</number>
+                  </property>
+                  <property name="value">
+                   <number>2</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="0">
+                 <widget class="QLabel" name="label_45">
+                  <property name="text">
+                   <string>Verbose</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="3" column="1">
+                 <widget class="QCheckBox" name="locate_verbose">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_46">
+                  <property name="text">
+                   <string>Heading</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QgsSpinBox" name="locate_heading">
+                  <property name="maximum">
+                   <number>360</number>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="0">
+                 <widget class="QLabel" name="label_47">
+                  <property name="text">
+                   <string>Heading +/-</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="1" column="1">
+                 <widget class="QgsSpinBox" name="locate_heading_tol">
+                  <property name="maximum">
+                   <number>360</number>
+                  </property>
                  </widget>
                 </item>
                </layout>
@@ -1855,6 +1932,11 @@
    <class>QgsMapLayerComboBox</class>
    <extends>QComboBox</extends>
    <header>qgsmaplayercombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QgsSpinBox</class>
+   <extends>QSpinBox</extends>
+   <header>qgsspinbox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

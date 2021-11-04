@@ -24,15 +24,14 @@
  ***************************************************************************/
 """
 
-from PyQt5.QtWidgets import QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox
+from qgis.PyQt.QtWidgets import QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox, QListWidget
 
 
-def get_locations(routing_fromline_list):
+def get_locations(routing_fromline_list: QListWidget, radius: int = 0, heading: int = 0, heading_tol: int = 0):
     """
     Extracts locations from GUI.
 
     :param routing_fromline_list: The GUI point list.
-    :type routing_fromline_list: QListWidget
 
     :returns: formatted list of locations as Valhalla expects it, i.e. [{"lat": y, "lon": x}, {...}].
     :rtype: list of dict
@@ -43,7 +42,18 @@ def get_locations(routing_fromline_list):
         param, coords = item.split(":")
         coords = coords.split(', ')
 
-        locations.append({'lon': float(coords[0]), 'lat': float(coords[1])})
+        loc = {
+            'lon': float(coords[0]),
+            'lat': float(coords[1]),
+            'radius': radius,
+        }
+
+        if heading:
+            loc['heading'] = heading
+        if heading_tol:
+            loc['heading_tolerance'] = heading_tol
+
+        locations.append(loc)
 
     return locations
 
