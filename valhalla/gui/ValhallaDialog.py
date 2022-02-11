@@ -23,6 +23,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import datetime
 import json
 import webbrowser
 from shutil import which
@@ -267,6 +268,19 @@ class ValhallaDialogMain:
         extra_params = {}
         if extra_params_text:
             extra_params = json.loads(extra_params_text)
+        # get the timing info
+        time_params = dict()
+        if self.dlg.routing_time_options_group.isChecked():
+            date_time = datetime.datetime.now().replace(second=0, microsecond=0).isoformat()
+            time_type = 0  # right now, ie realtime
+            if self.dlg.datetime_departure.isChecked():
+                time_type = 1
+            elif self.dlg.datetime_arrival.isChecked():
+                time_type = 2
+            time_params = {"date_time": {
+                "type": time_type,
+                "value": date_time
+            }}
         try:
             if method == 'route':
                 layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", f"Route {profile.capitalize()}", "memory")
@@ -276,6 +290,7 @@ class ValhallaDialogMain:
                 directions = directions_gui.Directions(self.dlg)
                 params = directions.get_parameters()
                 params.update(extra_params)
+                params.update(time_params)
                 response = clnt.request('/route', {}, post_json=params)
                 feat = directions_core.get_output_feature_directions(
                     response,
@@ -309,6 +324,7 @@ class ValhallaDialogMain:
                     isochrones_ui = isochrones_gui.Isochrones(self.dlg)
                     params = isochrones_ui.get_parameters(metric)  # change once isodistances are there too
                     params.update(extra_params)
+                    params.update(time_params)
 
                     name = 'Isodistance' if metric == 'distance' else 'Isochrone'
                     layer_out = QgsVectorLayer(f"{geometry_type}?crs=EPSG:4326", f"{name} {params['costing']}", "memory")
