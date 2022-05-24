@@ -226,6 +226,11 @@
             </item>
             <item>
              <property name="text">
+              <string>trace_attributes</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
               <string>locate</string>
              </property>
             </item>
@@ -237,6 +242,11 @@
             <item>
              <property name="text">
               <string>extract-osm</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string/>
              </property>
             </item>
            </widget>
@@ -353,6 +363,16 @@
             <property name="icon">
              <iconset>
               <normaloff>:/plugins/Valhalla/img/icon_add.png</normaloff>:/plugins/Valhalla/img/icon_add.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QToolButton" name="routing_import_locations">
+            <property name="text">
+             <string>...</string>
+            </property>
+            <property name="icon">
+             <iconset theme=":images/themes/default/mActionSharingImport.svg"/>
             </property>
            </widget>
           </item>
@@ -1806,7 +1826,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>28</height>
+              <height>22</height>
              </size>
             </property>
             <property name="toolTip">
@@ -1911,7 +1931,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>28</height>
+       <height>22</height>
       </size>
      </property>
      <property name="title">

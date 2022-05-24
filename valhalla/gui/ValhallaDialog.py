@@ -28,6 +28,7 @@ import json
 import webbrowser
 from shutil import which
 
+from PyQt5.QtWidgets import QInputDialog
 from qgis.PyQt.QtWidgets import (QAction,
                              QDialog,
                              QApplication,
@@ -45,11 +46,11 @@ from qgis.core import (QgsProject,
 from qgis.gui import QgsMapCanvasAnnotationItem
 import processing
 
-from . import resources_rc
+from . import resources_rc, trace_attributes_gui
 
 from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, DEFAULT_COLOR, __version__, __email__, __web__, __help__
 from valhalla.utils import exceptions, maptools, logger, configmanager, transform
-from valhalla.common import client, directions_core, isochrones_core, matrix_core, gravity_core
+from valhalla.common import client, directions_core, isochrones_core, matrix_core, gravity_core, trace_attributes_core
 from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui, identify_gui
 from valhalla.gui.common_gui import get_locations
 
@@ -450,6 +451,29 @@ class ValhallaDialogMain:
                 self.project.addMapLayer(layer_routes)
                 self.project.addMapLayer(layer_gravity)
 
+            elif method == 'trace_attributes':
+                layer_edges = QgsVectorLayer("LineString?crs=EPSG:4326", f"Trace Edges {profile}", "memory")
+                layer_points = QgsVectorLayer("Point?crs=EPSG:4326", f"Trace Points {profile}", "memory")
+                layer_edges.dataProvider().addAttributes(trace_attributes_core.get_fields('edge'))
+                layer_points.dataProvider().addAttributes(trace_attributes_core.get_fields('point'))
+                layer_edges.updateFields()
+                layer_points.updateFields()
+
+                trace_attributes = trace_attributes_gui.TraceAttributes(self.dlg)
+                params = trace_attributes.get_parameters()
+                params.update(extra_params)
+
+                response = clnt.request('/trace_attributes', {}, post_json=params)
+                edge_feats, point_feats = trace_attributes_core.get_output_features(response)
+
+                layer_edges.dataProvider().addFeatures(edge_feats)
+                layer_points.dataProvider().addFeatures(point_feats)
+                layer_edges.updateExtents()
+                layer_points.updateExtents()
+
+                self.project.addMapLayer(layer_edges)
+                self.project.addMapLayer(layer_points)
+
         except exceptions.Timeout as e:
             msg = "The connection has timed out!"
             logger.log(msg, 2)
@@ -530,9 +554,23 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
         self.routing_fromline_clear.clicked.connect(self._on_clear_listwidget_click)
+        self.routing_import_locations.clicked.connect(self._on_import_locations_click)
 
         # Extra params
         self.extra_params_button.clicked.connect(self.dlg_params.exec_)
+
+    def _on_import_locations_click(self):
+        """Imports valhalla locations as JSON to location table input"""
+        raw_json, ok = QInputDialog.getText(
+            self,
+            'Import Valhalla locations',
+            'Valhalla locations as JSON array',
+        )
+        if ok:
+            j = json.loads(raw_json)
+            self.routing_fromline_list.clear()
+            for idx, loc in enumerate(j):
+                self.routing_fromline_list.addItem("Point {0}: {1:.6f}, {2:.6f}".format(idx, loc['lon'], loc['lat']))
 
     def _on_prov_refresh_click(self):
         """Populates provider dropdown with fresh list from config.yml"""

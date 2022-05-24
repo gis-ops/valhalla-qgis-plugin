@@ -45,9 +45,10 @@ def get_locations(routing_fromline_list: QListWidget, radius: int = 0, heading: 
         loc = {
             'lon': float(coords[0]),
             'lat': float(coords[1]),
-            'radius': radius,
         }
 
+        if radius:
+            loc['radius'] = radius
         if heading:
             loc['heading'] = heading
         if heading_tol:
