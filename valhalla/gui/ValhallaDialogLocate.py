@@ -26,7 +26,7 @@
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtWidgets import QDialog
 
-from .ValhallaLocateDialog import Ui_VahallaLocateDialog
+from .ValhallaLocateDialog_ui import Ui_VahallaLocateDialog
 
 
 class ValhallaDialogLocateMain(QDialog, Ui_VahallaLocateDialog):

@@ -23,6 +23,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+from qgis.gui import QgsSpinBox
 
 from valhalla.gui.common_gui import get_locations, get_costing_options
 
@@ -50,13 +51,18 @@ class Locate:
         # API parameters
         profile = self.dlg.routing_travel_combo.currentText()
 
+        radius = self.dlg.locate_radius.value()
+        verbose = self.dlg.locate_verbose.isChecked()
+        heading = self.dlg.locate_heading.value()
+        heading_tolerance = self.dlg.locate_heading_tol.value()
+
         params = {
             'costing': profile,
-            'verbose': True,
+            'verbose': verbose,
             'id': 1,
         }
 
-        self.locations = get_locations(self.dlg.routing_fromline_list)
+        self.locations = get_locations(self.dlg.routing_fromline_list, radius=radius, heading=heading, heading_tol=heading_tolerance)
         params['locations'] = self.locations
 
         # Get Advanced parameters

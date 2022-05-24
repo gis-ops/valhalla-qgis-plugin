@@ -25,7 +25,7 @@
 """
 from PyQt5.QtWidgets import QDialog
 
-from .ValhallaExtraParamsDialogUI import Ui_ValhallaExtraParams
+from .ValhallaExtraParamsDialogUI_ui import Ui_ValhallaExtraParams
 
 
 class ValhallaDialogExtraParams(QDialog, Ui_ValhallaExtraParams):

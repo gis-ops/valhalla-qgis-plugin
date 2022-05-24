@@ -23,6 +23,7 @@
  *                                                                         *
  ***************************************************************************/
 """
+import datetime
 import json
 import webbrowser
 from shutil import which
@@ -52,7 +53,7 @@ from valhalla.common import client, directions_core, isochrones_core, matrix_cor
 from valhalla.gui import directions_gui, isochrones_gui, matrix_gui, locate_gui, identify_gui
 from valhalla.gui.common_gui import get_locations
 
-from .ValhallaDialogUI import Ui_ValhallaDialogBase
+from .ValhallaDialogUI_ui import Ui_ValhallaDialogBase
 from .ValhallaDialogConfig import ValhallaDialogConfigMain
 from .ValhallaDialogLocate import ValhallaDialogLocateMain
 from .ValhallaExtraParamsDialog import ValhallaDialogExtraParams
@@ -201,6 +202,7 @@ class ValhallaDialogMain:
             self.dlg.global_buttons.accepted.connect(self.run_gui_control)
             self.dlg.global_buttons.rejected.connect(self._cleanup_annotations)
             self.dlg.avoidlocation_dropdown.setFilters(QgsMapLayerProxyModel.PointLayer)
+            self.dlg.avoidpolygons_dropdown.setFilters(QgsMapLayerProxyModel.PolygonLayer)
 
             providers = configmanager.read_config()['providers']
             self.dlg.provider_combo.clear()
@@ -266,6 +268,19 @@ class ValhallaDialogMain:
         extra_params = {}
         if extra_params_text:
             extra_params = json.loads(extra_params_text)
+        # get the timing info
+        time_params = dict()
+        if self.dlg.routing_time_options_group.isChecked():
+            date_time = datetime.datetime.now().replace(second=0, microsecond=0).isoformat()
+            time_type = 0  # right now, ie realtime
+            if self.dlg.datetime_departure.isChecked():
+                time_type = 1
+            elif self.dlg.datetime_arrival.isChecked():
+                time_type = 2
+            time_params = {"date_time": {
+                "type": time_type,
+                "value": date_time
+            }}
         try:
             if method == 'route':
                 layer_out = QgsVectorLayer("LineString?crs=EPSG:4326", f"Route {profile.capitalize()}", "memory")
@@ -275,6 +290,7 @@ class ValhallaDialogMain:
                 directions = directions_gui.Directions(self.dlg)
                 params = directions.get_parameters()
                 params.update(extra_params)
+                params.update(time_params)
                 response = clnt.request('/route', {}, post_json=params)
                 feat = directions_core.get_output_feature_directions(
                     response,
@@ -308,6 +324,7 @@ class ValhallaDialogMain:
                     isochrones_ui = isochrones_gui.Isochrones(self.dlg)
                     params = isochrones_ui.get_parameters(metric)  # change once isodistances are there too
                     params.update(extra_params)
+                    params.update(time_params)
 
                     name = 'Isodistance' if metric == 'distance' else 'Isochrone'
                     layer_out = QgsVectorLayer(f"{geometry_type}?crs=EPSG:4326", f"{name} {params['costing']}", "memory")
