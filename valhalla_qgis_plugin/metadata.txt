@@ -1,0 +1,49 @@
+[general]
+name=Valhalla
+qgisMinimumVersion=3.0
+qgisMaximumVersion=3.99
+description=Valhalla routing, isochrones and matrix calculations for QGIS
+
+version=3.0.0
+author=GIS • OPS UG
+email=nils@gis-ops.com
+
+experimental=False
+deprecated=False
+hasProcessingProvider=True
+
+about=Valhalla provides access to most of the functions of the open-source Valhalla routing engine.
+    The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from Point/LineString files within the processing framework.
+    Extensive attributes are set for output files, incl. duration, length and start/end locations.
+
+    The plugin accesses remote or local Valhalla HTTP APIs. If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
+
+changelog=2022/06/07 v3.0.0 BREAKING: rename directory to valhalla_qgis_plugin to avoid clashing with pyvalhalla. Implement centroid endpoint; fixed #2; avoid_polygons; enhance /locate to accept heading & radius
+    2020/01/08 v2.1.0 Isodistances are in master now; add shortest to all processing algos
+    2020/12/18 v2.0.2 Remove isodistances until they are implemented
+    2020/12/15 v2.0.1 Some UI elements were not compiled to latest
+    2020/12/01 v2.0.0 Publish QGIS Plugin
+    2020/12/01 v1.6.1 Properly implement isodistances
+    2020/12/01 v1.6.0 Implement isodistances
+    2020/09/15 v1.5.0 Change to QgsNetworkAccessManager; add Extra Params dialog
+    2020/08/27 v1.4.1 Implement shortest for valhalla dev
+    2019/12/14 v1.4.0 Implement Point output for isochrones' show_locations
+    2019/11/20 v1.3.0 Add support to aggregate isochrones for multiple locations
+    2019/10/20 v1.2.2 Lines proc algo had a minor avoid_layer bug
+    2019/10/14 v1.2.1 Proc algos weren't converting length/width to feet
+    2019/10/14 v1.2.0 Implement identify method to retrieve OSM tags via locate endpoint. Requires osmium installed.
+    2019/10/14 v1.1.1 Truck costing was pedestrian in some algos
+    2019/10/14 v1.1.0 implemented locate endpoint
+    2019/10/05 v1.0.2 width/length are now in feet, as Valhalla expects it (off..)
+    2019/10/05 v1.0.1 rename processing algos
+    2019/10/05 v1.0.0 first version
+
+tracker=https://github.com/gis-ops/valhalla-qgis-plugin/issues
+repository=https://github.com/gis-ops/valhalla-qgis-plugin.git
+help=https://gis-ops.com/valhalla-qgis-plugin/
+
+homepage=https://gis-ops.com/valhalla-qgis-plugin/
+category=Web
+icon=gui/img/icon_valhalla.png
+
+tags=routing, OSM, openstreetmap, valhalla, isochrone, route, matrix, processing

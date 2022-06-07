@@ -1,0 +1,7 @@
+providers:
+- base_url: http://localhost:8002
+  key: ''
+  name: localhost
+- base_url: https://valhalla1.openstreetmap.de
+  key: ''
+  name: FOSSGIS
