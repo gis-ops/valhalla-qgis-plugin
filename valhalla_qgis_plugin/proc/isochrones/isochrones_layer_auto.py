@@ -361,8 +361,8 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         feat_count = source.featureCount() if not intervals_time else source.featureCount() * 2
 
         self.intervals = {
-            "time": [{"time": int(x)} for x in intervals_time.split(',')] if intervals_time else [],
-            "distance": [{"distance": int(x)} for x in intervals_distance.split(',')] if intervals_distance else []
+            "time": [{"time": float(x)} for x in intervals_time.split(',')] if intervals_time else [],
+            "distance": [{"distance": float(x)} for x in intervals_distance.split(',')] if intervals_distance else []
         }
 
         counter = 0
