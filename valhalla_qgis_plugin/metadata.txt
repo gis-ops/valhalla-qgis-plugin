@@ -18,7 +18,7 @@ about=Valhalla provides access to most of the functions of the open-source Valha
 
     The plugin accesses remote or local Valhalla HTTP APIs. If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
 
-changelog=2022/06/07 v3.0.0 BREAKING: rename directory to valhalla_qgis_plugin to avoid clashing with pyvalhalla. Implement centroid endpoint; fixed #2; avoid_polygons; enhance /locate to accept heading & radius
+changelog=2022/06/07 v3.0.0 BREAKING: rename directory to valhalla_qgis_plugin to avoid clashing namespaces with pyvalhalla. Implement centroid endpoint; fixed #2; avoid_polygons; enhance /locate to accept heading & radius; add time options
     2020/01/08 v2.1.0 Isodistances are in master now; add shortest to all processing algos
     2020/12/18 v2.0.2 Remove isodistances until they are implemented
     2020/12/15 v2.0.1 Some UI elements were not compiled to latest
