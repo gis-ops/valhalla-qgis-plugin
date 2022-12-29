@@ -144,7 +144,7 @@ class Isochrones():
                 feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
             feat.setAttributes([
                 id_field_value,
-                int(iso_value),
+                float(iso_value),
                 self.profile,
                 json.dumps(options),
                 'time'
@@ -248,7 +248,7 @@ class Isochrones():
                 symbol.changeSymbolLayer(0, symbol_layer)
 
             # create renderer object
-            category = QgsRendererCategory(unique_value, symbol, str(unique_value) + ' mins')
+            category = QgsRendererCategory(unique_value, symbol, str(unique_value) + ' mins' if metric == "time" else " km")
             # entry for the list of category items
             categories.append(category)
 

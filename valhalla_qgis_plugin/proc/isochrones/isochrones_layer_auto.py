@@ -94,7 +94,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
         self.providers = configmanager.read_config()['providers']
         self.costing_options = self.COSTING()
         self.intervals = None  # will be populated with the intervals available
-        self.isos_time_id, self.isos_dist_id, self.points_input_id, self.points_snapped_id= None, None, None, None
+        self.isos_time_id, self.isos_dist_id, self.points_input_id, self.points_snapped_id = None, None, None, None
 
 
     def initAlgorithm(self, configuration, p_str=None, Any=None, *args, **kwargs):
