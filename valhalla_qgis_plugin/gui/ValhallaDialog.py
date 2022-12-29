@@ -272,7 +272,7 @@ class ValhallaDialogMain:
         # get the timing info
         time_params = dict()
         if self.dlg.routing_time_options_group.isChecked():
-            date_time = datetime.datetime.now().replace(second=0, microsecond=0).isoformat()
+            date_time = datetime.datetime.now().replace(second=0, microsecond=0).isoformat(timespec="minutes")
             time_type = 0  # right now, ie realtime
             if self.dlg.datetime_departure.isChecked():
                 time_type = 1
