@@ -28,21 +28,21 @@ import json
 import webbrowser
 from shutil import which
 
-from PyQt5.QtWidgets import QInputDialog
 from qgis.PyQt.QtWidgets import (QAction,
                              QDialog,
                              QApplication,
                              QMenu,
                              QMessageBox,
-                             QDialogButtonBox)
+                             QDialogButtonBox,
+                             QInputDialog,
+                             QAbstractButton)
 from qgis.PyQt.QtGui import QIcon, QTextDocument
 from qgis.PyQt.QtCore import QSizeF, QPointF
 
 from qgis.core import (QgsProject,
                        QgsVectorLayer,
                        QgsTextAnnotation,
-                       QgsMapLayerProxyModel,
-                       QgsCoordinateReferenceSystem)
+                       QgsMapLayerProxyModel)
 from qgis.gui import QgsMapCanvasAnnotationItem
 import processing
 
@@ -550,6 +550,7 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
         self.help_button.clicked.connect(on_help_click)
         self.about_button.clicked.connect(lambda: on_about_click(parent=self._iface.mainWindow()))
         self.provider_refresh.clicked.connect(self._on_prov_refresh_click)
+        self.time_button_group.buttonToggled.connect(self._on_time_button_toggle)
 
         # Routing tab
         self.routing_fromline_map.clicked.connect(self._on_linetool_init)
@@ -558,6 +559,14 @@ class ValhallaDialog(QDialog, Ui_ValhallaDialogBase):
 
         # Extra params
         self.extra_params_button.clicked.connect(self.dlg_params.exec_)
+
+    def _on_time_button_toggle(self, button: QAbstractButton, is_checked: bool):
+        if button.objectName() == "datetime_now" and is_checked:
+            self.datetime_date.setEnabled(False)
+            self.datetime_time.setEnabled(False)
+        elif button.objectName() != "datetime_now" and is_checked:
+            self.datetime_date.setEnabled(True)
+            self.datetime_time.setEnabled(True)
 
     def _on_import_locations_click(self):
         """Imports valhalla locations as JSON to location table input"""

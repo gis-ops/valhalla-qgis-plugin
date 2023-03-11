@@ -5,3 +5,6 @@ providers:
 - base_url: https://valhalla1.openstreetmap.de
   key: ''
   name: FOSSGIS
+- base_url: http://116.202.182.93:8002
+  key: ''
+  name: hetzner
