@@ -24,6 +24,6 @@
  ***************************************************************************/
 """
 import os.path
-from valhalla import BASE_DIR
+from .. import BASE_DIR
 
 HELP_DIR = os.path.join(BASE_DIR, 'help')

@@ -37,7 +37,7 @@ from qgis.PyQt.QtWidgets import (QAction,
                              QInputDialog,
                              QAbstractButton)
 from qgis.PyQt.QtGui import QIcon, QTextDocument
-from qgis.PyQt.QtCore import QSizeF, QPointF
+from qgis.PyQt.QtCore import QSizeF, QPointF, Qt
 
 from qgis.core import (QgsProject,
                        QgsVectorLayer,
@@ -273,11 +273,15 @@ class ValhallaDialogMain:
         time_params = dict()
         if self.dlg.routing_time_options_group.isChecked():
             date_time = datetime.datetime.now().replace(second=0, microsecond=0).isoformat(timespec="minutes")
+            py_date = self.dlg.datetime_date.dateTime().toPyDateTime()
+            py_time = self.dlg.datetime_time.dateTime().toPyDateTime()
             time_type = 0  # right now, ie realtime
             if self.dlg.datetime_departure.isChecked():
                 time_type = 1
+                date_time = py_date.strftime("%Y-%m-%d") + "T" + py_time.strftime("%H:%M")
             elif self.dlg.datetime_arrival.isChecked():
                 time_type = 2
+                date_time = py_date.strftime("%Y-%m-%d") + "T" + py_time.strftime("%H:%M")
             time_params = {"date_time": {
                 "type": time_type,
                 "value": date_time
@@ -339,7 +343,7 @@ class ValhallaDialogMain:
                             layer_out.dataProvider().addFeature(feat)
 
                     layer_out.updateExtents()
-                    isochrones.stylePoly(layer_out, metric)
+                    # isochrones.stylePoly(layer_out, metric)
                     self.project.addMapLayer(layer_out)
 
                 if not no_points:

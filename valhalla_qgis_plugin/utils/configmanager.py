@@ -28,7 +28,7 @@ import os
 
 from PyQt5.QtWidgets import QMessageBox
 
-from valhalla import CONFIG_PATH
+from .. import CONFIG_PATH
 
 
 def read_config():

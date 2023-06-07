@@ -31,7 +31,7 @@ from qgis.core import (QgsWkbTypes)
 from qgis.gui import (QgsMapToolEmitPoint,
                       QgsRubberBand)
 
-from valhalla import DEFAULT_COLOR
+from .. import DEFAULT_COLOR
 
 
 class LineTool(QgsMapToolEmitPoint):

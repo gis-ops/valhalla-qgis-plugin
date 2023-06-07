@@ -26,7 +26,7 @@
 
 from qgis.core import QgsMessageLog, Qgis
 
-from valhalla import PLUGIN_NAME
+from .. import PLUGIN_NAME
 
 def log(message, level_in=0):
     """
