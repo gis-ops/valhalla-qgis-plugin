@@ -25,6 +25,7 @@
 """
 import os.path
 from copy import deepcopy
+from typing import Optional
 
 from PyQt5.QtGui import QIcon
 
@@ -390,24 +391,26 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
                 if feedback.isCanceled():
                     break
                 # If feature causes error, report and continue with next
+                exception: Optional[Exception] = None
                 try:
                     # Populate features from response
                     response = clnt.request('/isochrone', post_json=params)
-                except (exceptions.ApiError) as e:
-                    msg = "Feature ID {} caused a {}:\n{}".format(
-                        params['id'],
-                        e.__class__.__name__,
-                        str(e))
-                    feedback.reportError(msg)
-                    logger.log(msg, 2)
+                except exceptions.ApiError as e:
+                    exception = e
                     continue
-                except (exceptions.InvalidKey, exceptions.GenericServerError) as e:
-                    msg = "{}:\n{}".format(
-                        e.__class__.__name__,
-                        str(e))
-                    feedback.reportError(msg)
-                    logger.log(msg)
+                except Exception as e:
+                    exception = e
                     raise
+                finally:
+                    if exception:
+                        msg = "{}:\n{}".format(
+                            exception.__class__.__name__,
+                            str(exception))
+                        feedback.reportError(msg)
+                        logger.log(msg, 2)
+                        msg = f"Was caused by feature ID {params['id']} with parameters {params}"
+                        feedback.reportError(msg)
+                        logger.log(msg, 2)
 
                 options = {}
                 if params.get('costing_options'):
