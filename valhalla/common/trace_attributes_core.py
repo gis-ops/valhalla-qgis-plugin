@@ -48,6 +48,8 @@ def get_fields(t: str) -> QgsFields:
         fields.append(QgsField("SPEED", QVariant.Int))
         fields.append(QgsField("LENGTH", QVariant.Double))
         fields.append(QgsField("MEAN_ELEVATION", QVariant.Int))
+        fields.append(QgsField("SRC_PERC", QVariant.Double))
+        fields.append(QgsField("TARGET_PERC", QVariant.Double))
     else:
         fields.append(QgsField("TYPE", QVariant.String))
         fields.append(QgsField("EDGE_INDEX", QVariant.Double))
@@ -74,7 +76,9 @@ def get_output_features(response: dict) -> Tuple[List[QgsFeature], List[QgsFeatu
             edge['way_id'],
             edge['speed'],
             edge['length'],
-            edge['mean_elevation'],
+            edge.get('mean_elevation'),
+            edge.get('source_percent_along'),
+            edge.get('target_percent_along')
         ])
         edge_feats.append(feat)
 
