@@ -26,7 +26,7 @@
 from qgis.core import QgsApplication
 
 from .gui import ValhallaDialog
-from .proc import provider
+from .proc.provider import ValhallaProvider
 
 
 class Valhalla():
@@ -42,12 +42,15 @@ class Valhalla():
         :type iface: QgsInterface
         """
         self.dialog = ValhallaDialog.ValhallaDialogMain(iface)
-        self.provider = provider.ValhallaProvider()
+        self.provider = None
+
+    def initProcessing(self):
+        self.provider = ValhallaProvider()
+        QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):
         """Create the menu entries and toolbar icons inside the QGIS GUI."""
-
-        QgsApplication.processingRegistry().addProvider(self.provider)
+        self.initProcessing()
         self.dialog.initGui()
         
     def unload(self):
