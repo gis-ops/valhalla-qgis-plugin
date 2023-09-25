@@ -4,7 +4,7 @@ QGIS Plugin providing access to most of the functions of the open-source Valhall
 
 The tool set includes routing, isochrones and matrix calculations, either interactive in the map canvas or from Point/LineString files within the processing framework. Extensive attributes are set for output files, incl. duration, length and start/end locations.
 
-The plugin accesses remote or local Valhalla HTTP APIs. It has Mapbox and `localhost` pre-configured. Note, you'll need a Mapbox access token before you can use their service.
+The plugin accesses remote or local Valhalla HTTP APIs. It has the [FOSSGIS server](https://valhalla.openstreetmap.de/) and `localhost` pre-configured.
 
 If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
 
