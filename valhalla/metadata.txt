@@ -18,7 +18,7 @@ about=Valhalla provides access to most of the functions of the open-source Valha
 
     The plugin accesses remote or local Valhalla HTTP APIs. If you want to quickly get a local setup, try our Valhalla Docker image: https://github.com/gis-ops/docker-valhalla.
 
-changelog=2023/04/29 v2.4.2 Fix some datetime stuff, CAREFUL: will remove iso poly styling
+changelog=2023/04/29 v2.4.2 Fix some datetime & processing stuff, CAREFUL: will remove iso poly styling
     2023/04/29 v2.4.1 Bit more logging for isochrone processing algos
     2023/03/12 v2.4.0 Add multimodal routing for debugging; fix time options
     2022/12/28 v2.3.0 Implement centroid endpoint; fixed #2; avoid_polygons; enhance /locate to accept heading & radius; add time options
