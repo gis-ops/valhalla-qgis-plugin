@@ -473,7 +473,7 @@ class ValhallaIsochronesCarAlgo(QgsProcessingAlgorithm):
             processed_layer = QgsProcessingUtils.mapLayerFromString(layer_id, context)
 
             if processed_layer:
-                self.isochrones.stylePoly(processed_layer, metric)
+                # self.isochrones.stylePoly(processed_layer, metric)
                 result[out_id] = layer_id
 
         return result

@@ -34,7 +34,7 @@ from qgis.core import (QgsPointXY,
                        QgsFields,
                        QgsField)
 
-from valhalla.utils import convert
+from ..utils import convert
 
 
 def get_request_point_features(route_dict, row_by_row):

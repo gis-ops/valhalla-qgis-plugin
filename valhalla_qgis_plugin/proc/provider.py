@@ -27,7 +27,7 @@
 from PyQt5.QtGui import QIcon
 from qgis.core import QgsProcessingProvider
 
-from valhalla import RESOURCE_PREFIX, PLUGIN_NAME, __version__
+from .. import RESOURCE_PREFIX, PLUGIN_NAME, __version__
 from .directions_lines.directions_lines_auto import ValhallaRouteLinesCarAlgo
 from .directions_lines.directions_lines_truck import ValhallaRouteLinesTruckAlgo
 from .directions_lines.directions_lines_bicycle import ValhallaRouteLinesBicycleAlgo
