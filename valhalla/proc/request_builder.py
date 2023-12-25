@@ -103,7 +103,7 @@ def get_costing_options(costing_options, profile, mode):
         for cost in costing_options:
             if cost[1]:
                 if cost[0] in [TRUCK_COSTING.WIDTH, TRUCK_COSTING.LENGTH]:  # Temp bcs of Valhalla issue
-                    params[profile][cost[0]] = round(cost[1] / 3.28084, 2)
+                    params[profile][cost[0]] = cost[1]
                 else:
                     params[profile][cost[0]] = cost[1]
         if mode == 'Shortest':

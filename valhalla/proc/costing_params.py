@@ -239,15 +239,14 @@ class CostingTruck:
                 )
             )
 
-        # Boolean hazmat
         setattr(
             self,
             TRUCK_COSTING.HAZMAT,
-            proc_algo.parameterAsBool(
+            bool(proc_algo.parameterAsBool(
                 parameters,
                 TRUCK_COSTING.HAZMAT,
                 context
-            )
+            ))
         )
 
     @staticmethod
@@ -308,6 +307,7 @@ class CostingTruck:
             QgsProcessingParameterBoolean(
                 name=TRUCK_COSTING.HAZMAT,
                 description="Hazardous materials",
+                defaultValue=False,
                 optional=True,
             )
         )

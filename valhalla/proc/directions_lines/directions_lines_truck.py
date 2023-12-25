@@ -23,7 +23,7 @@
  *                                                                         *
  ***************************************************************************/
 """
-from ..costing_params import CostingPedestrian
+from ..costing_params import CostingTruck
 from .directions_lines_auto import ValhallaRouteLinesCarAlgo
 
 
@@ -33,7 +33,7 @@ class ValhallaRouteLinesTruckAlgo(ValhallaRouteLinesCarAlgo):
     ALGO_NAME = 'directions_from_polylines_truck'
     ALGO_NAME_LIST = ALGO_NAME.split('_')
 
-    COSTING = CostingPedestrian
+    COSTING = CostingTruck
     PROFILE = 'truck'
 
     def createInstance(self):
