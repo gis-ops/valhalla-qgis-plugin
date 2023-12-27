@@ -73,21 +73,18 @@ def get_costing_options(costing_group, profile):
     :rtype: dict
     """
 
-    costing_widgets = costing_group.findChildren((QComboBox, QSpinBox, QDoubleSpinBox))
+    costing_widgets = costing_group.findChildren((QComboBox, QSpinBox, QDoubleSpinBox, QCheckBox))
     costing_widgets = [o for o in costing_widgets if profile in o.objectName()]
 
     costing_options = dict()
     for widget in costing_widgets:
         param_name = widget.objectName().replace(profile + '_', '')
         if isinstance(widget, (QDoubleSpinBox, QSpinBox)):
-            if widget.objectName() == 'truck_length' or widget.objectName() == 'truck_width':
-                costing_options[param_name] = round(widget.value() / 3.28084, 2)
-            else:
-                costing_options[param_name] = widget.value()
+            costing_options[param_name] = widget.value()
         if isinstance(widget, QComboBox):
             if widget.currentText():
                 costing_options[param_name] = widget.currentText()
         if isinstance(widget, QCheckBox):
-            costing_group[param_name] = widget.isChecked()
+            costing_options[param_name] = widget.isChecked()
 
     return costing_options
