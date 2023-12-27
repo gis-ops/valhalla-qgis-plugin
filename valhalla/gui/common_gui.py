@@ -80,10 +80,7 @@ def get_costing_options(costing_group, profile):
     for widget in costing_widgets:
         param_name = widget.objectName().replace(profile + '_', '')
         if isinstance(widget, (QDoubleSpinBox, QSpinBox)):
-            if widget.objectName() == 'truck_length' or widget.objectName() == 'truck_width':
-                costing_options[param_name] = widget.value()
-            else:
-                costing_options[param_name] = widget.value()
+            costing_options[param_name] = widget.value()
         if isinstance(widget, QComboBox):
             if widget.currentText():
                 costing_options[param_name] = widget.currentText()
