@@ -126,22 +126,37 @@ class Isochrones():
         :rtype: QgsFeature
         """
 
-        features = [feature for feature in self.response['features'] if feature['geometry']['type'] in ('LineString', 'Polygon')]
-
+        features = [feature for feature in self.response['features'] if feature['geometry']['type'] in ('LineString', 'Polygon', 'MultiPolygon')]
         # Sort features based on the isochrone value, so that longest isochrone
         # is added first. This will plot the isochrones on top of each other.
         l = lambda x: x['properties']['contour']
         for isochrone in sorted(features, key=l, reverse=True):
             feat = QgsFeature()
             coordinates = isochrone['geometry']['coordinates']
+            geom_type = isochrone['geometry']['type']
             iso_value = isochrone['properties']['contour']
-            #metric = isochrone['properties']['metric']
-            if self.geometry == 'Polygon':
-                qgis_coords = [[QgsPointXY(coord[0], coord[1]) for coord in coordinates[0]]]
+            qgis_coords = []
+            if geom_type == 'Polygon':
+                for ring in coordinates:
+                    ring_coords = []
+                    for coord in ring:
+                        ring_coords.append(QgsPointXY(coord[0], coord[1]))
+                    qgis_coords.append(ring_coords)
                 feat.setGeometry(QgsGeometry.fromPolygonXY(qgis_coords))
-            if self.geometry == 'LineString':
+            if geom_type == 'LineString':
                 qgis_coords = [QgsPointXY(coord[0], coord[1]) for coord in coordinates]
                 feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
+            if geom_type == 'MultiPolygon':
+                for poly in coordinates:
+                    poly_coords = []
+                    for ring in poly:
+                        ring_coords = []
+                        for coord in ring:
+                            ring_coords.append(QgsPointXY(coord[0], coord[1]))
+                        poly_coords.append(ring_coords)
+                    qgis_coords.append(poly_coords)
+                feat.setGeometry(QgsGeometry.fromMultiPolygonXY(qgis_coords))
+
             feat.setAttributes([
                 id_field_value,
                 float(iso_value),

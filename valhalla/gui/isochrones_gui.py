@@ -72,9 +72,9 @@ class Isochrones:
             'id': 1,
         }
 
-        if denoise:
+        if denoise is not None:
             params['denoise'] = denoise
-        if generalize:
+        if generalize is not None:
             params['generalize'] = generalize
 
         # Get Advanced parameters
