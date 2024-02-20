@@ -343,7 +343,6 @@ class ValhallaDialogMain:
                             layer_out.dataProvider().addFeature(feat)
 
                     layer_out.updateExtents()
-                    # isochrones.stylePoly(layer_out, metric)
                     self.project.addMapLayer(layer_out)
 
                 if not no_points:
