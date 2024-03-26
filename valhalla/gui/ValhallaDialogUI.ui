@@ -548,7 +548,7 @@
              <string>Method configuration</string>
             </property>
             <property name="collapsed">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
             <property name="saveCollapsedState">
              <bool>false</bool>
@@ -763,6 +763,35 @@
               </widget>
              </item>
              <item>
+              <widget class="QgsCollapsibleGroupBox" name="matrix_group">
+               <property name="title">
+                <string>Matrix</string>
+               </property>
+               <property name="collapsed">
+                <bool>true</bool>
+               </property>
+               <layout class="QFormLayout" name="formLayout_3">
+                <item row="0" column="0">
+                 <widget class="QLabel" name="label_51">
+                  <property name="text">
+                   <string>Geometries</string>
+                  </property>
+                 </widget>
+                </item>
+                <item row="0" column="1">
+                 <widget class="QCheckBox" name="matrix_geometries">
+                  <property name="text">
+                   <string/>
+                  </property>
+                  <property name="checked">
+                   <bool>true</bool>
+                  </property>
+                 </widget>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item>
               <widget class="QgsCollapsibleGroupBox" name="mGroupBox_12">
                <property name="toolTip">
                 <string>Extract OSM roads and their attributes from a locally available OSM PBF file. Needs osmium!!</string>
@@ -828,6 +857,9 @@
               <widget class="QgsCollapsibleGroupBox" name="mGroupBox_13">
                <property name="title">
                 <string>Locate</string>
+               </property>
+               <property name="collapsed">
+                <bool>true</bool>
                </property>
                <layout class="QFormLayout" name="formLayout">
                 <item row="2" column="0">
@@ -1838,7 +1870,7 @@
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>27</height>
+              <height>24</height>
              </size>
             </property>
             <property name="toolTip">
@@ -1943,7 +1975,7 @@
      <property name="maximumSize">
       <size>
        <width>16777215</width>
-       <height>27</height>
+       <height>24</height>
       </size>
      </property>
      <property name="title">
