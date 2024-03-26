@@ -364,22 +364,28 @@ class ValhallaDialogMain:
                     self.project.addMapLayer(point_layer)
 
             elif method == 'sources_to_targets':
-                layer_out = QgsVectorLayer("None", 'Matrix_Valhalla', "memory")
+                matrix_geometries = self.dlg.matrix_geometries.isChecked()
+                layer_out = QgsVectorLayer("LineString?crs=EPSG:4326" if matrix_geometries else "None", f'Matrix {profile.capitalize()}', "memory")
                 layer_out.dataProvider().addAttributes(matrix_core.get_fields())
                 layer_out.updateFields()
 
                 matrix = matrix_gui.Matrix(self.dlg)
                 params = matrix.get_parameters()
                 params.update(extra_params)
+                params.update(time_params)
+                if matrix_geometries:
+                    params["shape_format"] = "polyline6"
                 response = clnt.request('/sources_to_targets', post_json=params)
                 feats = matrix_core.get_output_features_matrix(
                     response,
                     profile,
-                    matrix.costing_options
+                    matrix.costing_options,
+                    matrix_geometries
                 )
                 for feat in feats:
                     layer_out.dataProvider().addFeature(feat)
 
+                layer_out.updateExtents()
                 self.project.addMapLayer(layer_out)
 
             elif method == 'locate':

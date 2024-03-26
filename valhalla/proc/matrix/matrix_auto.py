@@ -43,7 +43,7 @@ from qgis.core import (QgsWkbTypes,
 from .. import HELP_DIR
 from ... import RESOURCE_PREFIX, __help__
 from ...common import client, matrix_core
-from ...utils import configmanager, transform, exceptions,logger
+from ...utils import configmanager, transform, exceptions, logger
 from ..costing_params import CostingAuto
 from ..request_builder import get_locations, get_costing_options, get_avoid_locations
 
@@ -309,6 +309,7 @@ class ValhallaMatrixCarAlgo(QgsProcessingAlgorithm):
                     response,
                     self.PROFILE,
                     costing_params,
+                    False,
                     source_attributes,
                     destination_attributes
                 )

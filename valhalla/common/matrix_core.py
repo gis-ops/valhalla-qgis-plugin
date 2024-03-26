@@ -29,7 +29,11 @@ from PyQt5.QtCore import QVariant
 
 from qgis.core import (QgsFeature,
                        QgsFields,
-                       QgsField)
+                       QgsField,
+                       QgsPointXY,
+                       QgsGeometry)
+
+from valhalla.utils import convert, logger
 
 
 def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FROM_ID", to_name="TO_ID"):
@@ -63,7 +67,7 @@ def get_fields(from_type=QVariant.String, to_type=QVariant.String, from_name="FR
     return fields
 
 
-def get_output_features_matrix(response, profile, options={}, source_attrs=[], destination_attrs=[]):
+def get_output_features_matrix(response, profile, options={}, matrix_geometries=False, source_attrs=[], destination_attrs=[]):
     """
     Build output feature based on response attributes for directions endpoint.
 
@@ -76,19 +80,22 @@ def get_output_features_matrix(response, profile, options={}, source_attrs=[], d
     :param options: Costing options being used.
     :type options: dict
 
+    :param matrix_geometries: Whether we want geometries for each connection.
+    :type matrix_geometries: bool
+
     :param source_attrs: Attribute values of the source features.
     :type source_attrs: list of any
 
     :param destination_attrs: Attribute values of the destination features.
     :type destination_attrs: list of any
 
-    :returns: Ouput features with attributes and geometry set.
+    :returns: Output features with attributes and geometry set.
     :rtype: list of QgsFeature
     """
 
     feats = []
-    sources = response['sources'][0]
-    targets = response['targets'][0]
+    sources = response['sources']
+    targets = response['targets']
     for o, origin in enumerate(response['sources_to_targets']):
         try:
             from_id = source_attrs[o]
@@ -117,6 +124,10 @@ def get_output_features_matrix(response, profile, options={}, source_attrs=[], d
                 json.dumps(options),
                 ]
             )
+            if matrix_geometries and destination.get("shape"):
+                shape = destination.get("shape", "")
+                qgis_coords = [QgsPointXY(x, y) for y, x in convert.decode_polyline6(shape)]
+                feat.setGeometry(QgsGeometry.fromPolylineXY(qgis_coords))
             feats.append(feat)
 
     return feats
