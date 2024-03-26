@@ -43,6 +43,8 @@ class Matrix:
         """
         Builds parameters across directions functionalities.
 
+        :param bidirectional: If True, will treat all locations as sources and targets.
+            If False, will treat the first location as source and all other locations as targets.
         :returns: All parameter mappings except for coordinates.
         :rtype: dict
         """
@@ -57,8 +59,17 @@ class Matrix:
         }
 
         self.locations = get_locations(self.dlg.routing_fromline_list)
-        params['sources'] = self.locations
-        params['targets'] = self.locations
+        # figure out directionality for this request
+        if self.dlg.matrix_many_to_many.isChecked():
+            params['sources'] = self.locations
+            params['targets'] = self.locations
+        elif self.dlg.matrix_one_to_many.isChecked():
+            params['sources'] = self.locations[:1]
+            params['targets'] = self.locations[1:]
+        else:
+            # many to one
+            params['sources'] = self.locations[:-1]
+            params['targets'] = self.locations[-1:]
 
         # Get Advanced parameters
         if self.dlg.routing_costing_options_group.isChecked() or mode == 'shortest':
